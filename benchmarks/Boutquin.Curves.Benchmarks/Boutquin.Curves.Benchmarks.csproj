@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Boutquin.Curves.Benchmarks</RootNamespace>
+    <AssemblyName>Boutquin.Curves.Benchmarks</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
+    <ProjectReference Include="../../src/Boutquin.Curves.Core/Boutquin.Curves.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+</Project>

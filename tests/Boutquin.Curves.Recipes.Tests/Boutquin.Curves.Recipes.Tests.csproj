@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Boutquin.Curves.Recipes.Tests</RootNamespace>
+    <AssemblyName>Boutquin.Curves.Recipes.Tests</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
+    <ProjectReference Include="../../src/Boutquin.Curves.Recipes/Boutquin.Curves.Recipes.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Boutquin.MarketData.Abstractions" />
+    <PackageReference Include="Boutquin.MarketData.Calendars" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+</Project>

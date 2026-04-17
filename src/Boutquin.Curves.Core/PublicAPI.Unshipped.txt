@@ -1,0 +1,8 @@
+#nullable enable
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IForwardCurve!
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IForwardCurve!

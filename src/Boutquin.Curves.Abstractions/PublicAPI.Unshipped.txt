@@ -1,0 +1,3 @@
+#nullable enable
+Boutquin.Curves.Abstractions.Curves.IDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Abstractions.Curves.IForwardCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IForwardCurve!

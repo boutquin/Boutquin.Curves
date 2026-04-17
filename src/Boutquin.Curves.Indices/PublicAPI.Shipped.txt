@@ -1,0 +1,15 @@
+#nullable enable
+
+Boutquin.Curves.Indices.BenchmarkCatalog
+Boutquin.Curves.Indices.BenchmarkCatalog.Add(Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark! benchmark) -> Boutquin.Curves.Indices.BenchmarkCatalog!
+Boutquin.Curves.Indices.BenchmarkCatalog.All() -> System.Collections.Generic.IReadOnlyCollection<Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!>!
+Boutquin.Curves.Indices.BenchmarkCatalog.BenchmarkCatalog() -> void
+Boutquin.Curves.Indices.BenchmarkCatalog.GetRequired(Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName name) -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!
+Boutquin.Curves.Indices.FallbackAdjustedBenchmarkFactory
+Boutquin.Curves.Indices.StandardBenchmarks
+static Boutquin.Curves.Indices.BenchmarkCatalog.CreateDefault() -> Boutquin.Curves.Indices.BenchmarkCatalog!
+static Boutquin.Curves.Indices.FallbackAdjustedBenchmarkFactory.Create(string! name, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, Boutquin.MarketData.Abstractions.ReferenceData.Tenor tenor, string! calendarCode, string! dayCountCode) -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!
+static Boutquin.Curves.Indices.StandardBenchmarks.EurEstr() -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!
+static Boutquin.Curves.Indices.StandardBenchmarks.GbpSonia() -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!
+static Boutquin.Curves.Indices.StandardBenchmarks.UsdLibor3M() -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!
+static Boutquin.Curves.Indices.StandardBenchmarks.UsdSofr() -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!

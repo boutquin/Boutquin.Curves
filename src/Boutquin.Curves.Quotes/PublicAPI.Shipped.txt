@@ -1,0 +1,35 @@
+#nullable enable
+
+Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.BasisSwap = 7 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.Custom = 8 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.Deposit = 1 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.FixedFloatSwap = 6 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.Fra = 5 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.Ois = 2 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.OisFuture = 3 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.OvernightFixing = 0 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.MarketInstrumentType.StirFuture = 4 -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.NormalizedQuote
+Boutquin.Curves.Quotes.NormalizedQuote.ConventionCode.get -> string!
+Boutquin.Curves.Quotes.NormalizedQuote.ConventionCode.init -> void
+Boutquin.Curves.Quotes.NormalizedQuote.InstrumentType.get -> Boutquin.Curves.Quotes.MarketInstrumentType
+Boutquin.Curves.Quotes.NormalizedQuote.InstrumentType.init -> void
+Boutquin.Curves.Quotes.NormalizedQuote.Label.get -> string!
+Boutquin.Curves.Quotes.NormalizedQuote.Label.init -> void
+Boutquin.Curves.Quotes.NormalizedQuote.NormalizedQuote(Boutquin.Curves.Abstractions.Identifiers.QuoteId QuoteId, decimal Value, Boutquin.Curves.Quotes.QuoteValueType ValueType, Boutquin.Curves.Quotes.MarketInstrumentType InstrumentType, string! ConventionCode, string! Label) -> void
+Boutquin.Curves.Quotes.NormalizedQuote.QuoteId.get -> Boutquin.Curves.Abstractions.Identifiers.QuoteId
+Boutquin.Curves.Quotes.NormalizedQuote.QuoteId.init -> void
+Boutquin.Curves.Quotes.NormalizedQuote.Value.get -> decimal
+Boutquin.Curves.Quotes.NormalizedQuote.Value.init -> void
+Boutquin.Curves.Quotes.NormalizedQuote.ValueType.get -> Boutquin.Curves.Quotes.QuoteValueType
+Boutquin.Curves.Quotes.NormalizedQuote.ValueType.init -> void
+Boutquin.Curves.Quotes.QuoteNormalizer
+Boutquin.Curves.Quotes.QuoteNormalizer.Normalize(Boutquin.Curves.Abstractions.Quotes.MarketQuote! quote, Boutquin.Curves.Quotes.QuoteValueType valueType, Boutquin.Curves.Quotes.MarketInstrumentType instrumentType, string! conventionCode, string! label) -> Boutquin.Curves.Quotes.NormalizedQuote!
+Boutquin.Curves.Quotes.QuoteNormalizer.NormalizeForNode(Boutquin.Curves.Abstractions.Quotes.MarketQuote! quote, string! nodeType, Boutquin.Curves.Quotes.QuoteValueType rawValueType, string! conventionCode, string! label) -> Boutquin.Curves.Quotes.NormalizedQuote!
+Boutquin.Curves.Quotes.QuoteNormalizer.QuoteNormalizer() -> void
+Boutquin.Curves.Quotes.QuoteValueType
+Boutquin.Curves.Quotes.QuoteValueType.DiscountFactor = 3 -> Boutquin.Curves.Quotes.QuoteValueType
+Boutquin.Curves.Quotes.QuoteValueType.Price = 1 -> Boutquin.Curves.Quotes.QuoteValueType
+Boutquin.Curves.Quotes.QuoteValueType.Rate = 0 -> Boutquin.Curves.Quotes.QuoteValueType
+Boutquin.Curves.Quotes.QuoteValueType.Spread = 2 -> Boutquin.Curves.Quotes.QuoteValueType

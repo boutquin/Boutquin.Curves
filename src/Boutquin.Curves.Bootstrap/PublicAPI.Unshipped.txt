@@ -1,0 +1,51 @@
+#nullable enable
+Boutquin.Curves.Bootstrap.CurveCalibrationInput
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.CurveCalibrationInput(System.DateOnly ValuationDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>! Curves, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! ReferenceData, bool SkipValidation = false) -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.Curves.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>!
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.Curves.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.ReferenceData.get -> Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider!
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.ReferenceData.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.SkipValidation.get -> bool
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.SkipValidation.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.ValuationDate.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveCalibrationSpec(Boutquin.Curves.Abstractions.Identifiers.CurveName CurveName, Boutquin.Curves.Abstractions.Curves.CurveReference! CurveReference, Boutquin.Curves.Bootstrap.Definitions.CurveValueType ValueType, string! DayCountCode, Boutquin.Curves.Interpolation.InterpolationSettings! Interpolation, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.ResolvedNode!>! Nodes, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>? Jumps = null) -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveName.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveName.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveReference.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveReference.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.DayCountCode.get -> string!
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.DayCountCode.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Interpolation.get -> Boutquin.Curves.Interpolation.InterpolationSettings!
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Interpolation.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Jumps.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>?
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Jumps.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Nodes.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.ResolvedNode!>!
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Nodes.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.ValueType.get -> Boutquin.Curves.Bootstrap.Definitions.CurveValueType
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.ValueType.init -> void
+Boutquin.Curves.Bootstrap.ResolvedNode
+Boutquin.Curves.Bootstrap.ResolvedNode.ConventionCode.get -> string!
+Boutquin.Curves.Bootstrap.ResolvedNode.ConventionCode.init -> void
+Boutquin.Curves.Bootstrap.ResolvedNode.InstrumentType.get -> string!
+Boutquin.Curves.Bootstrap.ResolvedNode.InstrumentType.init -> void
+Boutquin.Curves.Bootstrap.ResolvedNode.Label.get -> string!
+Boutquin.Curves.Bootstrap.ResolvedNode.Label.init -> void
+Boutquin.Curves.Bootstrap.ResolvedNode.Rate.get -> decimal
+Boutquin.Curves.Bootstrap.ResolvedNode.Rate.init -> void
+Boutquin.Curves.Bootstrap.ResolvedNode.ResolvedNode(string! Label, Boutquin.MarketData.Abstractions.ReferenceData.Tenor Tenor, string! InstrumentType, string! ConventionCode, Boutquin.Curves.Abstractions.Curves.CurveReference! TargetCurve, decimal Rate) -> void
+Boutquin.Curves.Bootstrap.ResolvedNode.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Bootstrap.ResolvedNode.TargetCurve.init -> void
+Boutquin.Curves.Bootstrap.ResolvedNode.Tenor.get -> Boutquin.MarketData.Abstractions.ReferenceData.Tenor
+Boutquin.Curves.Bootstrap.ResolvedNode.Tenor.init -> void
+Boutquin.Curves.Bootstrap.PiecewiseBootstrapCalibrator.Calibrate(Boutquin.Curves.Bootstrap.CurveCalibrationInput! request) -> Boutquin.Curves.Bootstrap.CurveCalibrationResult!
+Boutquin.Curves.Bootstrap.Helpers.BasisSwapInstrumentHelper.BasisSwapInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
+Boutquin.Curves.Bootstrap.Helpers.DepositInstrumentHelper.DepositInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
+Boutquin.Curves.Bootstrap.Helpers.FixedFloatSwapInstrumentHelper.FixedFloatSwapInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
+Boutquin.Curves.Bootstrap.Helpers.FraInstrumentHelper.FraInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
+Boutquin.Curves.Bootstrap.Helpers.OisFutureInstrumentHelper.OisFutureInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue, Boutquin.Curves.Abstractions.Bootstrap.IConvexityAdjustment? convexityAdjustment = null) -> void
+Boutquin.Curves.Bootstrap.Helpers.OisInstrumentHelper.OisInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
+static Boutquin.Curves.Bootstrap.NodeSorter.Sort(System.Collections.Generic.IEnumerable<Boutquin.Curves.Bootstrap.ResolvedNode!>! nodes, System.DateOnly valuationDate) -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.ResolvedNode!>!
+Boutquin.Curves.Bootstrap.Validation.CurveCalibrationInputValidator
+static Boutquin.Curves.Bootstrap.Validation.CurveCalibrationInputValidator.Validate(Boutquin.Curves.Bootstrap.CurveCalibrationInput! input) -> Boutquin.Curves.Bootstrap.Validation.ValidationResult!

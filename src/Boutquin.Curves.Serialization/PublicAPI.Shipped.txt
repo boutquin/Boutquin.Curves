@@ -1,0 +1,61 @@
+#nullable enable
+
+Boutquin.Curves.Serialization.CalibrationReportExporter
+Boutquin.Curves.Serialization.CsvQuoteLoader
+Boutquin.Curves.Serialization.CurveGroupDefinitionJsonSerializer
+Boutquin.Curves.Serialization.CurveGroupDefinitionJsonSerializer.CurveGroupDefinitionJsonSerializer() -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Benchmark.get -> string?
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Benchmark.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Currency.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Currency.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.CurveDefinitionDto(string! CurveName, string! Role, string! Currency, string? Benchmark, string! ValueType, string! DayCount, string! Interpolator, string! LeftExtrapolator, string! RightExtrapolator, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.JumpPointDto!>? Jumps, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto!>! Nodes) -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.CurveName.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.CurveName.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.DayCount.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.DayCount.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Interpolator.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Interpolator.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Jumps.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.JumpPointDto!>?
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Jumps.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.LeftExtrapolator.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.LeftExtrapolator.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Nodes.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto!>!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Nodes.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.RightExtrapolator.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.RightExtrapolator.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Role.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Role.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.ValueType.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.ValueType.init -> void
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.CurveGroupDefinitionDto(string! GroupName, string! ValuationDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.CurveDefinitionDto!>! Curves, string! SchemaVersion = "1.0") -> void
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.Curves.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.CurveDefinitionDto!>!
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.Curves.init -> void
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.GroupName.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.GroupName.init -> void
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.SchemaVersion.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.SchemaVersion.init -> void
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.ValuationDate.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.ValuationDate.init -> void
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Convention.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Convention.init -> void
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.CurveNodeDefinitionDto(string! Type, string! Label, string! QuoteId, string! Convention, string! Tenor) -> void
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Label.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Label.init -> void
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.QuoteId.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.QuoteId.init -> void
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Tenor.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Tenor.init -> void
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Type.get -> string!
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Type.init -> void
+Boutquin.Curves.Serialization.Dto.JumpPointDto
+Boutquin.Curves.Serialization.Dto.JumpPointDto.Date.get -> string!
+Boutquin.Curves.Serialization.Dto.JumpPointDto.Date.init -> void
+Boutquin.Curves.Serialization.Dto.JumpPointDto.JumpPointDto(string! Date, double Value) -> void
+Boutquin.Curves.Serialization.Dto.JumpPointDto.Value.get -> double
+Boutquin.Curves.Serialization.Dto.JumpPointDto.Value.init -> void
+static Boutquin.Curves.Serialization.CalibrationReportExporter.Export(Boutquin.Curves.Bootstrap.CurveCalibrationResult! result, System.DateOnly valuationDate) -> string!
+static Boutquin.Curves.Serialization.CsvQuoteLoader.Load(string! csv) -> Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet!
+static Boutquin.Curves.Serialization.CsvQuoteLoader.Load(System.IO.Stream! stream) -> Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet!

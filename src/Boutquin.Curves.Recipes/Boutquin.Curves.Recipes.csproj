@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Boutquin.Curves.Recipes</RootNamespace>
+    <AssemblyName>Boutquin.Curves.Recipes</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Bootstrap/Boutquin.Curves.Bootstrap.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Boutquin.MarketData.Abstractions" />
+    <PackageReference Include="Boutquin.MarketData.Calendars" />
+    <PackageReference Include="Boutquin.MarketData.Orchestration" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,43 @@
+#nullable enable
+
+abstract Boutquin.Curves.Risk.CurveShockScenario.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!
+Boutquin.Curves.Risk.BucketedSensitivity
+Boutquin.Curves.Risk.BucketedSensitivity.Bucket.get -> string!
+Boutquin.Curves.Risk.BucketedSensitivity.Bucket.init -> void
+Boutquin.Curves.Risk.BucketedSensitivity.BucketedSensitivity(string! Bucket, double Delta) -> void
+Boutquin.Curves.Risk.BucketedSensitivity.Delta.get -> double
+Boutquin.Curves.Risk.BucketedSensitivity.Delta.init -> void
+Boutquin.Curves.Risk.BucketedShockPoint
+Boutquin.Curves.Risk.BucketedShockPoint.BucketedShockPoint(double MaturityYears, double ShiftInBasisPoints) -> void
+Boutquin.Curves.Risk.BucketedShockPoint.MaturityYears.get -> double
+Boutquin.Curves.Risk.BucketedShockPoint.MaturityYears.init -> void
+Boutquin.Curves.Risk.BucketedShockPoint.ShiftInBasisPoints.get -> double
+Boutquin.Curves.Risk.BucketedShockPoint.ShiftInBasisPoints.init -> void
+Boutquin.Curves.Risk.BucketedZeroRateShock
+Boutquin.Curves.Risk.BucketedZeroRateShock.BucketedZeroRateShock(string! name, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedShockPoint!>! shockPoints) -> void
+Boutquin.Curves.Risk.BucketedZeroRateShock.ShockPoints.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedShockPoint!>!
+Boutquin.Curves.Risk.CurveRiskAnalyzer
+Boutquin.Curves.Risk.CurveRiskAnalyzer.BuildPlaceholderBucketedReport(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, Boutquin.Curves.Abstractions.Curves.CurveReference! reference) -> Boutquin.Curves.Risk.RiskReport!
+Boutquin.Curves.Risk.CurveRiskAnalyzer.BuildScenarioRiskReport(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, Boutquin.Curves.Abstractions.Curves.CurveReference! reference, Boutquin.Curves.Risk.CurveShockScenario! scenario, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.RiskBucket!>! buckets) -> Boutquin.Curves.Risk.RiskReport!
+Boutquin.Curves.Risk.CurveRiskAnalyzer.CurveRiskAnalyzer() -> void
+Boutquin.Curves.Risk.CurveShockScenario
+Boutquin.Curves.Risk.CurveShockScenario.CurveShockScenario(string! Name) -> void
+Boutquin.Curves.Risk.CurveShockScenario.Name.get -> string!
+Boutquin.Curves.Risk.CurveShockScenario.Name.init -> void
+Boutquin.Curves.Risk.ParallelZeroRateShock
+Boutquin.Curves.Risk.ParallelZeroRateShock.ParallelZeroRateShock(string! Name, double ShiftInBasisPoints) -> void
+Boutquin.Curves.Risk.ParallelZeroRateShock.ShiftInBasisPoints.get -> double
+Boutquin.Curves.Risk.ParallelZeroRateShock.ShiftInBasisPoints.init -> void
+Boutquin.Curves.Risk.RiskBucket
+Boutquin.Curves.Risk.RiskBucket.Bucket.get -> string!
+Boutquin.Curves.Risk.RiskBucket.Bucket.init -> void
+Boutquin.Curves.Risk.RiskBucket.MaturityDate.get -> System.DateOnly
+Boutquin.Curves.Risk.RiskBucket.MaturityDate.init -> void
+Boutquin.Curves.Risk.RiskBucket.RiskBucket(string! Bucket, System.DateOnly MaturityDate) -> void
+Boutquin.Curves.Risk.RiskReport
+Boutquin.Curves.Risk.RiskReport.Label.get -> string!
+Boutquin.Curves.Risk.RiskReport.RiskReport(string! label, string! scenarioName, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedSensitivity!>! sensitivities) -> void
+Boutquin.Curves.Risk.RiskReport.ScenarioName.get -> string!
+Boutquin.Curves.Risk.RiskReport.Sensitivities.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedSensitivity!>!
+override Boutquin.Curves.Risk.BucketedZeroRateShock.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!
+override Boutquin.Curves.Risk.ParallelZeroRateShock.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!

@@ -1,0 +1,109 @@
+#nullable enable
+Boutquin.Curves.Recipes.CurveGroupRecipe
+Boutquin.Curves.Recipes.CurveGroupRecipe.CurveGroupRecipe(string! GroupName, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.CurveRecipe!>! Curves) -> void
+Boutquin.Curves.Recipes.CurveGroupRecipe.Curves.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.CurveRecipe!>!
+Boutquin.Curves.Recipes.CurveGroupRecipe.Curves.init -> void
+Boutquin.Curves.Recipes.CurveGroupRecipe.GroupName.get -> string!
+Boutquin.Curves.Recipes.CurveGroupRecipe.GroupName.init -> void
+Boutquin.Curves.Recipes.CurveRecipe
+Boutquin.Curves.Recipes.CurveRecipe.CurveId.get -> string!
+Boutquin.Curves.Recipes.CurveRecipe.CurveId.init -> void
+Boutquin.Curves.Recipes.CurveRecipe.CurveRecipe(string! CurveId, Boutquin.Curves.Abstractions.Curves.CurveReference! CurveReference, Boutquin.Curves.Bootstrap.Definitions.CurveValueType ValueType, string! DayCountCode, Boutquin.Curves.Interpolation.InterpolationSettings! Interpolation, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec!>! Nodes) -> void
+Boutquin.Curves.Recipes.CurveRecipe.CurveReference.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Recipes.CurveRecipe.CurveReference.init -> void
+Boutquin.Curves.Recipes.CurveRecipe.DayCountCode.get -> string!
+Boutquin.Curves.Recipes.CurveRecipe.DayCountCode.init -> void
+Boutquin.Curves.Recipes.CurveRecipe.Interpolation.get -> Boutquin.Curves.Interpolation.InterpolationSettings!
+Boutquin.Curves.Recipes.CurveRecipe.Interpolation.init -> void
+Boutquin.Curves.Recipes.CurveRecipe.Nodes.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec!>!
+Boutquin.Curves.Recipes.CurveRecipe.Nodes.init -> void
+Boutquin.Curves.Recipes.CurveRecipe.ValueType.get -> Boutquin.Curves.Bootstrap.Definitions.CurveValueType
+Boutquin.Curves.Recipes.CurveRecipe.ValueType.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot
+Boutquin.Curves.Recipes.CurveSnapshot.CurveGroup.get -> Boutquin.Curves.Abstractions.Curves.ICurveGroup!
+Boutquin.Curves.Recipes.CurveSnapshot.CurveGroup.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.CurveSnapshot(string! GroupName, System.DateOnly ValuationDate, Boutquin.Curves.Abstractions.Curves.ICurveGroup! CurveGroup, Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics! Diagnostics, System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataIssue!>! DataIssues, System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataProvenance!>! Provenance, Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian? Jacobian = null) -> void
+Boutquin.Curves.Recipes.CurveSnapshot.DataIssues.get -> System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataIssue!>!
+Boutquin.Curves.Recipes.CurveSnapshot.DataIssues.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.Provenance.get -> System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataProvenance!>!
+Boutquin.Curves.Recipes.CurveSnapshot.Provenance.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.Diagnostics.get -> Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics!
+Boutquin.Curves.Recipes.CurveSnapshot.Diagnostics.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.GroupName.get -> string!
+Boutquin.Curves.Recipes.CurveSnapshot.GroupName.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.Jacobian.get -> Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian?
+Boutquin.Curves.Recipes.CurveSnapshot.Jacobian.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Recipes.CurveSnapshot.ValuationDate.init -> void
+Boutquin.Curves.Recipes.DataRequestEqualityComparer
+Boutquin.Curves.Recipes.DataRequestEqualityComparer.DataRequestEqualityComparer() -> void
+Boutquin.Curves.Recipes.DataRequestEqualityComparer.Equals(Boutquin.MarketData.Abstractions.Contracts.IDataRequest? x, Boutquin.MarketData.Abstractions.Contracts.IDataRequest? y) -> bool
+Boutquin.Curves.Recipes.DataRequestEqualityComparer.GetHashCode(Boutquin.MarketData.Abstractions.Contracts.IDataRequest! obj) -> int
+static Boutquin.Curves.Recipes.DataRequestEqualityComparer.Instance.get -> Boutquin.Curves.Recipes.DataRequestEqualityComparer!
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.ConventionCode.get -> string!
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.CreateRequest(System.DateOnly valuationDate) -> Boutquin.MarketData.Abstractions.Contracts.IDataRequest!
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.ExtractRate(System.Collections.Generic.IReadOnlyList<object!>! records, System.DateOnly valuationDate) -> decimal?
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.FuturesSettlementNode(string! label, Boutquin.MarketData.Abstractions.ReferenceData.Tenor tenor, string! productCode, string! contractMonth, string! conventionCode, Boutquin.Curves.Abstractions.Curves.CurveReference! targetCurve) -> void
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.InstrumentType.get -> string!
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.Label.get -> string!
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Recipes.Nodes.FuturesSettlementNode.Tenor.get -> Boutquin.MarketData.Abstractions.ReferenceData.Tenor
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.ConventionCode.get -> string!
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.CreateRequest(System.DateOnly valuationDate) -> Boutquin.MarketData.Abstractions.Contracts.IDataRequest!
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.ExtractActualDate(System.Collections.Generic.IReadOnlyList<object!>! records, System.DateOnly valuationDate) -> System.DateOnly?
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.ExtractRate(System.Collections.Generic.IReadOnlyList<object!>! records, System.DateOnly valuationDate) -> decimal?
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.InstrumentType.get -> string!
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.Label.get -> string!
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec.Tenor.get -> Boutquin.MarketData.Abstractions.ReferenceData.Tenor
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.ConventionCode.get -> string!
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.CreateRequest(System.DateOnly valuationDate) -> Boutquin.MarketData.Abstractions.Contracts.IDataRequest!
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.ExtractActualDate(System.Collections.Generic.IReadOnlyList<object!>! records, System.DateOnly valuationDate) -> System.DateOnly?
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.ExtractRate(System.Collections.Generic.IReadOnlyList<object!>! records, System.DateOnly valuationDate) -> decimal?
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.InstrumentType.get -> string!
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.Label.get -> string!
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.OvernightFixingNode(string! label, string! benchmarkId, string! conventionCode, Boutquin.Curves.Abstractions.Curves.CurveReference! targetCurve, int lookbackDays = 5, Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null, Boutquin.MarketData.Conventions.ObservationShiftConvention shiftConvention = Boutquin.MarketData.Conventions.ObservationShiftConvention.None) -> void
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Recipes.Nodes.OvernightFixingNode.Tenor.get -> Boutquin.MarketData.Abstractions.ReferenceData.Tenor
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.ConventionCode.get -> string!
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.CreateRequest(System.DateOnly valuationDate) -> Boutquin.MarketData.Abstractions.Contracts.IDataRequest!
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.ExtractRate(System.Collections.Generic.IReadOnlyList<object!>! records, System.DateOnly valuationDate) -> decimal?
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.InstrumentType.get -> string!
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.Label.get -> string!
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.Tenor.get -> Boutquin.MarketData.Abstractions.ReferenceData.Tenor
+Boutquin.Curves.Recipes.Nodes.YieldCurveNode.YieldCurveNode(string! label, Boutquin.MarketData.Abstractions.ReferenceData.Tenor tenor, string! instrumentType, string! curveId, string! targetTenor, string! conventionCode, Boutquin.Curves.Abstractions.Curves.CurveReference! targetCurve) -> void
+Boutquin.Curves.Recipes.StandardCurveRecipes
+static Boutquin.Curves.Recipes.StandardCurveRecipes.UsdSofrDiscount(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+static Boutquin.Curves.Recipes.StandardCurveRecipes.UsdSofrProjection(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+static Boutquin.Curves.Recipes.StandardCurveRecipes.CadCorraDiscount(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+static Boutquin.Curves.Recipes.StandardCurveRecipes.CadCorraProjection(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+static Boutquin.Curves.Recipes.StandardCurveRecipes.GbpSoniaDiscount(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+static Boutquin.Curves.Recipes.StandardCurveRecipes.GbpSoniaProjection(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+static Boutquin.Curves.Recipes.StandardCurveRecipes.EurEstrDiscount(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+static Boutquin.Curves.Recipes.StandardCurveRecipes.EurEstrProjection(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
+Boutquin.Curves.Recipes.CurveBuilder
+Boutquin.Curves.Recipes.CurveBuilder.CurveBuilder(Boutquin.MarketData.Abstractions.Contracts.IDataPipeline! pipeline, Boutquin.Curves.Bootstrap.PiecewiseBootstrapCalibrator! calibrator, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData, Microsoft.Extensions.Logging.ILogger<Boutquin.Curves.Recipes.CurveBuilder!>! logger) -> void
+Boutquin.Curves.Recipes.CurveBuilder.BuildAsync(Boutquin.Curves.Recipes.CurveGroupRecipe! recipe, System.DateOnly valuationDate, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Boutquin.Curves.Recipes.CurveSnapshot!>!
+Boutquin.Curves.Recipes.AnalyticsDependencyInjectionExtensions
+static Boutquin.Curves.Recipes.AnalyticsDependencyInjectionExtensions.AddAnalytics(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Boutquin.Curves.Recipes.Testing.FakeDataPipeline
+Boutquin.Curves.Recipes.Testing.FakeDataPipeline.FakeDataPipeline() -> void
+Boutquin.Curves.Recipes.Testing.FakeDataPipeline.Register<TRecord>(string! datasetKey, Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<TRecord>!>! envelope) -> Boutquin.Curves.Recipes.Testing.FakeDataPipeline!
+Boutquin.Curves.Recipes.Testing.FakeDataPipeline.ExecuteAsync<TRequest, TRecord>(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<TRecord>!>!>!
+Boutquin.Curves.Recipes.Testing.FixtureData
+static readonly Boutquin.Curves.Recipes.Testing.FixtureData.FixtureDate -> System.DateOnly
+static Boutquin.Curves.Recipes.Testing.FixtureData.UsdSofrFixings() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.ScalarObservation!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.UsdSofrOisQuotes() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.YieldCurveQuote!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.UsdTreasuryParQuotes() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.YieldCurveQuote!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.CadCorraFixings() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.ScalarObservation!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.CadBocZeroQuotes() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.YieldCurveQuote!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.GbpSoniaFixings() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.ScalarObservation!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.GbpSoniaOisQuotes() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.YieldCurveQuote!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.EurEstrFixings() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.ScalarObservation!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.EurEstrOisQuotes() -> Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Records.YieldCurveQuote!>!>!
+static Boutquin.Curves.Recipes.Testing.FixtureData.CreatePipeline() -> Boutquin.Curves.Recipes.Testing.FakeDataPipeline!

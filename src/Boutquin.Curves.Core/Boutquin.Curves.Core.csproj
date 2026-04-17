@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Boutquin.Curves.Core</RootNamespace>
+    <AssemblyName>Boutquin.Curves.Core</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Indices/Boutquin.Curves.Indices.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Quotes/Boutquin.Curves.Quotes.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Interpolation/Boutquin.Curves.Interpolation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Boutquin.Curves.Core.Tests" />
+  </ItemGroup>
+</Project>

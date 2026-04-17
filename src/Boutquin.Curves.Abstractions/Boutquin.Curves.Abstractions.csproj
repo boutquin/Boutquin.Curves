@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Boutquin.Curves.Abstractions</RootNamespace>
+    <AssemblyName>Boutquin.Curves.Abstractions</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Boutquin.MarketData.Abstractions" />
+    <PackageReference Include="Boutquin.MarketData.Conventions" />
+    <PackageReference Include="Boutquin.MarketData.DayCount" />
+  </ItemGroup>
+</Project>

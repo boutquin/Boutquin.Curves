@@ -1,0 +1,190 @@
+#nullable enable
+
+Boutquin.Curves.Abstractions.Bootstrap.IConvexityAdjustment
+Boutquin.Curves.Abstractions.Bootstrap.IConvexityAdjustment.Adjustment(double timeToExpiry, double timeToMaturity) -> double
+Boutquin.Curves.Abstractions.Bootstrap.ICurveCalibrator<TRequest, TResult>
+Boutquin.Curves.Abstractions.Bootstrap.ICurveCalibrator<TRequest, TResult>.Calibrate(TRequest request) -> TResult
+Boutquin.Curves.Abstractions.Bootstrap.ICurveNode
+Boutquin.Curves.Abstractions.Bootstrap.ICurveNode.Label.get -> string!
+Boutquin.Curves.Abstractions.Bootstrap.ICurveNode.ResolveNodeDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+Boutquin.Curves.Abstractions.Bootstrap.ICurveNode.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Abstractions.Bootstrap.IInstrumentHelper
+Boutquin.Curves.Abstractions.Bootstrap.IInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+Boutquin.Curves.Abstractions.Bootstrap.IInstrumentHelper.Label.get -> string!
+Boutquin.Curves.Abstractions.Bootstrap.IInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+Boutquin.Curves.Abstractions.Bootstrap.IInstrumentHelper.QuoteValue.get -> double
+Boutquin.Curves.Abstractions.Bootstrap.IInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+Boutquin.Curves.Abstractions.Bootstrap.IInstrumentHelper.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Abstractions.Curves.CurveGroupExtensions
+Boutquin.Curves.Abstractions.Curves.CurvePoint
+Boutquin.Curves.Abstractions.Curves.CurvePoint.CurvePoint(System.DateOnly Date, double Value) -> void
+Boutquin.Curves.Abstractions.Curves.CurvePoint.Date.get -> System.DateOnly
+Boutquin.Curves.Abstractions.Curves.CurvePoint.Date.init -> void
+Boutquin.Curves.Abstractions.Curves.CurvePoint.Value.get -> double
+Boutquin.Curves.Abstractions.Curves.CurvePoint.Value.init -> void
+Boutquin.Curves.Abstractions.Curves.CurveReference
+Boutquin.Curves.Abstractions.Curves.CurveReference.Benchmark.get -> Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName?
+Boutquin.Curves.Abstractions.Curves.CurveReference.Benchmark.init -> void
+Boutquin.Curves.Abstractions.Curves.CurveReference.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Abstractions.Curves.CurveReference.Currency.init -> void
+Boutquin.Curves.Abstractions.Curves.CurveReference.CurveReference(Boutquin.Curves.Abstractions.Curves.CurveRole Role, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode Currency, Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName? Benchmark = null) -> void
+Boutquin.Curves.Abstractions.Curves.CurveReference.Role.get -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveReference.Role.init -> void
+Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Basis = 2 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Borrow = 4 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Collateral = 3 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Custom = 7 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Discount = 0 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Dividend = 5 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Forward = 1 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.CurveRole.Inflation = 6 -> Boutquin.Curves.Abstractions.Curves.CurveRole
+Boutquin.Curves.Abstractions.Curves.ICurve
+Boutquin.Curves.Abstractions.Curves.ICurve.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Abstractions.Curves.ICurve.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Abstractions.Curves.ICurve.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Abstractions.Curves.ICurve.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Abstractions.Curves.ICurve.ValueAt(System.DateOnly date) -> double
+Boutquin.Curves.Abstractions.Curves.ICurveGroup
+Boutquin.Curves.Abstractions.Curves.ICurveGroup.GetCurve(Boutquin.Curves.Abstractions.Curves.CurveReference! reference) -> Boutquin.Curves.Abstractions.Curves.ICurve!
+Boutquin.Curves.Abstractions.Curves.ICurveGroup.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveGroupName
+Boutquin.Curves.Abstractions.Curves.ICurveGroup.TryGetCurve(Boutquin.Curves.Abstractions.Curves.CurveReference! reference, out Boutquin.Curves.Abstractions.Curves.ICurve? curve) -> bool
+Boutquin.Curves.Abstractions.Curves.ICurveGroup.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Abstractions.Curves.IDiscountCurve
+Boutquin.Curves.Abstractions.Curves.IDiscountCurve.DiscountFactor(System.DateOnly date) -> double
+Boutquin.Curves.Abstractions.Curves.IDiscountCurve.InstantaneousForwardRate(System.DateOnly date) -> double
+Boutquin.Curves.Abstractions.Curves.IDiscountCurve.ZeroRate(System.DateOnly date, Boutquin.MarketData.Conventions.CompoundingConvention compounding) -> double
+Boutquin.Curves.Abstractions.Curves.IForwardCurve
+Boutquin.Curves.Abstractions.Curves.IForwardCurve.Benchmark.get -> Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName
+Boutquin.Curves.Abstractions.Curves.IForwardCurve.ForwardRate(System.DateOnly startDate, System.DateOnly endDate) -> double
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.BootstrapDiagnostics(System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic!>! Repricing, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic!>! Structural, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic!>! Numerical) -> void
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.Numerical.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic!>!
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.Numerical.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.Repricing.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic!>!
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.Repricing.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.Structural.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic!>!
+Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.Structural.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian.CalibrationJacobian(System.Collections.Generic.IReadOnlyList<string!>! RowLabels, System.Collections.Generic.IReadOnlyList<string!>! ColumnLabels, double[,]! Values) -> void
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian.ColumnLabels.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian.ColumnLabels.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian.RowLabels.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian.RowLabels.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian.Values.get -> double[,]!
+Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian.Values.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Converged.get -> bool
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Converged.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Iterations.get -> int
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Iterations.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Message.get -> string!
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Message.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.NumericalDiagnostic(string! SolverName, int Iterations, bool Converged, string! Message, double? Residual = null) -> void
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Residual.get -> double?
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.Residual.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.SolverName.get -> string!
+Boutquin.Curves.Abstractions.Diagnostics.NumericalDiagnostic.SolverName.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.AbsoluteError.get -> double
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.AbsoluteError.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.ImpliedQuote.get -> double
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.ImpliedQuote.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.InstrumentType.get -> string!
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.InstrumentType.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.Label.get -> string!
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.Label.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.MarketQuote.get -> double
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.MarketQuote.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.PillarDate.get -> System.DateOnly
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.PillarDate.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.RepricingDiagnostic(string! Label, Boutquin.Curves.Abstractions.Curves.CurveReference! TargetCurve, System.DateOnly PillarDate, double MarketQuote, double ImpliedQuote, double AbsoluteError, double SignedError, string! InstrumentType, System.Collections.Generic.IReadOnlyList<string!>? WarningFlags = null) -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.SignedError.get -> double
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.SignedError.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.TargetCurve.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.WarningFlags.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic.WarningFlags.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Code.get -> string!
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Code.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Context.get -> string?
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Context.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Message.get -> string!
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Message.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Severity.get -> string!
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.Severity.init -> void
+Boutquin.Curves.Abstractions.Diagnostics.StructuralDiagnostic.StructuralDiagnostic(string! Code, string! Message, string! Severity, string? Context = null) -> void
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.Benchmarks.get -> System.Collections.Generic.IReadOnlyDictionary<Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName, Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!>!
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.Benchmarks.init -> void
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.Curves.get -> System.Collections.Generic.IReadOnlyDictionary<Boutquin.Curves.Abstractions.Curves.CurveReference!, Boutquin.Curves.Abstractions.Curves.ICurve!>!
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.Curves.init -> void
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.Fixings.get -> System.Collections.Generic.IReadOnlyDictionary<string!, decimal>!
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.Fixings.init -> void
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.MarketEnvironment(System.DateOnly ValuationDate, System.Collections.Generic.IReadOnlyDictionary<Boutquin.Curves.Abstractions.Curves.CurveReference!, Boutquin.Curves.Abstractions.Curves.ICurve!>! Curves, System.Collections.Generic.IReadOnlyDictionary<Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName, Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!>! Benchmarks, System.Collections.Generic.IReadOnlyDictionary<string!, decimal>! Fixings) -> void
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Abstractions.Environments.MarketEnvironment.ValuationDate.init -> void
+Boutquin.Curves.Abstractions.Fixings.IFixingsStore
+Boutquin.Curves.Abstractions.Fixings.IFixingsStore.AddFixing(string! fixingKey, System.DateOnly date, decimal value) -> void
+Boutquin.Curves.Abstractions.Fixings.IFixingsStore.GetFixing(string! fixingKey, System.DateOnly date) -> decimal
+Boutquin.Curves.Abstractions.Fixings.IFixingsStore.GetFixingsForDate(System.DateOnly date) -> System.Collections.Generic.IReadOnlyDictionary<string!, decimal>!
+Boutquin.Curves.Abstractions.Fixings.IFixingsStore.GetTimeSeries(string! fixingKey) -> System.Collections.Generic.IReadOnlyDictionary<System.DateOnly, decimal>!
+Boutquin.Curves.Abstractions.Fixings.IFixingsStore.TryGetFixing(string! fixingKey, System.DateOnly date, out decimal value) -> bool
+Boutquin.Curves.Abstractions.Fixings.InMemoryFixingsStore
+Boutquin.Curves.Abstractions.Fixings.InMemoryFixingsStore.AddFixing(string! fixingKey, System.DateOnly date, decimal value) -> void
+Boutquin.Curves.Abstractions.Fixings.InMemoryFixingsStore.GetFixing(string! fixingKey, System.DateOnly date) -> decimal
+Boutquin.Curves.Abstractions.Fixings.InMemoryFixingsStore.GetFixingsForDate(System.DateOnly date) -> System.Collections.Generic.IReadOnlyDictionary<string!, decimal>!
+Boutquin.Curves.Abstractions.Fixings.InMemoryFixingsStore.GetTimeSeries(string! fixingKey) -> System.Collections.Generic.IReadOnlyDictionary<System.DateOnly, decimal>!
+Boutquin.Curves.Abstractions.Fixings.InMemoryFixingsStore.InMemoryFixingsStore() -> void
+Boutquin.Curves.Abstractions.Fixings.InMemoryFixingsStore.TryGetFixing(string! fixingKey, System.DateOnly date, out decimal value) -> bool
+Boutquin.Curves.Abstractions.Identifiers.CurveGroupName
+Boutquin.Curves.Abstractions.Identifiers.CurveGroupName.CurveGroupName() -> void
+Boutquin.Curves.Abstractions.Identifiers.CurveGroupName.CurveGroupName(string! Value) -> void
+Boutquin.Curves.Abstractions.Identifiers.CurveGroupName.Value.get -> string!
+Boutquin.Curves.Abstractions.Identifiers.CurveGroupName.Value.init -> void
+Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Abstractions.Identifiers.CurveName.CurveName() -> void
+Boutquin.Curves.Abstractions.Identifiers.CurveName.CurveName(string! Value) -> void
+Boutquin.Curves.Abstractions.Identifiers.CurveName.Value.get -> string!
+Boutquin.Curves.Abstractions.Identifiers.CurveName.Value.init -> void
+Boutquin.Curves.Abstractions.Identifiers.QuoteId
+Boutquin.Curves.Abstractions.Identifiers.QuoteId.QuoteId() -> void
+Boutquin.Curves.Abstractions.Identifiers.QuoteId.QuoteId(string! Value) -> void
+Boutquin.Curves.Abstractions.Identifiers.QuoteId.Value.get -> string!
+Boutquin.Curves.Abstractions.Identifiers.QuoteId.Value.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.AsOfDate.get -> System.DateOnly
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.AsOfDate.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.FieldName.get -> string!
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.FieldName.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Id.get -> Boutquin.Curves.Abstractions.Identifiers.QuoteId
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Id.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.MarketQuote(Boutquin.Curves.Abstractions.Identifiers.QuoteId Id, decimal Value, string! FieldName, System.DateOnly AsOfDate, string? Source = null, string? Unit = null, string? Notes = null) -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Notes.get -> string?
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Notes.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Source.get -> string?
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Source.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Unit.get -> string?
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Unit.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Value.get -> decimal
+Boutquin.Curves.Abstractions.Quotes.MarketQuote.Value.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet
+Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet.AsOfDate.get -> System.DateOnly
+Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet.AsOfDate.init -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet.GetRequired(Boutquin.Curves.Abstractions.Identifiers.QuoteId quoteId) -> Boutquin.Curves.Abstractions.Quotes.MarketQuote!
+Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet.MarketQuoteSet(System.DateOnly AsOfDate, System.Collections.Generic.IReadOnlyDictionary<Boutquin.Curves.Abstractions.Identifiers.QuoteId, Boutquin.Curves.Abstractions.Quotes.MarketQuote!>! Quotes) -> void
+Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet.Quotes.get -> System.Collections.Generic.IReadOnlyDictionary<Boutquin.Curves.Abstractions.Identifiers.QuoteId, Boutquin.Curves.Abstractions.Quotes.MarketQuote!>!
+Boutquin.Curves.Abstractions.Quotes.MarketQuoteSet.Quotes.init -> void
+Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider
+Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider.GetBenchmark(Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName name) -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!
+Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider.GetCalendar(string! code) -> Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar!
+Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider.GetConvention(string! code) -> Boutquin.MarketData.Conventions.IInstrumentConvention!
+override Boutquin.Curves.Abstractions.Identifiers.CurveGroupName.ToString() -> string!
+override Boutquin.Curves.Abstractions.Identifiers.CurveName.ToString() -> string!
+override Boutquin.Curves.Abstractions.Identifiers.QuoteId.ToString() -> string!
+static Boutquin.Curves.Abstractions.Curves.CurveGroupExtensions.GetDiscountCurve(this Boutquin.Curves.Abstractions.Curves.ICurveGroup! group, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+static Boutquin.Curves.Abstractions.Curves.CurveGroupExtensions.GetForwardCurve(this Boutquin.Curves.Abstractions.Curves.ICurveGroup! group, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName benchmark) -> Boutquin.Curves.Abstractions.Curves.ICurve!
+static Boutquin.Curves.Abstractions.Curves.CurveGroupExtensions.TryGetDiscountCurve(this Boutquin.Curves.Abstractions.Curves.ICurveGroup! group, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, out Boutquin.Curves.Abstractions.Curves.IDiscountCurve? curve) -> bool
+static Boutquin.Curves.Abstractions.Curves.CurveGroupExtensions.TryGetForwardCurve(this Boutquin.Curves.Abstractions.Curves.ICurveGroup! group, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName benchmark, out Boutquin.Curves.Abstractions.Curves.ICurve? curve) -> bool
+static Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics.Empty.get -> Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics!

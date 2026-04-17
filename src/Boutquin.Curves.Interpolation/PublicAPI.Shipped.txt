@@ -1,0 +1,41 @@
+#nullable enable
+
+Boutquin.Curves.Interpolation.FlatForwardInterpolator
+Boutquin.Curves.Interpolation.FlatForwardInterpolator.FlatForwardInterpolator() -> void
+Boutquin.Curves.Interpolation.FlatForwardInterpolator.Interpolate(System.DateOnly valuationDate, System.DateOnly targetDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount) -> double
+Boutquin.Curves.Interpolation.FlatForwardInterpolator.Name.get -> string!
+Boutquin.Curves.Interpolation.INodalCurveInterpolator
+Boutquin.Curves.Interpolation.INodalCurveInterpolator.Interpolate(System.DateOnly valuationDate, System.DateOnly targetDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount) -> double
+Boutquin.Curves.Interpolation.INodalCurveInterpolator.Name.get -> string!
+Boutquin.Curves.Interpolation.InterpolationSettings
+Boutquin.Curves.Interpolation.InterpolationSettings.InterpolationSettings(Boutquin.Curves.Interpolation.InterpolatorKind Interpolator, string! LeftExtrapolator, string! RightExtrapolator) -> void
+Boutquin.Curves.Interpolation.InterpolationSettings.Interpolator.get -> Boutquin.Curves.Interpolation.InterpolatorKind
+Boutquin.Curves.Interpolation.InterpolationSettings.Interpolator.init -> void
+Boutquin.Curves.Interpolation.InterpolationSettings.LeftExtrapolator.get -> string!
+Boutquin.Curves.Interpolation.InterpolationSettings.LeftExtrapolator.init -> void
+Boutquin.Curves.Interpolation.InterpolationSettings.RightExtrapolator.get -> string!
+Boutquin.Curves.Interpolation.InterpolationSettings.RightExtrapolator.init -> void
+Boutquin.Curves.Interpolation.InterpolatorFactory
+Boutquin.Curves.Interpolation.InterpolatorKind
+Boutquin.Curves.Interpolation.InterpolatorKind.FlatForward = 2 -> Boutquin.Curves.Interpolation.InterpolatorKind
+Boutquin.Curves.Interpolation.InterpolatorKind.LinearZeroRate = 1 -> Boutquin.Curves.Interpolation.InterpolatorKind
+Boutquin.Curves.Interpolation.InterpolatorKind.LogLinearDiscountFactor = 0 -> Boutquin.Curves.Interpolation.InterpolatorKind
+Boutquin.Curves.Interpolation.InterpolatorKind.MonotoneConvex = 4 -> Boutquin.Curves.Interpolation.InterpolatorKind
+Boutquin.Curves.Interpolation.InterpolatorKind.MonotoneCubic = 3 -> Boutquin.Curves.Interpolation.InterpolatorKind
+Boutquin.Curves.Interpolation.LinearZeroRateInterpolator
+Boutquin.Curves.Interpolation.LinearZeroRateInterpolator.Interpolate(System.DateOnly valuationDate, System.DateOnly targetDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount) -> double
+Boutquin.Curves.Interpolation.LinearZeroRateInterpolator.LinearZeroRateInterpolator() -> void
+Boutquin.Curves.Interpolation.LinearZeroRateInterpolator.Name.get -> string!
+Boutquin.Curves.Interpolation.LogLinearDiscountFactorInterpolator
+Boutquin.Curves.Interpolation.LogLinearDiscountFactorInterpolator.Interpolate(System.DateOnly valuationDate, System.DateOnly targetDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount) -> double
+Boutquin.Curves.Interpolation.LogLinearDiscountFactorInterpolator.LogLinearDiscountFactorInterpolator() -> void
+Boutquin.Curves.Interpolation.LogLinearDiscountFactorInterpolator.Name.get -> string!
+Boutquin.Curves.Interpolation.MonotoneConvexInterpolator
+Boutquin.Curves.Interpolation.MonotoneConvexInterpolator.Interpolate(System.DateOnly valuationDate, System.DateOnly targetDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount) -> double
+Boutquin.Curves.Interpolation.MonotoneConvexInterpolator.MonotoneConvexInterpolator() -> void
+Boutquin.Curves.Interpolation.MonotoneConvexInterpolator.Name.get -> string!
+Boutquin.Curves.Interpolation.MonotoneCubicInterpolator
+Boutquin.Curves.Interpolation.MonotoneCubicInterpolator.Interpolate(System.DateOnly valuationDate, System.DateOnly targetDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount) -> double
+Boutquin.Curves.Interpolation.MonotoneCubicInterpolator.MonotoneCubicInterpolator() -> void
+Boutquin.Curves.Interpolation.MonotoneCubicInterpolator.Name.get -> string!
+static Boutquin.Curves.Interpolation.InterpolatorFactory.Create(Boutquin.Curves.Interpolation.InterpolatorKind kind) -> Boutquin.Curves.Interpolation.INodalCurveInterpolator!

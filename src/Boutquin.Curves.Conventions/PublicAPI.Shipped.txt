@@ -1,0 +1,18 @@
+#nullable enable
+
+Boutquin.Curves.Conventions.ScheduleGenerator
+Boutquin.Curves.Conventions.SchedulePeriod
+Boutquin.Curves.Conventions.SchedulePeriod.AccrualEndDate.get -> System.DateOnly
+Boutquin.Curves.Conventions.SchedulePeriod.AccrualEndDate.init -> void
+Boutquin.Curves.Conventions.SchedulePeriod.AccrualStartDate.get -> System.DateOnly
+Boutquin.Curves.Conventions.SchedulePeriod.AccrualStartDate.init -> void
+Boutquin.Curves.Conventions.SchedulePeriod.PaymentDate.get -> System.DateOnly
+Boutquin.Curves.Conventions.SchedulePeriod.PaymentDate.init -> void
+Boutquin.Curves.Conventions.SchedulePeriod.PeriodEndDate.get -> System.DateOnly
+Boutquin.Curves.Conventions.SchedulePeriod.PeriodEndDate.init -> void
+Boutquin.Curves.Conventions.SchedulePeriod.PeriodStartDate.get -> System.DateOnly
+Boutquin.Curves.Conventions.SchedulePeriod.PeriodStartDate.init -> void
+Boutquin.Curves.Conventions.SchedulePeriod.SchedulePeriod(System.DateOnly AccrualStartDate, System.DateOnly AccrualEndDate, System.DateOnly PeriodStartDate, System.DateOnly PeriodEndDate, System.DateOnly PaymentDate, double YearFraction) -> void
+Boutquin.Curves.Conventions.SchedulePeriod.YearFraction.get -> double
+Boutquin.Curves.Conventions.SchedulePeriod.YearFraction.init -> void
+static Boutquin.Curves.Conventions.ScheduleGenerator.Generate(System.DateOnly startDate, System.DateOnly endDate, Boutquin.MarketData.Conventions.PaymentFrequency frequency, Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar! calendar, Boutquin.MarketData.Abstractions.Calendars.BusinessDayAdjustment businessDayAdjustment, Boutquin.MarketData.DayCount.IYearFractionCalculator! yearFractionCalculator, int paymentLagBusinessDays = 0, bool endOfMonth = false) -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Conventions.SchedulePeriod!>!

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Boutquin.Curves.Risk.Tests</RootNamespace>
+    <AssemblyName>Boutquin.Curves.Risk.Tests</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
+    <ProjectReference Include="../../src/Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
+    <ProjectReference Include="../../src/Boutquin.Curves.Core/Boutquin.Curves.Core.csproj" />
+    <ProjectReference Include="../../src/Boutquin.Curves.Risk/Boutquin.Curves.Risk.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+</Project>

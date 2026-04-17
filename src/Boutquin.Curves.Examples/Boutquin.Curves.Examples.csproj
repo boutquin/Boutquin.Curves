@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Boutquin.Curves.Examples</RootNamespace>
+    <AssemblyName>Boutquin.Curves.Examples</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Indices/Boutquin.Curves.Indices.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Quotes/Boutquin.Curves.Quotes.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Core/Boutquin.Curves.Core.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Interpolation/Boutquin.Curves.Interpolation.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Bootstrap/Boutquin.Curves.Bootstrap.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Serialization/Boutquin.Curves.Serialization.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Risk/Boutquin.Curves.Risk.csproj" />
+    <ProjectReference Include="../Boutquin.Curves.Recipes/Boutquin.Curves.Recipes.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+  </ItemGroup>
+</Project>

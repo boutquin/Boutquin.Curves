@@ -1,0 +1,38 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="MinVer" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
+    <PackageVersion Include="coverlet.collector" Version="8.0.1" />
+    <PackageVersion Include="FluentAssertions" Version="8.9.0" />
+    <PackageVersion Include="FsCheck.Xunit" Version="3.3.2" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.202" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="NetArchTest.eNhancedEdition" Version="1.4.5" />
+
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.6" />
+
+    <!-- MarketData kernel packages (local 0.16.0 pre-release) -->
+    <PackageVersion Include="Boutquin.MarketData.Abstractions" Version="1.0.1" />
+    <PackageVersion Include="Boutquin.MarketData.Calendars" Version="1.0.1" />
+    <PackageVersion Include="Boutquin.MarketData.Conventions" Version="1.0.1" />
+    <PackageVersion Include="Boutquin.MarketData.DayCount" Version="1.0.1" />
+    <PackageVersion Include="Boutquin.MarketData.Orchestration" Version="1.0.1" />
+    <PackageVersion Include="Boutquin.MarketData.Storage" Version="1.0.1" />
+    <PackageVersion Include="Boutquin.MarketData.DependencyInjection" Version="1.0.1" />
+    <PackageVersion Include="Boutquin.MarketData.Testing" Version="1.0.1" />
+
+    <!-- Numerics (NuGet 1.0.0) -->
+    <PackageVersion Include="Boutquin.Numerics" Version="1.0.0" />
+  </ItemGroup>
+</Project>

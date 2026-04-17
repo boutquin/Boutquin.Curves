@@ -1,0 +1,134 @@
+#nullable enable
+
+abstract Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+abstract Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+Boutquin.Curves.Bootstrap.ConvexityAdjustments.ConstantConvexityAdjustment
+Boutquin.Curves.Bootstrap.ConvexityAdjustments.ConstantConvexityAdjustment.Adjustment(double timeToExpiry, double timeToMaturity) -> double
+Boutquin.Curves.Bootstrap.ConvexityAdjustments.ConstantConvexityAdjustment.ConstantConvexityAdjustment(double adjustment) -> void
+Boutquin.Curves.Bootstrap.ConvexityAdjustments.HullWhiteConvexityAdjustment
+Boutquin.Curves.Bootstrap.ConvexityAdjustments.HullWhiteConvexityAdjustment.Adjustment(double timeToExpiry, double timeToMaturity) -> double
+Boutquin.Curves.Bootstrap.ConvexityAdjustments.HullWhiteConvexityAdjustment.HullWhiteConvexityAdjustment(double meanReversion, double volatility) -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationResult
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.CurveCalibrationResult(Boutquin.Curves.Abstractions.Curves.ICurveGroup! CurveGroup, Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics! Diagnostics, Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian? Jacobian = null) -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.CurveGroup.get -> Boutquin.Curves.Abstractions.Curves.ICurveGroup!
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.CurveGroup.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.Diagnostics.get -> Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics!
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.Diagnostics.init -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.Jacobian.get -> Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian?
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.Jacobian.init -> void
+Boutquin.Curves.Bootstrap.Definitions.CurveValueType
+Boutquin.Curves.Bootstrap.Definitions.CurveValueType.DiscountFactor = 0 -> Boutquin.Curves.Bootstrap.Definitions.CurveValueType
+Boutquin.Curves.Bootstrap.Definitions.CurveValueType.ZeroRate = 1 -> Boutquin.Curves.Bootstrap.Definitions.CurveValueType
+Boutquin.Curves.Bootstrap.Diagnostics.BootstrapDiagnosticsFactory
+Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper
+Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.AbstractInstrumentHelper(string! label, Boutquin.Curves.Abstractions.Curves.CurveReference! targetCurve, double quoteValue, string! instrumentType) -> void
+Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.InstrumentType.get -> string!
+Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.Label.get -> string!
+Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.QuoteValue.get -> double
+Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
+Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.TryGetDiscountFactor(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly date) -> double?
+Boutquin.Curves.Bootstrap.Helpers.BasisSwapInstrumentHelper
+Boutquin.Curves.Bootstrap.Helpers.DepositInstrumentHelper
+Boutquin.Curves.Bootstrap.Helpers.FixedFloatSwapInstrumentHelper
+Boutquin.Curves.Bootstrap.Helpers.FraInstrumentHelper
+Boutquin.Curves.Bootstrap.Helpers.OisFutureInstrumentHelper
+Boutquin.Curves.Bootstrap.Helpers.OisInstrumentHelper
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.AnchorDate.get -> System.DateOnly
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.AnchorDate.init -> void
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode?
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.Currency.init -> void
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.CurveName.get -> string!
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.CurveName.init -> void
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.Deposits.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.DepositQuote!>!
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.Deposits.init -> void
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.OisBootstrapInput(string! CurveName, System.DateOnly AnchorDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.DepositQuote!>! Deposits, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote!>! OisSwaps, Boutquin.MarketData.DayCount.IYearFractionCalculator! YearFractionCalculator, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode? Currency = null) -> void
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.OisSwaps.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote!>!
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.OisSwaps.init -> void
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.YearFractionCalculator.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.YearFractionCalculator.init -> void
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.AnchorDate.get -> System.DateOnly
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.AnchorDate.init -> void
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode?
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.Currency.init -> void
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.CurveName.get -> string!
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.CurveName.init -> void
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.SwapBootstrapInput(string! CurveName, System.DateOnly AnchorDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote!>! Swaps, Boutquin.MarketData.DayCount.IYearFractionCalculator! YearFractionCalculator, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode? Currency = null) -> void
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.Swaps.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote!>!
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.Swaps.init -> void
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.YearFractionCalculator.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.YearFractionCalculator.init -> void
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.DepositQuote(int TenorInMonths, double Rate) -> void
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.Rate.get -> double
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.Rate.init -> void
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.TenorInMonths.get -> int
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.TenorInMonths.init -> void
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.FixedRate.get -> double
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.FixedRate.init -> void
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.InterestRateSwapQuote(int TenorInMonths, double FixedRate) -> void
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.TenorInMonths.get -> int
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.TenorInMonths.init -> void
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.FixedRate.get -> double
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.FixedRate.init -> void
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.OisSwapQuote(int TenorInMonths, double FixedRate) -> void
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.TenorInMonths.get -> int
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.TenorInMonths.init -> void
+Boutquin.Curves.Bootstrap.NodeSorter
+Boutquin.Curves.Bootstrap.OisDiscountCurveBootstrapper
+Boutquin.Curves.Bootstrap.OisDiscountCurveBootstrapper.Bootstrap(Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput! input) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Bootstrap.OisDiscountCurveBootstrapper.OisDiscountCurveBootstrapper() -> void
+Boutquin.Curves.Bootstrap.PiecewiseBootstrapCalibrator
+Boutquin.Curves.Bootstrap.PiecewiseBootstrapCalibrator.PiecewiseBootstrapCalibrator() -> void
+Boutquin.Curves.Bootstrap.ReferenceData.SimpleReferenceDataProvider
+Boutquin.Curves.Bootstrap.ReferenceData.SimpleReferenceDataProvider.GetBenchmark(Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName name) -> Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!
+Boutquin.Curves.Bootstrap.ReferenceData.SimpleReferenceDataProvider.GetCalendar(string! code) -> Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar!
+Boutquin.Curves.Bootstrap.ReferenceData.SimpleReferenceDataProvider.GetConvention(string! code) -> Boutquin.MarketData.Conventions.IInstrumentConvention!
+Boutquin.Curves.Bootstrap.ReferenceData.SimpleReferenceDataProvider.SimpleReferenceDataProvider(System.Collections.Generic.IEnumerable<Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar!>! calendars, System.Collections.Generic.IEnumerable<Boutquin.MarketData.Abstractions.ReferenceData.RateBenchmark!>! benchmarks, System.Collections.Generic.IEnumerable<Boutquin.MarketData.Conventions.IInstrumentConvention!>! conventions) -> void
+Boutquin.Curves.Bootstrap.SwapProjectionCurveBootstrapper
+Boutquin.Curves.Bootstrap.SwapProjectionCurveBootstrapper.Bootstrap(Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput! input) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
+Boutquin.Curves.Bootstrap.SwapProjectionCurveBootstrapper.SwapProjectionCurveBootstrapper() -> void
+Boutquin.Curves.Bootstrap.TenorParser
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Code.get -> string!
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Code.init -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Context.get -> string?
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Context.init -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Message.get -> string!
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Message.init -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.ValidationEntry(string! Code, string! Message, string? Context = null) -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationResult
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.Errors.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Validation.ValidationEntry!>!
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.Errors.init -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.IsValid.get -> bool
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.IsValid.init -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.ValidationResult(bool IsValid, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Validation.ValidationEntry!>! Errors, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Validation.ValidationEntry!>! Warnings) -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.Warnings.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Validation.ValidationEntry!>!
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.Warnings.init -> void
+override Boutquin.Curves.Bootstrap.Helpers.BasisSwapInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.BasisSwapInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+override Boutquin.Curves.Bootstrap.Helpers.BasisSwapInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.DepositInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.DepositInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+override Boutquin.Curves.Bootstrap.Helpers.DepositInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.FixedFloatSwapInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.FixedFloatSwapInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+override Boutquin.Curves.Bootstrap.Helpers.FixedFloatSwapInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.FraInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.FraInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+override Boutquin.Curves.Bootstrap.Helpers.FraInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.OisFutureInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.OisFutureInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+override Boutquin.Curves.Bootstrap.Helpers.OisFutureInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.OisInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+override Boutquin.Curves.Bootstrap.Helpers.OisInstrumentHelper.PillarDate(System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> System.DateOnly
+override Boutquin.Curves.Bootstrap.Helpers.OisInstrumentHelper.SolveNodeValue(Boutquin.Curves.Abstractions.Curves.ICurveGroup! partialCurveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double
+static Boutquin.Curves.Bootstrap.Diagnostics.BootstrapDiagnosticsFactory.CreateDiagnostics(System.Collections.Generic.IEnumerable<Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic!>! repricing, int curveCount, int nodeCount) -> Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics!
+static Boutquin.Curves.Bootstrap.Diagnostics.BootstrapDiagnosticsFactory.CreateExact(string! label, Boutquin.Curves.Abstractions.Curves.CurveReference! targetCurve, System.DateOnly pillarDate, double quote, string! instrumentType) -> Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic!
+static Boutquin.Curves.Bootstrap.Diagnostics.BootstrapDiagnosticsFactory.CreateFromImplied(string! label, Boutquin.Curves.Abstractions.Curves.CurveReference! targetCurve, System.DateOnly pillarDate, double marketQuote, double impliedQuote, string! instrumentType) -> Boutquin.Curves.Abstractions.Diagnostics.RepricingDiagnostic!
+static Boutquin.Curves.Bootstrap.TenorParser.AddTenor(System.DateOnly date, Boutquin.MarketData.Abstractions.ReferenceData.Tenor tenor) -> System.DateOnly
+static Boutquin.Curves.Bootstrap.Validation.ValidationResult.Valid.get -> Boutquin.Curves.Bootstrap.Validation.ValidationResult!
+virtual Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.ImpliedQuote(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, System.DateOnly valuationDate, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData) -> double

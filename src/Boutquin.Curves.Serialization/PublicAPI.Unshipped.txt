@@ -1,0 +1,3 @@
+#nullable enable
+Boutquin.Curves.Serialization.CurveGroupDefinitionJsonSerializer.Serialize(Boutquin.Curves.Bootstrap.CurveCalibrationInput! input) -> string!
+Boutquin.Curves.Serialization.CurveGroupDefinitionJsonSerializer.DeserializeSpecs(string! json) -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>!

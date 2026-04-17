@@ -1,0 +1,22 @@
+{
+  "groupName": "USD-SOFR",
+  "valuationDate": "2026-04-09",
+  "curves": [
+    {
+      "curveName": "USD-Disc",
+      "role": "Discount",
+      "currency": "USD",
+      "benchmark": null,
+      "valueType": "DiscountFactor",
+      "dayCount": "ACT/360",
+      "interpolator": "LogLinearDiscountFactor",
+      "leftExtrapolator": "FlatZero",
+      "rightExtrapolator": "FlatForward",
+      "nodes": [
+        { "type": "Ois", "label": "1M", "quoteId": "CME:USD-SOFR-OIS-1M", "convention": "USD-SOFR-OIS", "tenor": "1M" },
+        { "type": "Ois", "label": "6M", "quoteId": "CME:USD-SOFR-OIS-6M", "convention": "USD-SOFR-OIS", "tenor": "6M" },
+        { "type": "FixedFloatSwap", "label": "5Y", "quoteId": "CME:USD-SOFR-OIS-5Y", "convention": "USD-SOFR-OIS", "tenor": "5Y" }
+      ]
+    }
+  ]
+}

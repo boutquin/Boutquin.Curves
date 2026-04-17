@@ -1,0 +1,33 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
+    <Project Path="src/Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
+    <Project Path="src/Boutquin.Curves.Indices/Boutquin.Curves.Indices.csproj" />
+    <Project Path="src/Boutquin.Curves.Quotes/Boutquin.Curves.Quotes.csproj" />
+    <Project Path="src/Boutquin.Curves.Core/Boutquin.Curves.Core.csproj" />
+    <Project Path="src/Boutquin.Curves.Interpolation/Boutquin.Curves.Interpolation.csproj" />
+    <Project Path="src/Boutquin.Curves.Bootstrap/Boutquin.Curves.Bootstrap.csproj" />
+    <Project Path="src/Boutquin.Curves.Serialization/Boutquin.Curves.Serialization.csproj" />
+    <Project Path="src/Boutquin.Curves.Risk/Boutquin.Curves.Risk.csproj" />
+    <Project Path="src/Boutquin.Curves.Examples/Boutquin.Curves.Examples.csproj" />
+    <Project Path="src/Boutquin.Curves.Recipes/Boutquin.Curves.Recipes.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Boutquin.Curves.Abstractions.Tests/Boutquin.Curves.Abstractions.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Conventions.Tests/Boutquin.Curves.Conventions.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Indices.Tests/Boutquin.Curves.Indices.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Quotes.Tests/Boutquin.Curves.Quotes.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Core.Tests/Boutquin.Curves.Core.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Interpolation.Tests/Boutquin.Curves.Interpolation.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Bootstrap.Tests/Boutquin.Curves.Bootstrap.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Risk.Tests/Boutquin.Curves.Risk.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.PropertyTests/Boutquin.Curves.PropertyTests.csproj" />
+    <Project Path="tests/Boutquin.Curves.IntegrationTests/Boutquin.Curves.IntegrationTests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Recipes.Tests/Boutquin.Curves.Recipes.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.Serialization.Tests/Boutquin.Curves.Serialization.Tests.csproj" />
+    <Project Path="tests/Boutquin.Curves.ArchitectureTests/Boutquin.Curves.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Boutquin.Curves.Benchmarks/Boutquin.Curves.Benchmarks.csproj" />
+  </Folder>
+</Solution>

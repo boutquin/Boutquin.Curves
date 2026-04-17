@@ -1,0 +1,7 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/usr/local/share/dotnet/dotnet": true,
+        "git add": true,
+        "command": true
+    }
+}

@@ -1,0 +1,88 @@
+#nullable enable
+
+Boutquin.Curves.Core.CurveGroup
+Boutquin.Curves.Core.CurveGroup.AsDictionary() -> System.Collections.Generic.IReadOnlyDictionary<Boutquin.Curves.Abstractions.Curves.CurveReference!, Boutquin.Curves.Abstractions.Curves.ICurve!>!
+Boutquin.Curves.Core.CurveGroup.CurveGroup(Boutquin.Curves.Abstractions.Identifiers.CurveGroupName name, System.DateOnly valuationDate, System.Collections.Generic.IReadOnlyDictionary<Boutquin.Curves.Abstractions.Curves.CurveReference!, Boutquin.Curves.Abstractions.Curves.ICurve!>! curves) -> void
+Boutquin.Curves.Core.CurveGroup.GetCurve(Boutquin.Curves.Abstractions.Curves.CurveReference! reference) -> Boutquin.Curves.Abstractions.Curves.ICurve!
+Boutquin.Curves.Core.CurveGroup.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveGroupName
+Boutquin.Curves.Core.CurveGroup.TryGetCurve(Boutquin.Curves.Abstractions.Curves.CurveReference! reference, out Boutquin.Curves.Abstractions.Curves.ICurve? curve) -> bool
+Boutquin.Curves.Core.CurveGroup.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.CurveGroupBuilder
+Boutquin.Curves.Core.CurveGroupBuilder.Add(Boutquin.Curves.Abstractions.Curves.CurveReference! reference, Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Core.CurveGroupBuilder!
+Boutquin.Curves.Core.CurveGroupBuilder.Build() -> Boutquin.Curves.Core.CurveGroup!
+Boutquin.Curves.Core.CurveGroupBuilder.CurveGroupBuilder(Boutquin.Curves.Abstractions.Identifiers.CurveGroupName name, System.DateOnly valuationDate) -> void
+Boutquin.Curves.Core.CurveGroupBuilder.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveGroupName
+Boutquin.Curves.Core.CurveGroupBuilder.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.ContinuouslyCompoundedZeroRate.get -> double
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.DiscountFactor(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.FlatDiscountCurve(Boutquin.Curves.Abstractions.Identifiers.CurveName name, System.DateOnly valuationDate, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, double continuouslyCompoundedZeroRate, Boutquin.MarketData.DayCount.IYearFractionCalculator? dayCount = null) -> void
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.InstantaneousForwardRate(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.ValueAt(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.FlatDiscountCurve.ZeroRate(System.DateOnly date, Boutquin.MarketData.Conventions.CompoundingConvention compounding) -> double
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.DiscountFactor(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.InstantaneousForwardRate(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.InterpolatedDiscountCurve(Boutquin.Curves.Abstractions.Identifiers.CurveName name, System.DateOnly valuationDate, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, System.Collections.Generic.IEnumerable<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points) -> void
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.InterpolatedDiscountCurve(Boutquin.Curves.Abstractions.Identifiers.CurveName name, System.DateOnly valuationDate, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, System.Collections.Generic.IEnumerable<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! points, Boutquin.Curves.Interpolation.InterpolationSettings! interpolation, Boutquin.MarketData.DayCount.IYearFractionCalculator? dayCount = null) -> void
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.Interpolation.get -> Boutquin.Curves.Interpolation.InterpolationSettings!
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.Points.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>!
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.ValueAt(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.ZeroRate(System.DateOnly date, Boutquin.MarketData.Conventions.CompoundingConvention compounding) -> double
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.DiscountFactor(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.InstantaneousForwardRate(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.JumpAdjustedDiscountCurve(Boutquin.Curves.Abstractions.Curves.IDiscountCurve! innerCurve, System.Collections.Generic.IEnumerable<Boutquin.Curves.Abstractions.Curves.CurvePoint!>! jumps) -> void
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.ValueAt(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.ZeroRate(System.DateOnly date, Boutquin.MarketData.Conventions.CompoundingConvention compounding) -> double
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.DiscountFactor(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.InstantaneousForwardRate(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.MultiplicativeSpreadDiscountCurve(Boutquin.Curves.Abstractions.Identifiers.CurveName name, Boutquin.Curves.Abstractions.Curves.IDiscountCurve! underlying, double spreadFactor) -> void
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.ValueAt(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.ZeroRate(System.DateOnly date, Boutquin.MarketData.Conventions.CompoundingConvention compounding) -> double
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.DiscountFactor(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.InstantaneousForwardRate(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.ValueAt(System.DateOnly date) -> double
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.ZeroRate(System.DateOnly date, Boutquin.MarketData.Conventions.CompoundingConvention compounding) -> double
+Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.ZeroSpreadedDiscountCurve(Boutquin.Curves.Abstractions.Identifiers.CurveName name, Boutquin.Curves.Abstractions.Curves.IDiscountCurve! underlying, double spread) -> void
+Boutquin.Curves.Core.Forwards.FlatForwardCurve
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.Benchmark.get -> Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.FlatForwardCurve(Boutquin.Curves.Abstractions.Identifiers.CurveName name, System.DateOnly valuationDate, Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode currency, Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName benchmark, double flatForwardRate, Boutquin.MarketData.DayCount.IYearFractionCalculator? dayCount = null) -> void
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.FlatForwardRate.get -> double
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.ForwardRate(System.DateOnly startDate, System.DateOnly endDate) -> double
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Forwards.FlatForwardCurve.ValueAt(System.DateOnly date) -> double
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.Benchmark.get -> Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.Currency.get -> Boutquin.MarketData.Abstractions.ReferenceData.CurrencyCode
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.DayCount.get -> Boutquin.MarketData.DayCount.IYearFractionCalculator!
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.ForwardCurveFromDiscountCurves(Boutquin.Curves.Abstractions.Identifiers.CurveName name, Boutquin.MarketData.Abstractions.ReferenceData.BenchmarkName benchmark, Boutquin.Curves.Abstractions.Curves.IDiscountCurve! discountCurve, Boutquin.Curves.Abstractions.Curves.IDiscountCurve! projectionCurve) -> void
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.ForwardRate(System.DateOnly startDate, System.DateOnly endDate) -> double
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.Name.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.ValueAt(System.DateOnly date) -> double
