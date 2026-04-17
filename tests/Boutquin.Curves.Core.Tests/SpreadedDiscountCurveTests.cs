@@ -107,7 +107,7 @@ public sealed class SpreadedDiscountCurveTests
         var baseCurve = CreateBaseCurve();
         var spreaded = new ZeroSpreadedDiscountCurve(new CurveName("USD-Spread"), baseCurve, 0.01);
 
-        spreaded.s_valuationDate.Should().Be(s_valuationDate);
+        spreaded.ValuationDate.Should().Be(s_valuationDate);
         spreaded.Currency.Should().Be(Usd);
         spreaded.DayCount.Should().BeSameAs(baseCurve.DayCount);
     }
@@ -172,7 +172,7 @@ public sealed class SpreadedDiscountCurveTests
         var baseCurve = CreateBaseCurve();
         var spreaded = new MultiplicativeSpreadDiscountCurve(new CurveName("USD-Mult"), baseCurve, 0.999);
 
-        spreaded.s_valuationDate.Should().Be(s_valuationDate);
+        spreaded.ValuationDate.Should().Be(s_valuationDate);
         spreaded.Currency.Should().Be(Usd);
         spreaded.DayCount.Should().BeSameAs(baseCurve.DayCount);
     }

@@ -43,7 +43,7 @@ public sealed class WithValuationDateTests
 
     private static void AssertForwardsRealize(IDiscountCurve original, IDiscountCurve rolled, DateOnly step, params DateOnly[] probeDates)
     {
-        rolled.s_valuationDate.Should().Be(step);
+        rolled.ValuationDate.Should().Be(step);
         double anchor = original.DiscountFactor(step);
         foreach (DateOnly t in probeDates)
         {
@@ -61,7 +61,7 @@ public sealed class WithValuationDateTests
 
         IDiscountCurve rolled = original.WithValuationDate(s_step);
 
-        rolled.s_valuationDate.Should().Be(s_step);
+        rolled.ValuationDate.Should().Be(s_step);
         // Rate invariance: DF(step + ΔT) under the rolled curve equals exp(-r·ΔT).
         DateOnly oneYearOut = s_step.AddDays(365);
         rolled.DiscountFactor(oneYearOut).Should().BeApproximately(Math.Exp(-0.04d), 1e-12d);
@@ -199,7 +199,7 @@ public sealed class WithValuationDateTests
 
         IForwardCurve rolled = original.WithValuationDate(s_step);
 
-        rolled.s_valuationDate.Should().Be(s_step);
+        rolled.ValuationDate.Should().Be(s_step);
         rolled.ForwardRate(s_step.AddDays(30), s_step.AddDays(120))
             .Should().BeApproximately(0.035d, 1e-12d);
     }
@@ -214,7 +214,7 @@ public sealed class WithValuationDateTests
 
         IForwardCurve rolled = original.WithValuationDate(s_step);
 
-        rolled.s_valuationDate.Should().Be(s_step);
+        rolled.ValuationDate.Should().Be(s_step);
         DateOnly start = s_step.AddDays(90);
         DateOnly end = s_step.AddDays(180);
         rolled.ForwardRate(start, end).Should().BeApproximately(
