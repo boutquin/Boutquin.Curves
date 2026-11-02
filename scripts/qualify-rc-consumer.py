@@ -159,7 +159,9 @@ def write_identity_probe(consumer, expected):
             if dll not in zipped.namelist():
                 require(name == "Boutquin.Storage.SourceGenerator", f"Unexpected qualified runtime layout: {name}")
                 continue
+            core = package["version"].split("-")[0]
             runtime.append(dict(id=name, informationalVersion=package["version"] + "+" + package["sourceCommit"],
+                assemblyVersion=core.split(".")[0] + ".0.0.0", fileVersion=core + ".0",
                 dllSha256=hashlib.sha256(zipped.read(dll)).hexdigest()))
     ET.SubElement(group, "None", Include="runtime-identities.json", CopyToOutputDirectory="PreserveNewest")
     ET.ElementTree(project).write(directory / "IdentityProbe.csproj", encoding="unicode")
@@ -176,8 +178,8 @@ foreach (var package in document.RootElement.EnumerateArray())
     var assembly = Assembly.Load(name);
     var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
     var hash = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(assembly.Location))).ToLowerInvariant();
-    if (assembly.GetName().Name != name || assembly.GetName().Version?.ToString() != "2.0.0.0"
-        || System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location).FileVersion != "2.0.0.0"
+    if (assembly.GetName().Name != name || assembly.GetName().Version?.ToString() != package.GetProperty("assemblyVersion").GetString()
+        || System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location).FileVersion != package.GetProperty("fileVersion").GetString()
         || informationalVersion != package.GetProperty("informationalVersion").GetString()
         || hash != package.GetProperty("dllSha256").GetString())
     {
