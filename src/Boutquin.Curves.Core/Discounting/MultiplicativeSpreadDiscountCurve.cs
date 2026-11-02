@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Internal;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
 using Boutquin.MarketData.DayCount;
 
@@ -47,12 +47,15 @@ public sealed class MultiplicativeSpreadDiscountCurve : IDiscountCurve
     /// <param name="name">Curve name for the spreaded curve.</param>
     /// <param name="underlying">Base discount curve to which the spread is applied.</param>
     /// <param name="spreadFactor">Multiplicative discount-factor spread per unit time (e.g., 0.999 for ~10 bp/year).</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="spreadFactor"/> is non-positive.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="underlying"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="spreadFactor"/> is non-positive or not a finite number (NaN or ±Infinity).</exception>
     public MultiplicativeSpreadDiscountCurve(CurveName name, IDiscountCurve underlying, double spreadFactor)
     {
-        if (spreadFactor <= 0d)
+        ArgumentNullException.ThrowIfNull(underlying);
+
+        if (!double.IsFinite(spreadFactor) || spreadFactor <= 0d)
         {
-            throw new ArgumentOutOfRangeException(nameof(spreadFactor), "Spread factor must be strictly positive.");
+            throw new ArgumentOutOfRangeException(nameof(spreadFactor), "Spread factor must be a finite, strictly positive number.");
         }
 
         Name = name;
@@ -61,22 +64,26 @@ public sealed class MultiplicativeSpreadDiscountCurve : IDiscountCurve
         _logSpreadFactor = Math.Log(spreadFactor);
     }
 
-    /// <inheritdoc />
+    /// <summary>Identifier of this spread-adjusted curve.</summary>
     public CurveName Name { get; }
 
-    /// <inheritdoc />
+    /// <summary>Valuation date inherited from the underlying curve.</summary>
     public DateOnly ValuationDate => _underlying.ValuationDate;
 
-    /// <inheritdoc />
-    public CurrencyCode Currency => _underlying.Currency;
+    /// <summary>Currency inherited from the underlying curve.</summary>
+    public Currency Currency => _underlying.Currency;
 
-    /// <inheritdoc />
+    /// <summary>Day-count calculator borrowed from the underlying curve.</summary>
     public IYearFractionCalculator DayCount => _underlying.DayCount;
 
-    /// <inheritdoc />
+    /// <summary>Returns the spread-adjusted discount factor.</summary>
+    /// <param name="date">Evaluation date.</param>
+    /// <returns>The value returned by <see cref="DiscountFactor"/>.</returns>
     public double ValueAt(DateOnly date) => DiscountFactor(date);
 
-    /// <inheritdoc />
+    /// <summary>Applies this curve's spread to the underlying discount factor.</summary>
+    /// <param name="date">Evaluation date.</param>
+    /// <returns>One on or before valuation; otherwise the underlying discount factor multiplied by the exponential spread adjustment.</returns>
     public double DiscountFactor(DateOnly date)
     {
         if (date <= ValuationDate)
@@ -88,14 +95,24 @@ public sealed class MultiplicativeSpreadDiscountCurve : IDiscountCurve
         return _underlying.DiscountFactor(date) * Math.Exp(_logSpreadFactor * t);
     }
 
-    /// <inheritdoc />
+    /// <summary>Converts this curve's adjusted discount factor into a zero-rate quote.</summary>
+    /// <param name="date">Quote maturity.</param>
+    /// <param name="compounding">Requested compounding convention.</param>
+    /// <returns>Zero on or before valuation; otherwise a rate consistent with this curve's discount factor.</returns>
     public double ZeroRate(DateOnly date, CompoundingConvention compounding)
     {
+        if (date <= ValuationDate)
+        {
+            return 0d;
+        }
+
         double t = DayCount.YearFraction(ValuationDate, date);
         return CurveMath.ZeroRateFromDiscountFactor(DiscountFactor(date), t, compounding);
     }
 
-    /// <inheritdoc />
+    /// <summary>Applies the constant instantaneous-forward spread to the underlying forward.</summary>
+    /// <param name="date">Evaluation date.</param>
+    /// <returns>The underlying instantaneous forward minus the logarithm of the multiplicative spread factor.</returns>
     public double InstantaneousForwardRate(DateOnly date)
     {
         return _underlying.InstantaneousForwardRate(date) - _logSpreadFactor;

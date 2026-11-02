@@ -8,8 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="../Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
     <ProjectReference Include="../Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
-    <ProjectReference Include="../Boutquin.Curves.Indices/Boutquin.Curves.Indices.csproj" />
-    <ProjectReference Include="../Boutquin.Curves.Quotes/Boutquin.Curves.Quotes.csproj" />
     <ProjectReference Include="../Boutquin.Curves.Core/Boutquin.Curves.Core.csproj" />
     <ProjectReference Include="../Boutquin.Curves.Bootstrap/Boutquin.Curves.Bootstrap.csproj" />
   </ItemGroup>

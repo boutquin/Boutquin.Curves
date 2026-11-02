@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.MarketData.DayCount;
 
-using NumericsMonotoneCubic = Boutquin.Numerics.Interpolation.MonotoneCubicInterpolator;
+using NumericsMonotoneCubic = Boutquin.Numerics.Interpolation.MonotoneCubicInterpolator<double>;
 
 namespace Boutquin.Curves.Interpolation;
 
@@ -55,8 +55,25 @@ public sealed class MonotoneCubicInterpolator : INodalCurveInterpolator
     /// <param name="points">Sorted curve nodes expressed as discount factors.</param>
     /// <param name="dayCount">Day-count convention used to compute times in years.</param>
     /// <returns>Interpolated discount factor at <paramref name="targetDate"/>.</returns>
+    /// <remarks>
+    /// Node dates must be strictly ascending (as required by <see cref="INodalCurveInterpolator"/>).
+    /// The underlying Numerics monotone-cubic kernel also validates sort order internally (it
+    /// throws <see cref="ArgumentException"/> before any binary search runs), so an unsorted
+    /// input can never silently produce a wrong discount factor through this path. This wrapper
+    /// performs its own equivalent sort-order check before delegating so that a violation is
+    /// reported with a curve-specific message naming the offending node index and date pair,
+    /// rather than the kernel's raw index/value message.
+    /// </remarks>
+    /// <exception cref="ArgumentException">A node is null, its discount factor is not finite and positive, or node dates are not strictly ascending.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="points"/> or <paramref name="dayCount"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="points"/> is empty, or when any two consecutive nodes in
+    /// <paramref name="points"/> are not in strictly ascending date order.
+    /// </exception>
     public double Interpolate(DateOnly valuationDate, DateOnly targetDate, IReadOnlyList<CurvePoint> points, IYearFractionCalculator dayCount)
     {
+        InterpolationInputValidator.Validate(points, dayCount);
+
         if (targetDate <= valuationDate)
         {
             return 1d;
@@ -69,6 +86,19 @@ public sealed class MonotoneCubicInterpolator : INodalCurveInterpolator
         {
             xs[i] = dayCount.YearFraction(valuationDate, points[i].Date);
             ys[i] = Math.Log(points[i].Value);
+
+            // Guard: validate strictly-ascending node dates before delegating to the kernel.
+            // The Numerics monotone-cubic kernel also validates sort order internally and
+            // throws ArgumentException on violation, so this check is redundant with the
+            // kernel's own guard — it exists to report a curve-specific message naming the
+            // offending node index and date pair, rather than the kernel's raw index/value.
+            if (i > 0 && xs[i] <= xs[i - 1])
+            {
+                throw new ArgumentException(
+                    $"Node dates must be strictly ascending. Node {i} ({points[i].Date:yyyy-MM-dd}) " +
+                    $"is not after node {i - 1} ({points[i - 1].Date:yyyy-MM-dd}).",
+                    nameof(points));
+            }
         }
 
         double x = dayCount.YearFraction(valuationDate, targetDate);

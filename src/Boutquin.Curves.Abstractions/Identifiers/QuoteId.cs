@@ -14,6 +14,7 @@
 //   limitations under the License.
 //
 
+using System.Text.Json.Serialization;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 
 namespace Boutquin.Curves.Abstractions.Identifiers;
@@ -30,13 +31,47 @@ namespace Boutquin.Curves.Abstractions.Identifiers;
 /// calibration. Wrapping the raw string in a strongly-typed record ensures that
 /// quote identifiers cannot be accidentally interchanged with other string-based
 /// identifiers such as <see cref="CurveName"/> or <see cref="BenchmarkName"/>.
+///
+/// <b>Default-value hazard:</b> because <c>QuoteId</c> is a value type, the
+/// parameterless <c>default(QuoteId)</c> instance bypasses this constructor and
+/// leaves <see cref="Value"/> as <see langword="null"/> at the CLR level. Code that
+/// allocates arrays (<c>new QuoteId[N]</c>), uses uninitialized fields, or produces
+/// explicit <c>default</c> literals yields such instances without invoking this
+/// constructor. <see cref="ToString"/> returns <c>"&lt;uninitialized&gt;"</c> for
+/// those instances so that logging and diagnostics do not throw a
+/// <see cref="NullReferenceException"/>; however, using a default instance as a
+/// dictionary key or wire identifier remains a logic error.
 /// </remarks>
-/// <param name="Value">Quote identifier value.</param>
-public readonly record struct QuoteId(string Value)
+/// <exception cref="ArgumentException">
+/// Thrown when the value supplied to the constructor is <see langword="null"/>,
+/// empty, or consists solely of whitespace characters.
+/// </exception>
+public readonly record struct QuoteId
 {
     /// <summary>
-    /// Returns the underlying quote-id value.
+    /// The canonical string that identifies this market quote.
+    /// Always non-null on instances created via <see cref="QuoteId(string)"/>.
     /// </summary>
-    /// <returns>String representation of this quote id.</returns>
-    public override string ToString() => Value;
+    public string Value { get; }
+
+    /// <summary>
+    /// Initializes a new <see cref="QuoteId"/> with the specified value.
+    /// </summary>
+    /// <param name="value">Quote identifier value. Must be non-null and non-whitespace.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is <see langword="null"/>, empty, or whitespace.
+    /// </exception>
+    [JsonConstructor]
+    public QuoteId(string value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
+        Value = value;
+    }
+
+    /// <summary>
+    /// Returns the underlying quote-id value, or <c>"&lt;uninitialized&gt;"</c> for a
+    /// <c>default(QuoteId)</c> instance whose <see cref="Value"/> is <see langword="null"/>.
+    /// </summary>
+    /// <returns>String representation of this quote id. Never returns <see langword="null"/>.</returns>
+    public override string ToString() => Value ?? "<uninitialized>";
 }

@@ -34,5 +34,15 @@ public interface IConvexityAdjustment
     /// <param name="timeToExpiry">Year fraction from valuation to contract expiry.</param>
     /// <param name="timeToMaturity">Year fraction from valuation to contract maturity (end of accrual period).</param>
     /// <returns>Convexity adjustment in decimal form (e.g., 0.0003 for 3 bp). Subtract from futures rate to get OIS-equivalent rate.</returns>
+    /// <remarks>
+    /// Implementations are NOT required to validate the ranges of <paramref name="timeToExpiry"/>
+    /// or <paramref name="timeToMaturity"/>, and their handling of out-of-range or degenerate
+    /// inputs (e.g. non-positive time-to-expiry) is implementation-specific: some return a
+    /// well-defined value such as zero for a degenerate span (a Hull-White style model), while
+    /// others ignore one or both parameters entirely because the model does not need them (a
+    /// bond-yield style model that accepts both parameters purely for interface compliance and
+    /// derives its adjustment from state supplied at construction instead). Callers should not
+    /// assume a uniform validation or degeneracy contract across implementations.
+    /// </remarks>
     double Adjustment(double timeToExpiry, double timeToMaturity);
 }

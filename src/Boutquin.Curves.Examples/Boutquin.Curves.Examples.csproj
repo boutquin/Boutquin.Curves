@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Boutquin.Curves.Examples</RootNamespace>
     <AssemblyName>Boutquin.Curves.Examples</AssemblyName>
@@ -9,8 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="../Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
     <ProjectReference Include="../Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
-    <ProjectReference Include="../Boutquin.Curves.Indices/Boutquin.Curves.Indices.csproj" />
-    <ProjectReference Include="../Boutquin.Curves.Quotes/Boutquin.Curves.Quotes.csproj" />
     <ProjectReference Include="../Boutquin.Curves.Core/Boutquin.Curves.Core.csproj" />
     <ProjectReference Include="../Boutquin.Curves.Interpolation/Boutquin.Curves.Interpolation.csproj" />
     <ProjectReference Include="../Boutquin.Curves.Bootstrap/Boutquin.Curves.Bootstrap.csproj" />

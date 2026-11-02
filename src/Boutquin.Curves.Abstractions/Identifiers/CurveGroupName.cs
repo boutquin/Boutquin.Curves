@@ -14,6 +14,8 @@
 //   limitations under the License.
 //
 
+using System.Text.Json.Serialization;
+
 namespace Boutquin.Curves.Abstractions.Identifiers;
 
 /// <summary>
@@ -27,13 +29,47 @@ namespace Boutquin.Curves.Abstractions.Identifiers;
 /// a specific valuation date and flows through diagnostics, risk reports, and
 /// serialized curve stores. Strong typing as a dedicated record prevents a group
 /// name from being passed where a <see cref="CurveName"/> is expected, or vice versa.
+///
+/// <b>Default-value hazard:</b> because <c>CurveGroupName</c> is a value type, the
+/// parameterless <c>default(CurveGroupName)</c> instance bypasses this constructor and
+/// leaves <see cref="Value"/> as <see langword="null"/> at the CLR level. Code that
+/// allocates arrays (<c>new CurveGroupName[N]</c>), uses uninitialized fields, or
+/// produces explicit <c>default</c> literals yields such instances without invoking
+/// this constructor. <see cref="ToString"/> returns <c>"&lt;uninitialized&gt;"</c>
+/// for those instances so that logging and diagnostics do not throw a
+/// <see cref="NullReferenceException"/>; however, using a default instance as a
+/// dictionary key or wire identifier remains a logic error.
 /// </remarks>
-/// <param name="Value">Curve group name value.</param>
-public readonly record struct CurveGroupName(string Value)
+/// <exception cref="ArgumentException">
+/// Thrown when the value supplied to the constructor is <see langword="null"/>,
+/// empty, or consists solely of whitespace characters.
+/// </exception>
+public readonly record struct CurveGroupName
 {
     /// <summary>
-    /// Returns the underlying group-name value.
+    /// The canonical string that identifies this curve group snapshot.
+    /// Always non-null on instances created via <see cref="CurveGroupName(string)"/>.
     /// </summary>
-    /// <returns>String representation of this curve group name.</returns>
-    public override string ToString() => Value;
+    public string Value { get; }
+
+    /// <summary>
+    /// Initializes a new <see cref="CurveGroupName"/> with the specified value.
+    /// </summary>
+    /// <param name="value">Curve group name value. Must be non-null and non-whitespace.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is <see langword="null"/>, empty, or whitespace.
+    /// </exception>
+    [JsonConstructor]
+    public CurveGroupName(string value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
+        Value = value;
+    }
+
+    /// <summary>
+    /// Returns the underlying group-name value, or <c>"&lt;uninitialized&gt;"</c> for a
+    /// <c>default(CurveGroupName)</c> instance whose <see cref="Value"/> is <see langword="null"/>.
+    /// </summary>
+    /// <returns>String representation of this curve group name. Never returns <see langword="null"/>.</returns>
+    public override string ToString() => Value ?? "<uninitialized>";
 }

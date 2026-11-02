@@ -16,7 +16,8 @@
 
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Curves.Core.Internal;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
 using Boutquin.MarketData.DayCount;
 
@@ -43,10 +44,22 @@ public sealed class JumpAdjustedDiscountCurve : IDiscountCurve
     /// </summary>
     /// <param name="innerCurve">Base discount curve evaluated before jump adjustments.</param>
     /// <param name="jumps">Jump multipliers applied on or after each jump date.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="innerCurve"/> or <paramref name="jumps"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when any jump factor in <paramref name="jumps"/> is non-positive or non-finite, which would produce an arbitrage-violating non-positive discount factor.</exception>
     public JumpAdjustedDiscountCurve(IDiscountCurve innerCurve, IEnumerable<CurvePoint> jumps)
     {
+        ArgumentNullException.ThrowIfNull(innerCurve);
+        ArgumentNullException.ThrowIfNull(jumps);
+
+        CurvePoint[] orderedJumps = jumps.OrderBy(static jump => jump.Date).ToArray();
+
+        if (orderedJumps.Any(static jump => !double.IsFinite(jump.Value) || jump.Value <= 0d))
+        {
+            throw new ArgumentOutOfRangeException(nameof(jumps), "All jump factors must be finite and strictly positive to preserve discount factor positivity.");
+        }
+
         _innerCurve = innerCurve;
-        _jumps = jumps.OrderBy(static jump => jump.Date).ToArray();
+        _jumps = orderedJumps;
     }
 
     /// <summary>
@@ -62,7 +75,7 @@ public sealed class JumpAdjustedDiscountCurve : IDiscountCurve
     /// <summary>
     /// Currency inherited from the underlying discount curve.
     /// </summary>
-    public CurrencyCode Currency => _innerCurve.Currency;
+    public Currency Currency => _innerCurve.Currency;
 
     /// <summary>
     /// Day-count convention inherited from the underlying discount curve.
@@ -82,23 +95,53 @@ public sealed class JumpAdjustedDiscountCurve : IDiscountCurve
     /// <returns>Discount factor including all jumps up to <paramref name="date"/>.</returns>
     public double DiscountFactor(DateOnly date)
     {
+        if (date <= ValuationDate)
+        {
+            return 1d;
+        }
+
         double baseDf = _innerCurve.DiscountFactor(date);
         double jumpAdjustment = _jumps.Where(jump => jump.Date <= date).Aggregate(1d, static (acc, jump) => acc * jump.Value);
         return baseDf * jumpAdjustment;
     }
 
     /// <summary>
-    /// Returns the zero rate from the underlying curve for the requested date and compounding basis.
+    /// Returns the zero rate implied by this curve's own jump-adjusted discount factor.
     /// </summary>
     /// <param name="date">Target date for the returned zero-rate quote.</param>
     /// <param name="compounding">The compounding convention applied to the derived zero rate.</param>
-    /// <returns>Zero rate quoted by the underlying curve.</returns>
-    public double ZeroRate(DateOnly date, CompoundingConvention compounding) => _innerCurve.ZeroRate(date, compounding);
+    /// <returns>
+    /// 0.0 when <paramref name="date"/> is on or before <see cref="ValuationDate"/> (zero time horizon);
+    /// otherwise the zero rate that reproduces <see cref="DiscountFactor"/> under <paramref name="compounding"/>.
+    /// </returns>
+    /// <remarks>
+    /// Derived from this curve's jump-adjusted <see cref="DiscountFactor"/>, not from the underlying curve, so
+    /// that <c>exp(-ZeroRate · t)</c> (continuous) reproduces <see cref="DiscountFactor"/> for dates on or after
+    /// a jump. Delegating to the inner curve would ignore the jump overlay and return a rate inconsistent with
+    /// this curve's own discount factors.
+    /// </remarks>
+    public double ZeroRate(DateOnly date, CompoundingConvention compounding)
+    {
+        if (date <= ValuationDate)
+        {
+            return 0d;
+        }
+
+        double t = DayCount.YearFraction(ValuationDate, date);
+        return CurveMath.ZeroRateFromDiscountFactor(DiscountFactor(date), t, compounding);
+    }
 
     /// <summary>
     /// Returns the instantaneous forward rate from the underlying curve.
     /// </summary>
     /// <returns>Instantaneous forward rate at <paramref name="date"/>.</returns>
+    /// <remarks>
+    /// The jump overlay is a discrete multiplicative step in the discount factor: it is a measure-zero
+    /// discontinuity in <c>ln P(t)</c>, contributing a Dirac delta to <c>f(t) = -d/dt ln P(t)</c> at the jump
+    /// instant and nothing for any other <paramref name="date"/>. Between jump dates the instantaneous forward
+    /// therefore equals the inner curve's forward; the cumulative jump effect is carried by
+    /// <see cref="DiscountFactor"/> and <see cref="ZeroRate"/>, not by the instantaneous forward.
+    /// </remarks>
     public double InstantaneousForwardRate(DateOnly date) => _innerCurve.InstantaneousForwardRate(date);
 
     /// <summary>

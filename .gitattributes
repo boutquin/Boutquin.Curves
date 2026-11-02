@@ -23,4 +23,9 @@ review-accepted.yaml export-ignore
 ###############################################################################
 #*.jpg   binary
 #*.png   binary
-#*.gif   binary
+#*.gif   binary\n\n# Arena run evidence: versioned and shared, but never in a `git archive`.
+.code-arena/ export-ignore
+.code-arena/** export-ignore
+
+# Preserve the exact downloaded bytes bound by qualification receipt hashes.
+specs/verification/published-storage-2026-10-27/ci/runs/** -text

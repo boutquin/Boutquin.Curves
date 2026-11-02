@@ -14,6 +14,7 @@
 //   limitations under the License.
 //
 
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 
 namespace Boutquin.Curves.Abstractions.Curves;
@@ -26,5 +27,5 @@ namespace Boutquin.Curves.Abstractions.Curves;
 /// <param name="Benchmark">Optional benchmark identity when the curve role is benchmark-specific.</param>
 public sealed record CurveReference(
     CurveRole Role,
-    CurrencyCode Currency,
+    Currency Currency,
     BenchmarkName? Benchmark = null);

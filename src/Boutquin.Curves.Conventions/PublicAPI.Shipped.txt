@@ -1,5 +1,7 @@
 #nullable enable
 
+Boutquin.Curves.Conventions.Calendars.ObservationShiftHelper
+Boutquin.Curves.Conventions.CompoundedInArrearsRate
 Boutquin.Curves.Conventions.ScheduleGenerator
 Boutquin.Curves.Conventions.SchedulePeriod
 Boutquin.Curves.Conventions.SchedulePeriod.AccrualEndDate.get -> System.DateOnly
@@ -15,4 +17,7 @@ Boutquin.Curves.Conventions.SchedulePeriod.PeriodStartDate.init -> void
 Boutquin.Curves.Conventions.SchedulePeriod.SchedulePeriod(System.DateOnly AccrualStartDate, System.DateOnly AccrualEndDate, System.DateOnly PeriodStartDate, System.DateOnly PeriodEndDate, System.DateOnly PaymentDate, double YearFraction) -> void
 Boutquin.Curves.Conventions.SchedulePeriod.YearFraction.get -> double
 Boutquin.Curves.Conventions.SchedulePeriod.YearFraction.init -> void
+static Boutquin.Curves.Conventions.Calendars.ObservationShiftHelper.ComputeObservationDate(System.DateOnly accrualDate, Boutquin.MarketData.Conventions.ObservationShiftConvention convention, Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar! calendar, int shiftDays = 0) -> System.DateOnly
+static Boutquin.Curves.Conventions.CompoundedInArrearsRate.Compute(System.Collections.Generic.IReadOnlyList<(System.DateOnly FixingDate, decimal Rate)>! dailyFixings, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount, int daysPerYear = 360) -> decimal
+static Boutquin.Curves.Conventions.CompoundedInArrearsRate.ComputeWithLookback(System.Collections.Generic.IReadOnlyList<(System.DateOnly FixingDate, decimal Rate)>! dailyFixings, Boutquin.MarketData.DayCount.IYearFractionCalculator! dayCount, int lookbackBusinessDays, Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar! calendar, int daysPerYear = 360) -> decimal
 static Boutquin.Curves.Conventions.ScheduleGenerator.Generate(System.DateOnly startDate, System.DateOnly endDate, Boutquin.MarketData.Conventions.PaymentFrequency frequency, Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar! calendar, Boutquin.MarketData.Abstractions.Calendars.BusinessDayAdjustment businessDayAdjustment, Boutquin.MarketData.DayCount.IYearFractionCalculator! yearFractionCalculator, int paymentLagBusinessDays = 0, bool endOfMonth = false) -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Conventions.SchedulePeriod!>!

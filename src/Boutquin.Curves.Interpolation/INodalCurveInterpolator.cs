@@ -45,10 +45,23 @@ public interface INodalCurveInterpolator
     /// <param name="points">Ordered curve nodes used as interpolation inputs.</param>
     /// <param name="dayCount">Day-count convention used when interpolation requires time fractions.</param>
     /// <returns>Interpolated discount factor for <paramref name="targetDate"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="points"/> or <paramref name="dayCount"/> is null.</exception>
+    /// <exception cref="ArgumentException">The node set is empty, contains a null or non-positive/non-finite value, or is not strictly ordered.</exception>
     /// <remarks>
     /// Callers must supply nodes ordered by increasing date and strictly positive discount factors.
     /// If boundary behavior matters, combine this with explicit left/right extrapolation policy at
     /// the curve level rather than encoding extrapolation assumptions inside interpolation internals.
+    ///
+    /// <para><b>Before-first-node extrapolation is not uniform across implementations.</b>
+    /// <see cref="FlatForwardInterpolator"/>, <see cref="LogLinearDiscountFactorInterpolator"/>,
+    /// <see cref="MonotoneCubicInterpolator"/>, and <see cref="MonotoneConvexInterpolator"/> all
+    /// return the first node's discount factor unchanged (flat-DF rule).
+    /// <see cref="LinearZeroRateInterpolator"/> instead holds the first-node zero rate
+    /// $z_0 = -\ln P_0 / t_0$ constant and returns $\exp(-z_0 \cdot t)$. The two rules agree
+    /// at $t = t_0$ but diverge before the first pillar: the difference is approximately
+    /// $\tfrac{1}{2} z_0^2 t_0 t + O(t^2)$, reaching ~37 basis points for a 5% short rate
+    /// with a 31-day stub period. Callers switching interpolators on a curve that has stub
+    /// dates before the first pillar must account for this divergence.</para>
     /// </remarks>
     double Interpolate(DateOnly valuationDate, DateOnly targetDate, IReadOnlyList<CurvePoint> points, IYearFractionCalculator dayCount);
 }

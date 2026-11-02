@@ -14,6 +14,8 @@
 //   limitations under the License.
 //
 
+using System.Collections.ObjectModel;
+
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 
@@ -35,9 +37,11 @@ public sealed class CurveGroup : ICurveGroup
     /// <param name="curves">Curve map keyed by role, currency, and optional benchmark.</param>
     public CurveGroup(CurveGroupName name, DateOnly valuationDate, IReadOnlyDictionary<CurveReference, ICurve> curves)
     {
+        ArgumentNullException.ThrowIfNull(curves);
+
         Name = name;
         ValuationDate = valuationDate;
-        _curves = curves;
+        _curves = new Dictionary<CurveReference, ICurve>(curves);
     }
 
     /// <summary>
@@ -77,5 +81,10 @@ public sealed class CurveGroup : ICurveGroup
     /// <summary>
     /// Exposes the underlying curve map for read-only iteration.
     /// </summary>
-    public IReadOnlyDictionary<CurveReference, ICurve> AsDictionary() => _curves;
+    /// <remarks>
+    /// Returns a <see cref="ReadOnlyDictionary{TKey,TValue}"/> wrapper so that the returned reference
+    /// cannot be upcast to <see cref="Dictionary{TKey,TValue}"/> and used to mutate the immutable snapshot.
+    /// </remarks>
+    public IReadOnlyDictionary<CurveReference, ICurve> AsDictionary() =>
+        new ReadOnlyDictionary<CurveReference, ICurve>(new Dictionary<CurveReference, ICurve>(_curves));
 }

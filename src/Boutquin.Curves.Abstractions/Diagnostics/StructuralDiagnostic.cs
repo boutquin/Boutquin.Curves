@@ -27,13 +27,14 @@ namespace Boutquin.Curves.Abstractions.Diagnostics;
 /// warnings where a node's day-count or compounding rule differs from the curve
 /// default. Each entry carries a machine-readable <see cref="Code"/> for
 /// programmatic filtering, a human-readable <see cref="Message"/>, a
-/// <see cref="Severity"/> level (info, warning, or error), and an optional
+/// <see cref="Severity"/> level (e.g. <c>"Info"</c>, <c>"Warning"</c>, or
+/// <c>"Error"</c> — PascalCase, not a closed enum), and an optional
 /// <see cref="Context"/> string that pinpoints the affected node or instrument
 /// for targeted debugging.
 /// </remarks>
 /// <param name="Code">Machine-readable diagnostic code.</param>
 /// <param name="Message">Human-readable description of the structural issue.</param>
-/// <param name="Severity">Severity indicator such as info, warning, or error.</param>
+/// <param name="Severity">Severity indicator such as <c>"Info"</c>, <c>"Warning"</c>, or <c>"Error"</c> (PascalCase).</param>
 /// <param name="Context">Optional context payload for pinpointing the issue location.</param>
 public sealed record StructuralDiagnostic(
     string Code,

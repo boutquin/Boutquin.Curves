@@ -18,6 +18,7 @@ using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Discounting;
 using Boutquin.Curves.Core.Forwards;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using FluentAssertions;
 
@@ -39,7 +40,7 @@ public sealed class WithValuationDateTests
     private static readonly DateOnly s_valuation = new(2026, 4, 15);
     private static readonly DateOnly s_step = new(2026, 10, 15);
     private static readonly CurveName s_name = new("USD-OIS");
-    private const CurrencyCode Usd = CurrencyCode.USD;
+    private const Currency Usd = Currency.USD;
 
     private static void AssertForwardsRealize(IDiscountCurve original, IDiscountCurve rolled, DateOnly step, params DateOnly[] probeDates)
     {

@@ -38,4 +38,43 @@ namespace Boutquin.Curves.Abstractions.Diagnostics;
 public sealed record CalibrationJacobian(
     IReadOnlyList<string> RowLabels,
     IReadOnlyList<string> ColumnLabels,
-    double[,] Values);
+    double[,] Values)
+{
+    private IReadOnlyList<string> _rowLabels = SnapshotCopies.List(RowLabels, nameof(RowLabels));
+    private IReadOnlyList<string> _columnLabels = SnapshotCopies.List(ColumnLabels, nameof(ColumnLabels));
+    private double[,] _values = CopyValues(RowLabels, ColumnLabels, Values, nameof(Values));
+
+    /// <summary>Protected instrument-label snapshot in matrix-row order.</summary>
+    public IReadOnlyList<string> RowLabels
+    {
+        get => _rowLabels;
+        init => _rowLabels = SnapshotCopies.List(value, nameof(RowLabels));
+    }
+
+    /// <summary>Protected parameter-label snapshot in matrix-column order.</summary>
+    public IReadOnlyList<string> ColumnLabels
+    {
+        get => _columnLabels;
+        init => _columnLabels = SnapshotCopies.List(value, nameof(ColumnLabels));
+    }
+
+    /// <summary>Copy of the Jacobian entries; modifying the returned array does not change this snapshot.</summary>
+    /// <remarks>Cache this copy locally before iterating. Constructor dimensions must match the supplied labels.</remarks>
+    public double[,] Values
+    {
+        get => (double[,])_values.Clone();
+        init => _values = CopyValues(RowLabels, ColumnLabels, value, nameof(Values));
+    }
+
+    private static double[,] CopyValues(IReadOnlyList<string> rows, IReadOnlyList<string> columns, double[,] values, string parameter)
+    {
+        ArgumentNullException.ThrowIfNull(rows, nameof(RowLabels));
+        ArgumentNullException.ThrowIfNull(columns, nameof(ColumnLabels));
+        ArgumentNullException.ThrowIfNull(values, parameter);
+        if (rows.Count != values.GetLength(0) || columns.Count != values.GetLength(1))
+        {
+            throw new ArgumentException("Jacobian dimensions must match row and column label counts.", parameter);
+        }
+        return (double[,])values.Clone();
+    }
+}

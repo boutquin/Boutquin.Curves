@@ -36,9 +36,20 @@ public sealed class ConstantConvexityAdjustment : IConvexityAdjustment
     /// <param name="adjustment">Fixed convexity adjustment in decimal form (e.g., 0.0003 for 3 bp).</param>
     public ConstantConvexityAdjustment(double adjustment)
     {
+        if (!double.IsFinite(adjustment))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(adjustment),
+                adjustment,
+                "Convexity adjustment must be a finite number (NaN and ±Infinity are not valid).");
+        }
+
         _adjustment = adjustment;
     }
 
-    /// <inheritdoc />
+    /// <summary>Returns the configured constant futures-to-forward adjustment.</summary>
+    /// <param name="timeToExpiry">Expiry horizon; ignored by the constant model.</param>
+    /// <param name="timeToMaturity">Accrual-end horizon; ignored by the constant model.</param>
+    /// <returns>The same configured decimal rate adjustment for every horizon.</returns>
     public double Adjustment(double timeToExpiry, double timeToMaturity) => _adjustment;
 }

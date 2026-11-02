@@ -3,10 +3,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Boutquin.Curves.Indices</RootNamespace>
     <AssemblyName>Boutquin.Curves.Indices</AssemblyName>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>DEPRECATED — types moved to Boutquin.Curves.Abstractions in v1.0. This package will be removed in v1.1.</Description>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Compat dependency: consumers referencing this package get Abstractions transitively -->
     <ProjectReference Include="../Boutquin.Curves.Abstractions/Boutquin.Curves.Abstractions.csproj" />
-    <ProjectReference Include="../Boutquin.Curves.Conventions/Boutquin.Curves.Conventions.csproj" />
   </ItemGroup>
 </Project>

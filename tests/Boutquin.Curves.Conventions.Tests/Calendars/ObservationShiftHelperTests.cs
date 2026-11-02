@@ -85,6 +85,30 @@ public sealed class ObservationShiftHelperTests
     }
 
     [Fact]
+    public void Shifted_AndLookback_AreDeliberatelyEquivalentInV1()
+    {
+        // D-1: v1 treats Shifted and Lookback as byte-identical for per-date computation. This is
+        // a DELIBERATE, DOCUMENTED equivalence
+        // — ISDA's 2021 Definitions distinguish them (Lookback also shifts which day-count fraction
+        // the rate applies to; Shifted does not), but modelling that accrual-side distinction is a
+        // pricing-model change, out of scope for this hardening pass. This test pins the current
+        // v1 contract explicitly, rather than letting it hold silently through two similar-looking
+        // but independently-authored test cases: if this assertion ever fails, either the
+        // deliberate equivalence was broken unintentionally (investigate), or the ISDA distinction
+        // was implemented on purpose (this test must be updated together with the <remarks> above
+        // and the spec that authorized the divergence).
+        var accrualDate = new DateOnly(2026, 4, 8);
+        const int shiftDays = 3;
+
+        DateOnly shifted = ObservationShiftHelper.ComputeObservationDate(
+            accrualDate, ObservationShiftConvention.Shifted, s_calendar, shiftDays);
+        DateOnly lookback = ObservationShiftHelper.ComputeObservationDate(
+            accrualDate, ObservationShiftConvention.Lookback, s_calendar, shiftDays);
+
+        shifted.Should().Be(lookback, "v1 deliberately treats Shifted and Lookback identically for per-date computation (see ComputeObservationDate remarks)");
+    }
+
+    [Fact]
     public void Lockout_ReturnsOriginalDate()
     {
         // Arrange

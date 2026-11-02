@@ -31,19 +31,66 @@ namespace Boutquin.Curves.Recipes;
 /// Recipes are composable: a <see cref="CurveGroupRecipe"/> bundles multiple curves that
 /// must be calibrated together (e.g., a SOFR discount curve and an overnight forward curve).
 /// </remarks>
-/// <param name="CurveId">Unique identifier for this curve within the recipe group.</param>
-/// <param name="CurveReference">Typed curve reference identifying the role, currency, and optional benchmark.</param>
-/// <param name="ValueType">Whether the curve stores discount factors, zero rates, or forward rates.</param>
-/// <param name="DayCountCode">Day-count convention code applied during calibration (e.g., "ACT/360").</param>
-/// <param name="Interpolation">Interpolation and extrapolation settings for the calibrated curve.</param>
-/// <param name="Nodes">Ordered list of calibration node specifications that define the curve's term structure.</param>
-public sealed record CurveRecipe(
-    string CurveId,
-    CurveReference CurveReference,
-    CurveValueType ValueType,
-    string DayCountCode,
-    InterpolationSettings Interpolation,
-    IReadOnlyList<ICurveNodeSpec> Nodes);
+public sealed record CurveRecipe
+{
+    /// <summary>Unique curve identifier within the recipe group.</summary>
+    public string CurveId { get; init; }
+
+    /// <summary>Curve role, currency, and optional benchmark used for lookup and calibration.</summary>
+    public CurveReference CurveReference { get; init; }
+
+    /// <summary>Requested calibration ordinate; the piecewise calibrator currently supports discount factors.</summary>
+    public CurveValueType ValueType { get; init; }
+
+    /// <summary>Time-axis day-count convention, such as "ACT/360".</summary>
+    public string DayCountCode { get; init; }
+
+    /// <summary>Interpolation and extrapolation settings for the calibrated curve.</summary>
+    public InterpolationSettings Interpolation { get; init; }
+
+    /// <summary>Protected snapshot of the ordered calibration nodes defining this term structure.</summary>
+    public IReadOnlyList<ICurveNodeSpec> Nodes
+    {
+        get => _nodes;
+        init => _nodes = SnapshotList.Copy(value, nameof(Nodes));
+    }
+
+    private IReadOnlyList<ICurveNodeSpec> _nodes = [];
+
+    /// <summary>
+    /// Initialises a <see cref="CurveRecipe"/> with full validation of all identity and data fields.
+    /// </summary>
+    /// <param name="curveId">Unique identifier for this curve within the recipe group.</param>
+    /// <param name="curveReference">Typed curve reference identifying the role, currency, and optional benchmark.</param>
+    /// <param name="valueType">Whether the curve stores discount factors, zero rates, or forward rates.</param>
+    /// <param name="dayCountCode">Day-count convention code applied during calibration (e.g., "ACT/360").</param>
+    /// <param name="interpolation">Interpolation and extrapolation settings for the calibrated curve.</param>
+    /// <param name="nodes">Ordered list of calibration node specifications that define the curve's term structure.</param>
+    public CurveRecipe(
+        string curveId,
+        CurveReference curveReference,
+        CurveValueType valueType,
+        string dayCountCode,
+        InterpolationSettings interpolation,
+        IReadOnlyList<ICurveNodeSpec> nodes)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(curveId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dayCountCode);
+        ArgumentNullException.ThrowIfNull(curveReference);
+        ArgumentNullException.ThrowIfNull(interpolation);
+        ArgumentNullException.ThrowIfNull(nodes);
+        if (nodes.Count == 0)
+        {
+            throw new ArgumentException("Nodes must contain at least one node specification.", nameof(nodes));
+        }
+        CurveId = curveId;
+        CurveReference = curveReference;
+        ValueType = valueType;
+        DayCountCode = dayCountCode;
+        Interpolation = interpolation;
+        Nodes = nodes;
+    }
+}
 
 /// <summary>
 /// Groups multiple <see cref="CurveRecipe"/> instances that must be calibrated together.
@@ -54,8 +101,37 @@ public sealed record CurveRecipe(
 /// coordinated pass. The group name serves as the logical identifier for the entire
 /// calibration bundle in diagnostics and snapshot storage.
 /// </remarks>
-/// <param name="GroupName">Logical name for the calibration group (e.g., "USD-SOFR").</param>
-/// <param name="Curves">Ordered list of curve recipes in the group.</param>
-public sealed record CurveGroupRecipe(
-    string GroupName,
-    IReadOnlyList<CurveRecipe> Curves);
+public sealed record CurveGroupRecipe
+{
+    /// <summary>Logical calibration-group name, such as "USD-SOFR".</summary>
+    public string GroupName { get; init; }
+
+    /// <summary>Protected snapshot of curve recipes in calibration order.</summary>
+    public IReadOnlyList<CurveRecipe> Curves
+    {
+        get => _curves;
+        init => _curves = SnapshotList.Copy(value, nameof(Curves));
+    }
+
+    private IReadOnlyList<CurveRecipe> _curves = [];
+
+    /// <summary>
+    /// Initialises a <see cref="CurveGroupRecipe"/> with validation that the curve list is non-null
+    /// and non-empty.
+    /// </summary>
+    /// <param name="groupName">Logical name for the calibration group (e.g., "USD-SOFR").</param>
+    /// <param name="curves">Ordered list of curve recipes in the group. Must contain at least one entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="curves"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="curves"/> is empty.</exception>
+    public CurveGroupRecipe(string groupName, IReadOnlyList<CurveRecipe> curves)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(groupName);
+        ArgumentNullException.ThrowIfNull(curves);
+        if (curves.Count == 0)
+        {
+            throw new ArgumentException("Curves must contain at least one recipe.", nameof(curves));
+        }
+        GroupName = groupName;
+        Curves = curves;
+    }
+}

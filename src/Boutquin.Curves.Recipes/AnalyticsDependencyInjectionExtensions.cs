@@ -17,6 +17,8 @@
 using Boutquin.Curves.Abstractions.ReferenceData;
 using Boutquin.Curves.Bootstrap;
 using Boutquin.Curves.Bootstrap.ReferenceData;
+using Boutquin.Domain.Enumerations;
+using Boutquin.MarketData.Abstractions.Calendars;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using Boutquin.MarketData.Calendars.Holidays;
 using Boutquin.MarketData.Conventions;
@@ -35,7 +37,8 @@ namespace Boutquin.Curves.Recipes;
 /// <see cref="IReferenceDataProvider"/> backed by <see cref="SimpleReferenceDataProvider"/>
 /// with standard calendars, benchmarks, and conventions. All registrations use
 /// <c>TryAddSingleton</c> so callers can override individual services before calling
-/// this method.
+/// this method. Register an <see cref="Boutquin.MarketData.Abstractions.Contracts.IDataPipeline"/>
+/// separately before resolving <see cref="CurveBuilder"/>; this extension does not select data providers.
 /// </remarks>
 public static class AnalyticsDependencyInjectionExtensions
 {
@@ -55,23 +58,55 @@ public static class AnalyticsDependencyInjectionExtensions
 
     private static SimpleReferenceDataProvider CreateDefaultReferenceData()
     {
-        var calendars = HolidayCalendarFactory.SupportedCodes.Select(HolidayCalendarFactory.Create).ToArray();
+        // D-3 (spec: defensive-guard-hardening): "ZURH" and "TKYO" are DELIBERATELY excluded
+        // from HolidayCalendarFactory.SupportedCodes (no holiday dataset yet — see that factory's
+        // remarks), so the SupportedCodes projection below never includes them even though
+        // Create("ZURH")/Create("TKYO") both work (weekend-only fallback). Without an explicit
+        // registration here, a direct GetCalendar("ZURH"/"TKYO") call on this provider throws,
+        // even though the SARON/TONA benchmarks below reference those exact codes. Registered
+        // explicitly for consumer-API consistency.
+        //
+        // Dedup guard: append ZURH/TKYO ONLY when SupportedCodes does not already contain them
+        // (OrdinalIgnoreCase — the same comparer SimpleReferenceDataProvider keys calendars on).
+        // The factory's remarks anticipate these codes gaining a dataset and joining SupportedCodes;
+        // the moment that happens, an unconditional .Append would produce a duplicate calendar code
+        // and SimpleReferenceDataProvider's ToDictionary would throw at construction. This keeps the
+        // registration idempotent w.r.t. SupportedCodes growth.
+        var fallbackCodes = new[] { "ZURH", "TKYO" }
+            .Where(code => !HolidayCalendarFactory.SupportedCodes.Contains(code, StringComparer.OrdinalIgnoreCase));
+        var calendars = HolidayCalendarFactory.SupportedCodes
+            .Concat(fallbackCodes)
+            .Select(HolidayCalendarFactory.Create)
+            .ToArray();
 
         var benchmarks = new[]
         {
-            new RateBenchmark(new BenchmarkName("SOFR"), CurrencyCode.USD, BenchmarkKind.OvernightRiskFree, null, 0, 1, "USNY", "ACT/360", true),
-            new RateBenchmark(new BenchmarkName("CORRA"), CurrencyCode.CAD, BenchmarkKind.OvernightRiskFree, null, 0, 1, "CATO", "ACT/365F", true),
-            new RateBenchmark(new BenchmarkName("SONIA"), CurrencyCode.GBP, BenchmarkKind.OvernightRiskFree, null, 0, 0, "GBLO", "ACT/365F", true),
-            new RateBenchmark(new BenchmarkName("ESTR"), CurrencyCode.EUR, BenchmarkKind.OvernightRiskFree, null, 0, 1, "TARGET", "ACT/360", true),
+            new RateBenchmark(new BenchmarkName("SOFR"), Currency.USD, BenchmarkKind.OvernightRiskFree, null, 0, 1, "USNY", "ACT/360", true),
+            new RateBenchmark(new BenchmarkName("CORRA"), Currency.CAD, BenchmarkKind.OvernightRiskFree, null, 0, 1, "CATO", "ACT/365F", true),
+            new RateBenchmark(new BenchmarkName("SONIA"), Currency.GBP, BenchmarkKind.OvernightRiskFree, null, 0, 0, "GBLO", "ACT/365F", true),
+            new RateBenchmark(new BenchmarkName("ESTR"), Currency.EUR, BenchmarkKind.OvernightRiskFree, null, 0, 1, "TARGET", "ACT/360", true),
+            // CHF SARON / JPY TONA back the published StandardCurveRecipes.ChfSaron*/JpyTona*
+            // recipes. "ZURH"/"TKYO" are weekend-only fallback calendars (per HolidayCalendarFactory)
+            // registered explicitly above (D-3) so these benchmarks' calendar codes resolve.
+            new RateBenchmark(new BenchmarkName("SARON"), Currency.CHF, BenchmarkKind.OvernightRiskFree, null, 0, 0, "ZURH", "ACT/360", true),
+            new RateBenchmark(new BenchmarkName("TONA"), Currency.JPY, BenchmarkKind.OvernightRiskFree, null, 0, 1, "TKYO", "ACT/365F", true),
         };
 
-        var registry = InstrumentConventionRegistry.CreateDefault();
+        // Register the CHF-SARON-OIS / JPY-TONA-OIS conventions in-repo: the MarketData baseline
+        // registry ships only the four USD/CAD/GBP/EUR OIS conventions, but the published CHF/JPY
+        // recipes (StandardCurveRecipes) reference these codes. Their day-counts mirror the recipes
+        // (CHF ACT/360, JPY ACT/365F).
+        var registry = InstrumentConventionRegistry.CreateDefault()
+            .Add(new OisConvention("CHF-SARON-OIS", "ZURH", "ACT/360", PaymentFrequency.Annual, BusinessDayAdjustment.ModifiedFollowing, 2, 2, ObservationShiftConvention.Shifted))
+            .Add(new OisConvention("JPY-TONA-OIS", "TKYO", "ACT/365F", PaymentFrequency.Annual, BusinessDayAdjustment.ModifiedFollowing, 2, 2, ObservationShiftConvention.Shifted));
         var conventions = new[]
         {
             registry.GetRequired("USD-SOFR-OIS"),
             registry.GetRequired("CAD-CORRA-OIS"),
             registry.GetRequired("GBP-SONIA-OIS"),
             registry.GetRequired("EUR-ESTR-OIS"),
+            registry.GetRequired("CHF-SARON-OIS"),
+            registry.GetRequired("JPY-TONA-OIS"),
             registry.GetRequired("USD-FIXED-6M-30-360"),
             registry.GetRequired("GBP-FIXED-1Y-ACT-365F"),
             registry.GetRequired("EUR-FIXED-1Y-ACT-360"),

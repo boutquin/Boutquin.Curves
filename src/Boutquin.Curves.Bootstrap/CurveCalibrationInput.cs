@@ -14,6 +14,7 @@
 //   limitations under the License.
 //
 
+using Boutquin.Curves.Abstractions.Bootstrap;
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Abstractions.ReferenceData;
@@ -38,11 +39,30 @@ namespace Boutquin.Curves.Bootstrap;
 /// <param name="Curves">Per-curve specifications with pre-resolved node rates.</param>
 /// <param name="ReferenceData">Provider supplying holiday calendars, conventions, and other static data.</param>
 /// <param name="SkipValidation">When <see langword="true"/>, bypass pre-calibration consistency checks.</param>
+/// <param name="ConvexityAdjustment">
+/// Optional model supplying the futures-to-forward convexity correction applied to <c>OisFuture</c>
+/// nodes during the bootstrap. When <see langword="null"/> (the default), futures rates are used
+/// raw — the backward-compatible behaviour. When supplied, the calibrator threads it into the
+/// <see cref="Helpers.OisFutureInstrumentHelper"/> so the forward (and therefore the calibrated
+/// discount factor) reflects <c>forward = futures − adjustment</c>. Non-OisFuture instrument
+/// helpers ignore this value.
+/// </param>
 public sealed record CurveCalibrationInput(
     DateOnly ValuationDate,
     IReadOnlyList<CurveCalibrationSpec> Curves,
     IReferenceDataProvider ReferenceData,
-    bool SkipValidation = false);
+    bool SkipValidation = false,
+    IConvexityAdjustment? ConvexityAdjustment = null)
+{
+    private IReadOnlyList<CurveCalibrationSpec> _curves = BootstrapInputSnapshot.Copy(Curves, nameof(Curves));
+
+    /// <summary>Curve specifications captured for this calibration input. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<CurveCalibrationSpec> Curves
+    {
+        get => _curves;
+        init => _curves = BootstrapInputSnapshot.Copy(value, nameof(value));
+    }
+}
 
 /// <summary>
 /// Specification for a single curve within a calibration input, including interpolation
@@ -56,10 +76,14 @@ public sealed record CurveCalibrationInput(
 /// </remarks>
 /// <param name="CurveName">Logical name for the curve (e.g., "USD-SOFR-DISC").</param>
 /// <param name="CurveReference">Typed curve reference identifying role, currency, and optional benchmark.</param>
-/// <param name="ValueType">Whether the curve stores discount factors, zero rates, or forward rates.</param>
+/// <param name="ValueType">Requested ordinate representation. The piecewise calibrator accepts only discount-factor storage; rate quotes are available from the calibrated curve.</param>
 /// <param name="DayCountCode">Day-count convention code applied during calibration (e.g., "ACT/360").</param>
 /// <param name="Interpolation">Interpolation and extrapolation settings for the calibrated curve.</param>
-/// <param name="Nodes">Ordered list of resolved calibration nodes with pre-extracted rates.</param>
+/// <param name="Nodes">
+/// Ordered (by ascending pillar date) list of resolved calibration nodes with pre-extracted rates.
+/// Must be non-<see langword="null"/> and non-empty. The calibrator sorts nodes by resolved pillar date;
+/// an empty list is rejected by validation or curve construction when validation is bypassed.
+/// </param>
 /// <param name="Jumps">Optional deterministic jump adjustments applied on configured dates for event handling.</param>
 public sealed record CurveCalibrationSpec(
     CurveName CurveName,
@@ -68,7 +92,26 @@ public sealed record CurveCalibrationSpec(
     string DayCountCode,
     InterpolationSettings Interpolation,
     IReadOnlyList<ResolvedNode> Nodes,
-    IReadOnlyList<CurvePoint>? Jumps = null);
+    IReadOnlyList<CurvePoint>? Jumps = null)
+{
+    private IReadOnlyList<ResolvedNode> _nodes = BootstrapInputSnapshot.Copy(Nodes, nameof(Nodes));
+
+    /// <summary>Resolved calibration nodes in their declared order. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<ResolvedNode> Nodes
+    {
+        get => _nodes;
+        init => _nodes = BootstrapInputSnapshot.Copy(value, nameof(value));
+    }
+
+    private IReadOnlyList<CurvePoint>? _jumps = BootstrapInputSnapshot.CopyOptional(Jumps);
+
+    /// <summary>Optional discrete jump factors; null means no jump overlay. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<CurvePoint>? Jumps
+    {
+        get => _jumps;
+        init => _jumps = BootstrapInputSnapshot.CopyOptional(value);
+    }
+}
 
 /// <summary>
 /// A fully resolved calibration node carrying the extracted market rate alongside its metadata.
@@ -84,10 +127,28 @@ public sealed record CurveCalibrationSpec(
 /// <param name="ConventionCode">Convention code for day-count and payment rules.</param>
 /// <param name="TargetCurve">The curve this node calibrates into.</param>
 /// <param name="Rate">Pre-extracted market rate ready for calibration.</param>
+/// <param name="ProjectionCurves">
+/// Optional forward (projection) curve references that supply this node's floating-leg forwards
+/// (Fx) during the pillar solve. When <see langword="null"/> or empty, the node is self-discounting:
+/// forwards are read from its own <paramref name="TargetCurve"/> using the self-discounting pricing relation.
+/// A single-curve forward (FixedFloat/OIS) names 0 or 1 reference; a two-curve basis swap names 2
+/// references (Fa then Fb). The semantics of each position are interpreted by the instrument helpers.
+/// </param>
 public sealed record ResolvedNode(
     string Label,
     Tenor Tenor,
     string InstrumentType,
     string ConventionCode,
     CurveReference TargetCurve,
-    decimal Rate);
+    decimal Rate,
+    IReadOnlyList<CurveReference>? ProjectionCurves = null)
+{
+    private IReadOnlyList<CurveReference>? _projectionCurves = BootstrapInputSnapshot.CopyOptional(ProjectionCurves);
+
+    /// <summary>Optional projection-curve references; null selects self-discounting. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<CurveReference>? ProjectionCurves
+    {
+        get => _projectionCurves;
+        init => _projectionCurves = BootstrapInputSnapshot.CopyOptional(value);
+    }
+}

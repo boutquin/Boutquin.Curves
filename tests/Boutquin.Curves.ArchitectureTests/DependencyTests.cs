@@ -84,46 +84,6 @@ public sealed class DependencyTests : BaseArchitectureTest
     }
 
     [Fact]
-    public void Indices_ShouldNotDependOnHigherLayers()
-    {
-        var result = Types
-            .InAssembly(IndicesAssembly)
-            .Should()
-            .NotHaveDependencyOnAny(
-                "Boutquin.Curves.Core",
-                "Boutquin.Curves.Interpolation",
-                "Boutquin.Curves.Bootstrap",
-                "Boutquin.Curves.Serialization",
-                "Boutquin.Curves.Risk",
-                "Boutquin.Curves.Recipes",
-                "Boutquin.Curves.Examples")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue(
-            because: $"Indices must not depend on Curves or composition layers [{GetFailingTypes(result)}]");
-    }
-
-    [Fact]
-    public void Quotes_ShouldNotDependOnHigherLayers()
-    {
-        var result = Types
-            .InAssembly(QuotesAssembly)
-            .Should()
-            .NotHaveDependencyOnAny(
-                "Boutquin.Curves.Core",
-                "Boutquin.Curves.Interpolation",
-                "Boutquin.Curves.Bootstrap",
-                "Boutquin.Curves.Serialization",
-                "Boutquin.Curves.Risk",
-                "Boutquin.Curves.Recipes",
-                "Boutquin.Curves.Examples")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue(
-            because: $"Quotes must not depend on Curves or composition layers [{GetFailingTypes(result)}]");
-    }
-
-    [Fact]
     public void Curves_ShouldNotDependOnHigherLayers()
     {
         var result = Types

@@ -31,9 +31,27 @@ namespace Boutquin.Curves.Serialization.Dto;
 /// <param name="QuoteId">Identifier of the market quote bound to this node.</param>
 /// <param name="Convention">Convention code used for schedule and accrual rules.</param>
 /// <param name="Tenor">Tenor value used to derive maturity timing.</param>
+/// <param name="ProjectionCurves">
+/// Optional forward (projection) curve references that supply this node's floating-leg forwards
+/// during the pillar solve. Null or empty denotes a self-discounting node. Persisted so that a
+/// multi-curve basis-swap/forward node round-trips with its full identity instead of silently
+/// collapsing to self-discounting. Older JSON without this field deserializes to <c>null</c>,
+/// preserving the self-discounting default.
+/// </param>
 public sealed record CurveNodeDefinitionDto(
     string Type,
     string Label,
     string QuoteId,
     string Convention,
-    string Tenor);
+    string Tenor,
+    IReadOnlyList<CurveReferenceDto>? ProjectionCurves = null)
+{
+    private IReadOnlyList<CurveReferenceDto>? _projectionCurves = ProjectionCurves is null ? null : DefinitionCopies.List(ProjectionCurves, nameof(ProjectionCurves));
+
+    /// <summary>Independent snapshot of the supplied projectioncurves definitions.</summary>
+    public IReadOnlyList<CurveReferenceDto>? ProjectionCurves
+    {
+        get => _projectionCurves;
+        init => _projectionCurves = value is null ? null : DefinitionCopies.List(value, nameof(ProjectionCurves));
+    }
+}

@@ -1,8 +1,9 @@
 #nullable enable
-Boutquin.Curves.Core.Discounting.FlatDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
-Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
-Boutquin.Curves.Core.Discounting.JumpAdjustedDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
-Boutquin.Curves.Core.Discounting.MultiplicativeSpreadDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
-Boutquin.Curves.Core.Discounting.ZeroSpreadedDiscountCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IDiscountCurve!
-Boutquin.Curves.Core.Forwards.FlatForwardCurve.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IForwardCurve!
-Boutquin.Curves.Core.Forwards.ForwardCurveFromDiscountCurves.WithValuationDate(System.DateOnly newValuationDate) -> Boutquin.Curves.Abstractions.Curves.IForwardCurve!
+Boutquin.Curves.Core.NormalizedQuote.<Clone>$() -> Boutquin.Curves.Core.NormalizedQuote!
+Boutquin.Curves.Core.NormalizedQuote.Deconstruct(out Boutquin.Curves.Abstractions.Identifiers.QuoteId QuoteId, out decimal Value, out Boutquin.Curves.Core.QuoteValueType ValueType, out Boutquin.Curves.Core.MarketInstrumentType InstrumentType, out string! ConventionCode, out string! Label) -> void
+Boutquin.Curves.Core.NormalizedQuote.Equals(Boutquin.Curves.Core.NormalizedQuote? other) -> bool
+override Boutquin.Curves.Core.NormalizedQuote.Equals(object? obj) -> bool
+override Boutquin.Curves.Core.NormalizedQuote.GetHashCode() -> int
+override Boutquin.Curves.Core.NormalizedQuote.ToString() -> string!
+static Boutquin.Curves.Core.NormalizedQuote.operator !=(Boutquin.Curves.Core.NormalizedQuote? left, Boutquin.Curves.Core.NormalizedQuote? right) -> bool
+static Boutquin.Curves.Core.NormalizedQuote.operator ==(Boutquin.Curves.Core.NormalizedQuote? left, Boutquin.Curves.Core.NormalizedQuote? right) -> bool

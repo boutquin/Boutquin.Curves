@@ -15,7 +15,7 @@
 //
 
 using Boutquin.Curves.Bootstrap.Instruments;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.DayCount;
 
 namespace Boutquin.Curves.Bootstrap.Inputs;
@@ -41,4 +41,14 @@ public sealed record SwapBootstrapInput(
     DateOnly AnchorDate,
     IReadOnlyList<InterestRateSwapQuote> Swaps,
     IYearFractionCalculator YearFractionCalculator,
-    CurrencyCode? Currency = null);
+    Currency? Currency = null)
+{
+    private IReadOnlyList<InterestRateSwapQuote> _swaps = BootstrapInputSnapshot.Copy(Swaps, nameof(Swaps));
+
+    /// <summary>Swap quotes available to the compatibility bootstrapper. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<InterestRateSwapQuote> Swaps
+    {
+        get => _swaps;
+        init => _swaps = BootstrapInputSnapshot.Copy(value, nameof(value));
+    }
+}

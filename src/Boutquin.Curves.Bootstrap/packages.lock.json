@@ -1,0 +1,138 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "Boutquin.Numerics": {
+        "type": "Direct",
+        "requested": "[2.0.0, 2.0.0]",
+        "resolved": "2.0.0",
+        "contentHash": "v+JJIdYniXIaqCyzzC4rkqU+mFTfISamCr/benuoW8TjeiP4vXVNtrWE+Jt2sFym14OYiRyv6cMPFQ1kVcq3Dw=="
+      },
+      "Microsoft.CodeAnalysis.PublicApiAnalyzers": {
+        "type": "Direct",
+        "requested": "[5.6.0, )",
+        "resolved": "5.6.0",
+        "contentHash": "W4kJGezNIKLzo0Ak5FAQDFvkMf2U7DtGL4THmHyRSApfKsKt5V+eX/bU0ZLKAt/uf9Bb2o1bi0YDKj/GRB/vYQ=="
+      },
+      "Microsoft.SourceLink.GitHub": {
+        "type": "Direct",
+        "requested": "[10.0.403, )",
+        "resolved": "10.0.403",
+        "contentHash": "T4WYxWydJGNQRe/EgURFlhPZ1cHYgivrCCHSomCcfQzGzhkDYGNn5bUwwjs4/PHuMxsmGaLvPv2puG8lluA1IA==",
+        "dependencies": {
+          "Microsoft.Build.Tasks.Git": "10.0.403",
+          "Microsoft.SourceLink.Common": "10.0.403",
+          "System.IO.Hashing": "10.0.14"
+        }
+      },
+      "MinVer": {
+        "type": "Direct",
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "AJy/KVjXgUbgjf6HiI8wAk4DSSq0SCmvXQF8aU6IB+pnIQq+YJvofvMczug2hqO8yEvnQY557ryew66KPpyCsA=="
+      },
+      "Microsoft.Build.Tasks.Git": {
+        "type": "Transitive",
+        "resolved": "10.0.403",
+        "contentHash": "1furteBFeemMmZ4s+ORjQb7YtO+wG63NJahbQbRUi91FV6V87BdV0U3vX1jbMC6iKSELYYoXWssSzLu3mx0i2w==",
+        "dependencies": {
+          "System.IO.Hashing": "10.0.14"
+        }
+      },
+      "Microsoft.SourceLink.Common": {
+        "type": "Transitive",
+        "resolved": "10.0.403",
+        "contentHash": "SvzUeqFGrcQxlIgjmcoSGiV5UWcPa0NCTuH69/40uSDsSD/26c6p9cH7XLAxpn+I8+2Zhl1qp+WMugl0oOwBMg=="
+      },
+      "System.IO.Hashing": {
+        "type": "Transitive",
+        "resolved": "10.0.14",
+        "contentHash": "lVqovhCt3HlZe7ONG5ydaj6BYwYI004gldVfMMkJl/lR5ueeCtWNpW4nejOX75sPmzm8vXCxB69GqwHaYCnyUQ=="
+      },
+      "boutquin.curves.abstractions": {
+        "type": "Project",
+        "dependencies": {
+          "Boutquin.Domain": "[1.0.1, 1.0.1]",
+          "Boutquin.MarketData.Abstractions": "[2.0.1, 2.0.1]",
+          "Boutquin.MarketData.Conventions": "[2.0.1, 2.0.1]",
+          "Boutquin.MarketData.DayCount": "[2.0.1, 2.0.1]"
+        }
+      },
+      "boutquin.curves.conventions": {
+        "type": "Project",
+        "dependencies": {
+          "Boutquin.Curves.Abstractions": "[1.0.0, )",
+          "Boutquin.MarketData.Calendars": "[2.0.1, 2.0.1]",
+          "Boutquin.MarketData.Conventions": "[2.0.1, 2.0.1]"
+        }
+      },
+      "boutquin.curves.core": {
+        "type": "Project",
+        "dependencies": {
+          "Boutquin.Curves.Abstractions": "[1.0.0, )",
+          "Boutquin.Curves.Conventions": "[1.0.0, )",
+          "Boutquin.Curves.Interpolation": "[1.0.0, )"
+        }
+      },
+      "boutquin.curves.interpolation": {
+        "type": "Project",
+        "dependencies": {
+          "Boutquin.Curves.Abstractions": "[1.0.0, )",
+          "Boutquin.Numerics": "[2.0.0, 2.0.0]"
+        }
+      },
+      "Boutquin.Domain": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.1, 1.0.1]",
+        "resolved": "1.0.1",
+        "contentHash": "tT7PhmUGA3ziZCFX/6TafzJANtg1gP6V/HV+Dt6M6s1+8+NKYQHbIXQgbg8mpnXJCaIr7X+yy2Pa63SCqrb2Yw=="
+      },
+      "Boutquin.MarketData.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, 2.0.1]",
+        "resolved": "2.0.1",
+        "contentHash": "R2piTf5wYylrMtjmK4z+eMqaGi/hd9lrIZPDkn36N4WfW7PFetqvc6qW7A7YawoAODjwm2qTrXv74SHEJPDhAA==",
+        "dependencies": {
+          "Boutquin.Domain": "1.0.1",
+          "Boutquin.Storage.Domain": "2.0.1"
+        }
+      },
+      "Boutquin.MarketData.Calendars": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, 2.0.1]",
+        "resolved": "2.0.1",
+        "contentHash": "Xd2e6/9r1EI3rZwKyF5fwwI5wQVF6pvCWDtZRCnAc7hkjX9Memjd13GdxHRO3eM3qEyLnPqH4UCctl198MR6lg==",
+        "dependencies": {
+          "Boutquin.MarketData.Abstractions": "2.0.1"
+        }
+      },
+      "Boutquin.MarketData.Conventions": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, 2.0.1]",
+        "resolved": "2.0.1",
+        "contentHash": "e4elMuQ9rtDRgGUlSoetFLbg5ayTf+5pWV0nVFDWjQYszbhse/zYv4CbKgM5X0AMCdbHrQr0wpXkq6mad8w/9A==",
+        "dependencies": {
+          "Boutquin.MarketData.Abstractions": "2.0.1"
+        }
+      },
+      "Boutquin.MarketData.DayCount": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, 2.0.1]",
+        "resolved": "2.0.1",
+        "contentHash": "8dYQjF89VxfkNZ/VousFvNBDRhIPYUnxtPe33vHJpsFUKQmAjc1EGhzRPontOJJXp1Rc32izwKaIJ85SnntTcg==",
+        "dependencies": {
+          "Boutquin.MarketData.Abstractions": "2.0.1"
+        }
+      },
+      "Boutquin.Storage.Domain": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, 2.0.1]",
+        "resolved": "2.0.1",
+        "contentHash": "1A0Dn2pU1RFia0qLyfBx8ZfX5T/HCyiswx9MxRxPU6WI18omgqdeHbZKyZ7+3gxgKa7MfxLOAJFInxtPCEXGmQ==",
+        "dependencies": {
+          "Boutquin.Domain": "[1.0.1]"
+        }
+      }
+    }
+  }
+}

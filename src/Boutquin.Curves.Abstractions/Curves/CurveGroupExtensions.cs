@@ -14,6 +14,7 @@
 //   limitations under the License.
 //
 
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 
 namespace Boutquin.Curves.Abstractions.Curves;
@@ -30,10 +31,12 @@ public static class CurveGroupExtensions
     /// <param name="group">Curve group to query.</param>
     /// <param name="currency">Currency whose discount curve is requested.</param>
     /// <returns>The discount curve cast to <see cref="IDiscountCurve"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="group"/> is <see langword="null"/>.</exception>
     /// <exception cref="KeyNotFoundException">Thrown when no discount curve exists for <paramref name="currency"/>.</exception>
     /// <exception cref="InvalidCastException">Thrown when the resolved curve does not implement <see cref="IDiscountCurve"/>.</exception>
-    public static IDiscountCurve GetDiscountCurve(this ICurveGroup group, CurrencyCode currency)
+    public static IDiscountCurve GetDiscountCurve(this ICurveGroup group, Currency currency)
     {
+        ArgumentNullException.ThrowIfNull(group);
         var reference = new CurveReference(CurveRole.Discount, currency);
         var curve = group.GetCurve(reference);
         return curve as IDiscountCurve
@@ -47,8 +50,10 @@ public static class CurveGroupExtensions
     /// <param name="currency">Currency whose discount curve is requested.</param>
     /// <param name="curve">Resolved discount curve when found and castable; otherwise <see langword="null"/>.</param>
     /// <returns><see langword="true"/> when a matching discount curve is found; otherwise <see langword="false"/>.</returns>
-    public static bool TryGetDiscountCurve(this ICurveGroup group, CurrencyCode currency, out IDiscountCurve? curve)
+    /// <exception cref="ArgumentNullException"><paramref name="group"/> is <see langword="null"/>.</exception>
+    public static bool TryGetDiscountCurve(this ICurveGroup group, Currency currency, out IDiscountCurve? curve)
     {
+        ArgumentNullException.ThrowIfNull(group);
         curve = null;
         var reference = new CurveReference(CurveRole.Discount, currency);
         if (!group.TryGetCurve(reference, out var raw))
@@ -70,11 +75,23 @@ public static class CurveGroupExtensions
     /// </summary>
     /// <param name="group">Curve group to query.</param>
     /// <param name="currency">Currency for forward curve lookup.</param>
-    /// <param name="benchmark">Benchmark identity for the forward curve.</param>
-    /// <returns>The forward curve matching the benchmark.</returns>
+    /// <param name="benchmark">
+    /// Benchmark identity for the forward curve (e.g., <c>SOFR</c>, <c>CORRA</c>).
+    /// Unlike <see cref="GetDiscountCurve"/>, which only requires <paramref name="currency"/>
+    /// because a group holds at most one discount curve per currency, forward curves are not
+    /// unique per currency — a USD group may carry both a SOFR and an EFFR forward curve. The
+    /// <paramref name="benchmark"/> parameter disambiguates between them.
+    /// </param>
+    /// <returns>
+    /// The forward curve as <see cref="ICurve"/>. Cast to <see cref="IForwardCurve"/> when
+    /// forward-rate calls are needed; the base interface is returned here to avoid an
+    /// unconditional type check (not all forward curves implement <see cref="IForwardCurve"/>).
+    /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="group"/> is <see langword="null"/>.</exception>
     /// <exception cref="KeyNotFoundException">Thrown when no forward curve exists for the benchmark.</exception>
-    public static ICurve GetForwardCurve(this ICurveGroup group, CurrencyCode currency, BenchmarkName benchmark)
+    public static ICurve GetForwardCurve(this ICurveGroup group, Currency currency, BenchmarkName benchmark)
     {
+        ArgumentNullException.ThrowIfNull(group);
         var reference = new CurveReference(CurveRole.Forward, currency, benchmark);
         return group.GetCurve(reference);
     }
@@ -84,11 +101,16 @@ public static class CurveGroupExtensions
     /// </summary>
     /// <param name="group">Curve group to query.</param>
     /// <param name="currency">Currency for forward curve lookup.</param>
-    /// <param name="benchmark">Benchmark identity for the forward curve.</param>
+    /// <param name="benchmark">
+    /// Benchmark identity for the forward curve. See <see cref="GetForwardCurve"/> for the
+    /// rationale for requiring this parameter in addition to <paramref name="currency"/>.
+    /// </param>
     /// <param name="curve">Resolved forward curve when found; otherwise <see langword="null"/>.</param>
     /// <returns><see langword="true"/> when a matching forward curve is found; otherwise <see langword="false"/>.</returns>
-    public static bool TryGetForwardCurve(this ICurveGroup group, CurrencyCode currency, BenchmarkName benchmark, out ICurve? curve)
+    /// <exception cref="ArgumentNullException"><paramref name="group"/> is <see langword="null"/>.</exception>
+    public static bool TryGetForwardCurve(this ICurveGroup group, Currency currency, BenchmarkName benchmark, out ICurve? curve)
     {
+        ArgumentNullException.ThrowIfNull(group);
         var reference = new CurveReference(CurveRole.Forward, currency, benchmark);
         return group.TryGetCurve(reference, out curve);
     }

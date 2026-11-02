@@ -16,6 +16,7 @@
 
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using Boutquin.MarketData.DayCount;
 
@@ -49,12 +50,17 @@ public sealed class ForwardCurveFromDiscountCurves : IForwardCurve
     /// <paramref name="discountCurve"/> is retained to preserve explicit wiring in dependency graphs
     /// and support future extensions where discount context participates in diagnostics or adjustments.
     /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="discountCurve"/> or <paramref name="projectionCurve"/> is <see langword="null"/>.
+    /// </exception>
     public ForwardCurveFromDiscountCurves(
         CurveName name,
         BenchmarkName benchmark,
         IDiscountCurve discountCurve,
         IDiscountCurve projectionCurve)
     {
+        ArgumentNullException.ThrowIfNull(discountCurve);
+        ArgumentNullException.ThrowIfNull(projectionCurve);
         Name = name;
         Benchmark = benchmark;
         _discountCurve = discountCurve;
@@ -74,7 +80,7 @@ public sealed class ForwardCurveFromDiscountCurves : IForwardCurve
     /// <summary>
     /// Currency inherited from the projection curve.
     /// </summary>
-    public CurrencyCode Currency => _projectionCurve.Currency;
+    public Currency Currency => _projectionCurve.Currency;
 
     /// <summary>
     /// Day-count convention used for forward accrual fractions.

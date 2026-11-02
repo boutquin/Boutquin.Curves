@@ -35,7 +35,11 @@ public static class TenorParser
     /// <param name="date">Base date to shift.</param>
     /// <param name="tenor">Tenor expression such as 3M, 2Y, 1W, or 10D.</param>
     /// <returns>Date obtained after applying the tenor offset to <paramref name="date"/>.</returns>
-    /// <exception cref="NotSupportedException">Thrown when <paramref name="tenor"/> does not end with D, W, M, or Y.</exception>
+    /// <exception cref="NotSupportedException">
+    /// Thrown when <paramref name="tenor"/> does not end with D, W, M, or Y, or when the numeric
+    /// prefix preceding that unit is missing, non-numeric, or outside the range of a 32-bit integer.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">The tenor moves the date beyond the supported calendar range.</exception>
     /// <remarks>
     /// This method applies pure calendar arithmetic via DateOnly AddDays/AddMonths/AddYears.
     /// Business-day adjustment is intentionally left to convention-aware schedule generation layers.
@@ -57,24 +61,45 @@ public static class TenorParser
 
         if (value.EndsWith('D'))
         {
-            return date.AddDays(int.Parse(value[..^1], CultureInfo.InvariantCulture));
+            return date.AddDays(ParseMagnitude(value, tenor.Value));
         }
 
         if (value.EndsWith('W'))
         {
-            return date.AddDays(7 * int.Parse(value[..^1], CultureInfo.InvariantCulture));
+            int weeks = ParseMagnitude(value, tenor.Value);
+            if (weeks > int.MaxValue / 7 || weeks < int.MinValue / 7)
+            {
+                throw new ArgumentOutOfRangeException(nameof(tenor), "Week tenor exceeds the supported date range.");
+            }
+
+            return date.AddDays(7 * weeks);
         }
 
         if (value.EndsWith('M'))
         {
-            return date.AddMonths(int.Parse(value[..^1], CultureInfo.InvariantCulture));
+            return date.AddMonths(ParseMagnitude(value, tenor.Value));
         }
 
         if (value.EndsWith('Y'))
         {
-            return date.AddYears(int.Parse(value[..^1], CultureInfo.InvariantCulture));
+            return date.AddYears(ParseMagnitude(value, tenor.Value));
         }
 
         throw new NotSupportedException($"Unsupported tenor format: '{tenor.Value}'.");
+    }
+
+    /// <summary>
+    /// Parses the integer magnitude preceding the unit suffix, surfacing the parser's documented
+    /// <see cref="NotSupportedException"/> contract rather than the BCL's
+    /// <see cref="FormatException"/>/<see cref="OverflowException"/> for malformed prefixes.
+    /// </summary>
+    private static int ParseMagnitude(string normalizedValue, string originalValue)
+    {
+        if (!int.TryParse(normalizedValue[..^1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int magnitude))
+        {
+            throw new NotSupportedException($"Unsupported tenor format: '{originalValue}'.");
+        }
+
+        return magnitude;
     }
 }

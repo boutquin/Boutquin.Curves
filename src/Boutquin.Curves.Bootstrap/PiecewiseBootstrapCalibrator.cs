@@ -23,6 +23,8 @@ using Boutquin.Curves.Bootstrap.Helpers;
 using Boutquin.Curves.Bootstrap.Validation;
 using Boutquin.Curves.Core;
 using Boutquin.Curves.Core.Discounting;
+using Boutquin.MarketData.DayCount;
+using Boutquin.Numerics.Solvers;
 
 namespace Boutquin.Curves.Bootstrap;
 
@@ -51,7 +53,7 @@ namespace Boutquin.Curves.Bootstrap;
 /// <seealso cref="ResolvedNode"/>
 /// <seealso cref="Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics"/>
 /// <seealso cref="Boutquin.Curves.Core.Discounting.InterpolatedDiscountCurve"/>
-public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibrationInput, CurveCalibrationResult>
+public class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibrationInput, CurveCalibrationResult>
 {
     private const decimal JacobianBump = 1e-6m;
     private const double JacobianIllConditionedThreshold = 1e12d;
@@ -64,11 +66,16 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
     /// <exception cref="InvalidOperationException">
     /// Thrown when pre-calibration validation detects configuration errors (duplicate curve references, missing conventions,
     /// or unsupported interpolators) — unless <see cref="CurveCalibrationInput.SkipValidation"/> is set.
-    /// Also thrown when the calibration Jacobian contains non-finite values.
+    /// Empty curve inputs are rejected even when validation is bypassed. Also thrown when a self-discounting coupon node cannot be solved on its trial curve,
+    /// later interpolation invalidates its completed-curve repricing, or the calibration Jacobian contains non-finite values.
     /// </exception>
-    /// <exception cref="NotSupportedException">Thrown when a resolved node has an unrecognised instrument type.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a resolved node has an unrecognised instrument type or a curve requests a value type other than discount factors.</exception>
     /// <remarks>
     /// Nodes are solved sequentially within each curve specification, ordered by tenor.
+    /// Self-discounting coupon nodes use their par-annuity estimate and refine the terminal
+    /// log-discount-factor against the configured trial curve to a quote residual of at most 1e-12.
+    /// Their final whole-curve quote residual must be at most 1e-10; nonlocal interpolation
+    /// that invalidates earlier coupons requires simultaneous calibration instead.
     /// After calibration, a finite-difference Jacobian is computed by bumping each input rate
     /// by <c>1e-6</c> and measuring the implied-quote sensitivity.
     /// The resulting Jacobian serves as an explainability artifact for risk teams: each entry approximates
@@ -81,10 +88,22 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
     /// that each instrument's calibration is primarily sensitive to its own rate, confirming clean bootstrap
     /// structure.
     /// </remarks>
-    public CurveCalibrationResult Calibrate(CurveCalibrationInput request) => CalibrateInternal(request, includeJacobian: true);
+    public CurveCalibrationResult Calibrate(CurveCalibrationInput request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return CalibrateInternal(request, includeJacobian: true);
+    }
 
     private CurveCalibrationResult CalibrateInternal(CurveCalibrationInput request, bool includeJacobian)
     {
+        foreach (CurveCalibrationSpec curve in request.Curves)
+        {
+            if (curve.ValueType != Definitions.CurveValueType.DiscountFactor)
+            {
+                throw new NotSupportedException("PiecewiseBootstrapCalibrator supports DiscountFactor storage only; use the returned curve's ZeroRate accessor for rate quotes.");
+            }
+        }
+
         if (!request.SkipValidation)
         {
             ValidationResult validation = CurveCalibrationInputValidator.Validate(request);
@@ -95,8 +114,17 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
             }
         }
 
+        if (request.Curves.Count == 0)
+        {
+            throw new InvalidOperationException("Curve calibration input validation failed: [EMPTY_CURVES] Calibration input contains no curve specifications; at least one curve is required.");
+        }
+
+        // F-27: the group name is taken from the first curve specification by convention; in a
+        // multi-curve calibration this is the primary (discount) curve, which is idiomatic desk
+        // practice: name the snapshot after its reference discount curve.
         CurveGroupBuilder builder = new(new CurveGroupName(request.Curves[0].CurveName.Value), request.ValuationDate);
         List<(AbstractInstrumentHelper Helper, DateOnly PillarDate, double MarketQuote, int CurveIndex, int NodeIndex)> pendingRepricing = new();
+        HashSet<AbstractInstrumentHelper> refinedCouponNodes = new();
         int solvedNodeCount = 0;
 
         for (int curveIndex = 0; curveIndex < request.Curves.Count; curveIndex++)
@@ -110,11 +138,21 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
             {
                 ResolvedNode node = sortedNodes[nodeIndex];
                 double quote = (double)node.Rate;
-                AbstractInstrumentHelper helper = CreateHelper(node, quote);
+                AbstractInstrumentHelper helper = CreateHelper(node, quote, request.ConvexityAdjustment);
                 DateOnly nodeDate = helper.PillarDate(request.ValuationDate, request.ReferenceData);
                 double curveValue = helper.SolveNodeValue(builder.Build(), request.ValuationDate, request.ReferenceData);
 
                 points.Add(new CurvePoint(nodeDate, curveValue));
+
+                if (IsSelfDiscountingCouponNode(node) && curveSpec.CurveReference.Role != CurveRole.Forward)
+                {
+                    RefineCouponNode(builder, curveSpec, points, helper, request);
+                    refinedCouponNodes.Add(helper);
+                }
+
+                // Publish each solved pillar immediately so subsequent nodes see the in-progress curve.
+                builder.Add(curveSpec.CurveReference, BuildCurve(curveSpec, request.ValuationDate, points));
+
                 pendingRepricing.Add((helper, nodeDate, quote, curveIndex, nodeIndex));
                 solvedNodeCount++;
             }
@@ -130,6 +168,14 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
         {
             (AbstractInstrumentHelper helper, DateOnly pillarDate, double marketQuote, _, _) = pendingRepricing[i];
             double impliedQuote = helper.ImpliedQuote(calibratedCurveGroup, request.ValuationDate, request.ReferenceData);
+            if (refinedCouponNodes.Contains(helper) &&
+                (!double.IsFinite(impliedQuote) || Math.Abs(impliedQuote - marketQuote) > 1e-10))
+            {
+                throw new InvalidOperationException(
+                    $"Coupon node '{helper.Label}' no longer reprices within 1e-10 on the completed curve. " +
+                    "The configured interpolation or later curve dependencies changed an earlier calibrated coupon value; use a local interpolation or a simultaneous calibrator.");
+            }
+
             repricing.Add(BootstrapDiagnosticsFactory.CreateFromImplied(
                 helper.Label,
                 helper.TargetCurve,
@@ -156,21 +202,81 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
         return new CurveCalibrationResult(calibratedCurveGroup, diagnostics, jacobian);
     }
 
+    private static bool IsSelfDiscountingCouponNode(ResolvedNode node) =>
+        node.InstrumentType == "Ois" ||
+        ((node.InstrumentType == "FixedFloatSwap" || node.InstrumentType == "BasisSwap") &&
+         (node.ProjectionCurves is not { Count: > 0 } ||
+          (node.InstrumentType == "FixedFloatSwap" && node.ProjectionCurves.All(reference => reference == node.TargetCurve))));
+
+    private static void RefineCouponNode(
+        CurveGroupBuilder builder,
+        CurveCalibrationSpec spec,
+        List<CurvePoint> points,
+        AbstractInstrumentHelper helper,
+        CurveCalibrationInput request)
+    {
+        // The closed form is exact only when all earlier coupon DFs are already locked.
+        // Sparse pillars leave coupons inside the new segment; price those coupons on each
+        // trial curve, rather than on the previous curve's extrapolated tail.
+        CurvePoint terminal = points[^1];
+        double Residual(double logDiscountFactor)
+        {
+            points[^1] = new CurvePoint(terminal.Date, Math.Exp(logDiscountFactor));
+            builder.Add(spec.CurveReference, BuildCurve(spec, request.ValuationDate, points));
+            return helper.ImpliedQuote(builder.Build(), request.ValuationDate, request.ReferenceData) - helper.QuoteValue;
+        }
+
+        double initial = Math.Log(terminal.Value);
+        if (Math.Abs(Residual(initial)) <= 1e-12)
+        {
+            return;
+        }
+
+        // Log coordinates keep every trial DF positive and allow negative-rate curves (DF > 1).
+        double width = 0.01;
+        for (int attempt = 0; attempt < 12; attempt++, width *= 2)
+        {
+            double lower = initial - width;
+            double upper = initial + width;
+            double fLower = Residual(lower);
+            double fUpper = Residual(upper);
+            if (!double.IsFinite(fLower) || !double.IsFinite(fUpper))
+            {
+                break;
+            }
+
+            if (fLower == 0 || fUpper == 0 || Math.Sign(fLower) != Math.Sign(fUpper))
+            {
+                var result = new BrentSolver<double>(1e-13, 200).Solve(Residual, lower, upper);
+                double error = Math.Abs(Residual(result.Root));
+                if (result.Converged && error <= 1e-12)
+                {
+                    return;
+                }
+
+                break;
+            }
+        }
+
+        throw new InvalidOperationException($"Coupon node '{helper.Label}' could not be calibrated to repricing tolerance 1e-12 with the configured interpolation.");
+    }
+
     private static BootstrapDiagnostics AppendJacobianQualityDiagnostics(BootstrapDiagnostics diagnostics, CalibrationJacobian jacobian)
     {
+        double[,] values = jacobian.Values;
         bool dimensionsConsistent =
-            jacobian.RowLabels.Count == jacobian.Values.GetLength(0) &&
-            jacobian.ColumnLabels.Count == jacobian.Values.GetLength(1);
+            jacobian.RowLabels.Count == values.GetLength(0) &&
+            jacobian.ColumnLabels.Count == values.GetLength(1);
 
         bool allFinite = true;
         double maxAbs = 0d;
         double minAbsNonZero = double.PositiveInfinity;
 
-        for (int row = 0; row < jacobian.Values.GetLength(0); row++)
+        for (int row = 0; row < values.GetLength(0); row++)
         {
-            for (int column = 0; column < jacobian.Values.GetLength(1); column++)
+            for (int column = 0; column < values.GetLength(1); column++)
             {
-                double value = jacobian.Values[row, column];
+                double value = values[row, column];
                 if (!double.IsFinite(value))
                 {
                     allFinite = false;
@@ -218,7 +324,7 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
         {
             new NumericalDiagnostic(
                 "JacobianQuality",
-                jacobian.Values.GetLength(0),
+                values.GetLength(0),
                 jacobianHealthy,
                 conditionMessage,
                 conditionEstimate)
@@ -237,11 +343,21 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
         IReadOnlyList<(AbstractInstrumentHelper Helper, DateOnly PillarDate, double MarketQuote, int CurveIndex, int NodeIndex)> pendingRepricing,
         IReadOnlyList<RepricingDiagnostic> baseRepricing)
     {
-        // Build a flat list of (curveIndex, nodeIndex) to identify unique bump targets.
-        // Distinct is load-bearing: duplicate labels would produce a wrong-shaped Jacobian.
-        var bumpTargets = pendingRepricing.Select(item => (item.CurveIndex, item.NodeIndex)).Distinct().ToArray();
+        // F-16/F-33: use DistinctBy (clearer intent, same semantics as Select+Distinct on the key).
+        // DistinctBy preserves first-seen order, which matches the node-sort order already applied
+        // by NodeSorter — so column ordering is deterministic and consistent with row ordering.
+        var bumpTargets = pendingRepricing
+            .DistinctBy(item => (item.CurveIndex, item.NodeIndex))
+            .Select(item => (item.CurveIndex, item.NodeIndex))
+            .ToArray();
         string[] rowLabels = pendingRepricing.Select(static item => item.Helper.Label).ToArray();
-        string[] columnLabels = bumpTargets.Select(t => pendingRepricing.First(p => p.CurveIndex == t.CurveIndex && p.NodeIndex == t.NodeIndex).Helper.Label).ToArray();
+
+        // F-06: pre-build a lookup dictionary so column labels are resolved in O(n) rather than O(n²).
+        Dictionary<(int CurveIndex, int NodeIndex), string> labelByIndex =
+            pendingRepricing.ToDictionary(
+                item => (item.CurveIndex, item.NodeIndex),
+                item => item.Helper.Label);
+        string[] columnLabels = bumpTargets.Select(t => labelByIndex[t]).ToArray();
         double[,] values = new double[rowLabels.Length, columnLabels.Length];
 
         for (int column = 0; column < bumpTargets.Length; column++)
@@ -290,15 +406,36 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
         return input with { Curves = bumpedCurves };
     }
 
-    private static AbstractInstrumentHelper CreateHelper(ResolvedNode node, double quote)
+    /// <summary>
+    /// Creates the instrument helper for a resolved node, including continuous-zero yield observations and contractual instruments.
+    /// </summary>
+    /// <param name="node">The resolved calibration node whose instrument type selects the helper.</param>
+    /// <param name="quote">The pre-extracted market quote passed to the helper.</param>
+    /// <param name="convexityAdjustment">
+    /// Optional futures-to-forward convexity model, taken from <see cref="CurveCalibrationInput.ConvexityAdjustment"/>.
+    /// Threaded into the <see cref="OisFutureInstrumentHelper"/> so OIS-future nodes calibrate against
+    /// <c>forward = futures − adjustment</c>; <see langword="null"/> (the default) preserves the raw-rate
+    /// behaviour. Ignored by every other instrument helper.
+    /// </param>
+    /// <returns>An instrument helper capable of solving and repricing the node.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="node"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException">Thrown when the node has an unrecognised instrument type.</exception>
+    /// <remarks>
+    /// Marked <see langword="protected"/> <see langword="virtual"/> so test harnesses and specialised
+    /// calibrators can intercept helper creation (for example, to observe the in-progress curve group
+    /// passed to <see cref="AbstractInstrumentHelper.SolveNodeValue"/> during the sequential bootstrap).
+    /// </remarks>
+    protected virtual AbstractInstrumentHelper CreateHelper(ResolvedNode node, double quote, IConvexityAdjustment? convexityAdjustment = null)
     {
+        ArgumentNullException.ThrowIfNull(node);
         return node.InstrumentType switch
         {
             "Deposit" => new DepositInstrumentHelper(node, quote),
+            "ContinuousZero" => new ContinuousZeroInstrumentHelper(node, quote),
             "Ois" => new OisInstrumentHelper(node, quote),
             "FixedFloatSwap" => new FixedFloatSwapInstrumentHelper(node, quote),
             "Fra" => new FraInstrumentHelper(node, quote),
-            "OisFuture" => new OisFutureInstrumentHelper(node, quote),
+            "OisFuture" => new OisFutureInstrumentHelper(node, quote, convexityAdjustment),
             "BasisSwap" => new BasisSwapInstrumentHelper(node, quote),
             _ => throw new NotSupportedException($"Unsupported instrument type: {node.InstrumentType}.")
         };
@@ -311,7 +448,8 @@ public sealed class PiecewiseBootstrapCalibrator : ICurveCalibrator<CurveCalibra
             valuationDate,
             spec.CurveReference.Currency,
             points,
-            spec.Interpolation);
+            spec.Interpolation,
+            DayCountResolver.Resolve(spec.DayCountCode));
 
         if (spec.Jumps is { Count: > 0 })
         {

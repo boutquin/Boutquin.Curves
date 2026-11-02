@@ -82,8 +82,16 @@ public sealed class CurveBuilder
     /// </summary>
     /// <param name="recipe">Declarative curve group recipe defining what to build.</param>
     /// <param name="valuationDate">As-of date for the calibration run.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>A <see cref="CurveSnapshot"/> containing the calibrated curves, diagnostics, and any data issues.</returns>
+    /// <param name="ct">Cancellation token passed to each asynchronous data fetch.</param>
+    /// <returns>A task completing after node fetches and synchronous calibration, containing curves, diagnostics and data issues.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="recipe"/> is null.</exception>
+    /// <exception cref="OperationCanceledException">A pipeline fetch observes cancellation.</exception>
+    /// <exception cref="NotSupportedException">A request type or enabled pipeline capability is unsupported.</exception>
+    /// <remarks>
+    /// Cancellation is observed by the pipeline at fetch boundaries; the synchronous calibrator does not poll the token.
+    /// Earlier fetches may already be cached when a later fetch is canceled. Retrying the build is safe;
+    /// no partial curve snapshot is returned on cancellation. Requests are deduplicated within each curve recipe.
+    /// </remarks>
     /// <exception cref="InvalidOperationException">Thrown when no curves could be resolved from the recipe.</exception>
     public async Task<CurveSnapshot> BuildAsync(
         CurveGroupRecipe recipe,
@@ -109,6 +117,10 @@ public sealed class CurveBuilder
             {
                 // Fetch data from pipeline
                 IReadOnlyList<object>? records = null;
+
+                // Whether THIS group's own fetch reported an unexpected gap. Scoped per group so a
+                // gap in one curve/dataset does not escalate RATE_MISSING in an unrelated clean one.
+                bool groupHasUnexpectedGap = false;
                 try
                 {
                     (records, IReadOnlyList<DataProvenance> fetchProvenance, IReadOnlyList<DataIssue> fetchIssues) =
@@ -121,11 +133,14 @@ public sealed class CurveBuilder
                         i.Code == IssueCode.UnexpectedGap);
                     foreach (var gap in unexpectedGaps)
                     {
+                        groupHasUnexpectedGap = true;
                         _logger.LogWarning("Data gap for {DatasetKey}: {Message}",
                             group.Key.DatasetKey, gap.Message);
                     }
                 }
-                catch (Exception ex) when (ex is not OperationCanceledException)
+                catch (Exception ex) when (ex is not OperationCanceledException
+                                                      and not NotSupportedException
+                                                      and not ArgumentException)
                 {
                     _logger.LogWarning(ex, "Pipeline fetch failed for {DatasetKey}", group.Key.DatasetKey);
                     issues.Add(new DataIssue(new IssueCode("FETCH_FAILED"), IssueSeverity.Error,
@@ -144,11 +159,9 @@ public sealed class CurveBuilder
                     decimal? rate = nodeSpec.ExtractRate(records, valuationDate);
                     if (rate is null)
                     {
-                        var hasUnexpectedGap = issues.Any(i =>
-                            i.Code == IssueCode.UnexpectedGap);
                         issues.Add(new DataIssue(
                             new IssueCode("RATE_MISSING"),
-                            hasUnexpectedGap ? IssueSeverity.Error : IssueSeverity.Warning,
+                            groupHasUnexpectedGap ? IssueSeverity.Error : IssueSeverity.Warning,
                             $"No rate extracted for {nodeSpec.Label} from {group.Key.DatasetKey}"));
                         continue;
                     }
@@ -167,7 +180,8 @@ public sealed class CurveBuilder
                         nodeSpec.InstrumentType,
                         nodeSpec.ConventionCode,
                         nodeSpec.TargetCurve,
-                        rate.Value));
+                        rate.Value,
+                        nodeSpec.ProjectionCurves));
                 }
             }
 

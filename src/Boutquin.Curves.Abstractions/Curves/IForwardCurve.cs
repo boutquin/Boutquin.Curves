@@ -28,9 +28,10 @@ namespace Boutquin.Curves.Abstractions.Curves;
 /// </remarks>
 /// <example>
 /// <code>
-/// IForwardCurve projection = curveGroup.GetForwardCurve(benchmarkRef);
-/// double rate = projection.ForwardRate(accrualStart, accrualEnd);
-/// // Use rate to project floating coupon in swap pricing
+/// if (curveGroup.GetCurve(benchmarkRef) is IForwardCurve projection)
+/// {
+///     double rate = projection.ForwardRate(accrualStart, accrualEnd);
+/// }
 /// </code>
 /// </example>
 /// <seealso cref="Boutquin.Curves.Abstractions.Curves.IDiscountCurve"/>
@@ -49,8 +50,11 @@ public interface IForwardCurve : ICurve
     /// Returns the implied forward rate over an accrual interval.
     /// </summary>
     /// <param name="startDate">Accrual start date.</param>
-    /// <param name="endDate">Accrual end date.</param>
+    /// <param name="endDate">Accrual end date. Must be strictly after <paramref name="startDate"/>.</param>
     /// <returns>Forward rate implied between <paramref name="startDate"/> and <paramref name="endDate"/> under the curve's day-count convention.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="endDate"/> is not strictly after <paramref name="startDate"/>.
+    /// </exception>
     /// <remarks>
     /// This method is commonly consumed by swap pricers and coupon projection engines. Callers are
     /// responsible for supplying valid accrual boundaries generated from product conventions and calendars.

@@ -48,4 +48,22 @@ public sealed record CurveDefinitionDto(
     string LeftExtrapolator,
     string RightExtrapolator,
     IReadOnlyList<JumpPointDto>? Jumps,
-    IReadOnlyList<CurveNodeDefinitionDto> Nodes);
+    IReadOnlyList<CurveNodeDefinitionDto> Nodes)
+{
+    private IReadOnlyList<CurveNodeDefinitionDto> _nodes = Nodes is null ? null! : DefinitionCopies.List(Nodes, nameof(Nodes));
+
+    /// <summary>Independent snapshot of the supplied nodes definitions.</summary>
+    public IReadOnlyList<CurveNodeDefinitionDto> Nodes
+    {
+        get => _nodes;
+        init => _nodes = value is null ? null! : DefinitionCopies.List(value, nameof(Nodes));
+    }
+    private IReadOnlyList<JumpPointDto>? _jumps = Jumps is null ? null : DefinitionCopies.List(Jumps, nameof(Jumps));
+
+    /// <summary>Independent snapshot of the supplied jumps definitions.</summary>
+    public IReadOnlyList<JumpPointDto>? Jumps
+    {
+        get => _jumps;
+        init => _jumps = value is null ? null : DefinitionCopies.List(value, nameof(Jumps));
+    }
+}

@@ -17,13 +17,13 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.MarketData.DayCount;
 
-using NumericsMonotoneConvex = Boutquin.Numerics.Interpolation.MonotoneConvexInterpolator;
+using NumericsMonotoneConvex = Boutquin.Numerics.Interpolation.MonotoneConvexInterpolator<double>;
 
 namespace Boutquin.Curves.Interpolation;
 
 /// <summary>
 /// Interpolates discount factors using the Hagan-West (2006) monotone-convex method,
-/// which guarantees non-negative instantaneous forward rates across the full curve maturity range.
+/// on non-increasing discount factors, producing non-negative instantaneous forward rates between pillars.
 /// </summary>
 /// <remarks>
 /// The monotone-convex method constructs a smooth, continuous instantaneous forward rate curve $f(t)$
@@ -80,14 +80,45 @@ public sealed class MonotoneConvexInterpolator : INodalCurveInterpolator
     ///
     /// Boundary behavior: dates at or before the valuation date return 1; dates before the first
     /// node return the first node value; dates at or after the last node return the last node value
-    /// (via flat extrapolation in the kernel).
+    /// (clamped by this wrapper before the kernel's constant-forward extrapolation).
+    ///
+    /// Domain precondition: discount factors must not increase from the virtual unit origin;
+    /// negative-rate curves are unsupported by this kernel. <paramref name="points"/> must be non-empty and every node date must
+    /// be strictly after <paramref name="valuationDate"/>. The monotone-convex algorithm augments
+    /// the node set with a virtual origin at $t=0$ (the valuation date); a node at or before the
+    /// valuation date would collapse or invert the first interval and cause an opaque kernel error.
+    /// A domain-level <see cref="ArgumentException"/> is thrown early with a message that
+    /// identifies the offending node date.
     ///
     /// This wrapper converts dates to year fractions and discount factors to normalized cumulative
     /// return (NCR) values before delegating to <see cref="NumericsMonotoneConvex"/>, then
     /// converts the returned NCR back to a discount factor via $P = \exp(-\text{NCR})$.
     /// </remarks>
+    /// <exception cref="ArgumentException">A node is null, its discount factor is not finite and positive, or node dates are not strictly ascending.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="points"/> or <paramref name="dayCount"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="points"/> is empty, or when any node date in
+    /// <paramref name="points"/> is at or before <paramref name="valuationDate"/>.
+    /// </exception>
     public double Interpolate(DateOnly valuationDate, DateOnly targetDate, IReadOnlyList<CurvePoint> points, IYearFractionCalculator dayCount)
     {
+        InterpolationInputValidator.Validate(points, dayCount);
+
+        // Guard: the virtual-origin node placed at t=0 (valuationDate) requires all real node
+        // dates to be strictly after valuationDate. A node at or before valuationDate would
+        // produce xs[k] <= 0 in the augmented array, violating the kernel's strictly-ascending
+        // precondition and causing an opaque internal ArgumentException naming 'xs'.
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (points[i].Date <= valuationDate)
+            {
+                throw new ArgumentException(
+                    $"All node dates must be strictly after the valuation date ({valuationDate:yyyy-MM-dd}). " +
+                    $"Node {i} has date {points[i].Date:yyyy-MM-dd}, which is at or before the valuation date.",
+                    nameof(points));
+            }
+        }
+
         if (targetDate <= valuationDate)
         {
             return 1d;
@@ -98,13 +129,21 @@ public sealed class MonotoneConvexInterpolator : INodalCurveInterpolator
             return points[0].Value;
         }
 
+        if (targetDate >= points[^1].Date)
+        {
+            return points[^1].Value;
+        }
+
         // Build augmented arrays: xs[0]=0/ys[0]=0 is the virtual origin (P(0)=1 → NCR=0),
         // followed by the actual curve nodes as (year fraction, NCR = -ln(DF)).
         int n = points.Count;
         int N = n + 1;
 
-        double[] xs = new double[N];
-        double[] ys = new double[N];
+        // Avoid heap allocations on the calibration hot path (this method is called for every
+        // DiscountFactor query during bootstrap). For curves with ≤ 128 nodes (the common case),
+        // use stack allocation to eliminate GC pressure. Larger node sets fall back to heap.
+        Span<double> xs = N <= 128 ? stackalloc double[N] : new double[N];
+        Span<double> ys = N <= 128 ? stackalloc double[N] : new double[N];
         xs[0] = 0.0;
         ys[0] = 0.0;
         for (int i = 0; i < n; i++)

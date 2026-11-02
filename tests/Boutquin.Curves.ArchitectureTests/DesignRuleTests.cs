@@ -31,6 +31,11 @@ public sealed class DesignRuleTests : BaseArchitectureTest
                 .AreNotStatic()
                 .And()
                 .AreNotAbstract()
+                // PiecewiseBootstrapCalibrator is intentionally non-sealed: CreateHelper is
+                // protected virtual to allow test subclasses to intercept the helper factory
+                // (AC-4 seam test) and to enable future subclass-based calibrator variants.
+                .And()
+                .DoNotHaveName("PiecewiseBootstrapCalibrator")
                 .Should()
                 .BeSealed()
                 .GetResult();

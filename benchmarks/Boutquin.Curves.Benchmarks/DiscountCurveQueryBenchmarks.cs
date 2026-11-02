@@ -18,7 +18,7 @@ using BenchmarkDotNet.Attributes;
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 
 namespace Boutquin.Curves.Benchmarks;
 
@@ -26,7 +26,7 @@ namespace Boutquin.Curves.Benchmarks;
 /// Measures discount-factor query performance on a representative interpolated curve.
 /// </summary>
 [MemoryDiagnoser]
-public sealed class DiscountCurveQueryBenchmarks
+public class DiscountCurveQueryBenchmarks
 {
     private readonly InterpolatedDiscountCurve _curve;
     private readonly DateOnly _targetDate;
@@ -40,7 +40,7 @@ public sealed class DiscountCurveQueryBenchmarks
         _curve = new InterpolatedDiscountCurve(
             new CurveName("USD-Disc"),
             valuationDate,
-            CurrencyCode.USD,
+            Currency.USD,
             Enumerable.Range(1, 40)
                 .Select(index => new CurvePoint(valuationDate.AddMonths(index * 3), Math.Exp(-0.04d * (index * 0.25d))))
                 .ToArray());

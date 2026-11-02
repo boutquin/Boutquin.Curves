@@ -41,6 +41,10 @@ public sealed class SimpleReferenceDataProvider : IReferenceDataProvider
         IEnumerable<RateBenchmark> benchmarks,
         IEnumerable<IInstrumentConvention> conventions)
     {
+        ArgumentNullException.ThrowIfNull(calendars);
+        ArgumentNullException.ThrowIfNull(benchmarks);
+        ArgumentNullException.ThrowIfNull(conventions);
+
         _calendars = calendars.ToDictionary(static calendar => calendar.Code, StringComparer.OrdinalIgnoreCase);
         _benchmarks = benchmarks.ToDictionary(static benchmark => benchmark.Name);
         _conventions = conventions.ToDictionary(static convention => convention.Code, StringComparer.OrdinalIgnoreCase);

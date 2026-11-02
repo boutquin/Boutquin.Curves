@@ -37,4 +37,12 @@ public sealed class MarketQuoteSetTests
 
         quote.Value.Should().Be(0.05m);
     }
+    [Fact]
+    public void GetRequired_MissingQuote_ThrowsWithIdentifier()
+    {
+        var snapshot = new MarketQuoteSet(new DateOnly(2024, 1, 12), new Dictionary<QuoteId, MarketQuote>());
+        Action act = () => snapshot.GetRequired(new QuoteId("MISSING"));
+        act.Should().Throw<KeyNotFoundException>().WithMessage("*MISSING*");
+    }
+
 }

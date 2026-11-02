@@ -14,6 +14,7 @@
 //   limitations under the License.
 //
 
+using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Interpolation;
 
 namespace Boutquin.Curves.Bootstrap.Validation;
@@ -29,20 +30,25 @@ namespace Boutquin.Curves.Bootstrap.Validation;
 /// <c>KeyNotFoundException</c> or <c>InvalidOperationException</c> deep in the calibration pipeline.
 ///
 /// Validation rules:
-/// 1. No duplicate <c>CurveReference</c> within the input
-/// 2. No duplicate node labels within a curve
-/// 3. All <c>ConventionCode</c> values resolve in <c>IReferenceDataProvider</c>
-/// 4. All <c>InterpolatorKind</c> values are supported
-/// 5. Left/right extrapolator mode names are valid
+/// 1. At least one curve specification is present (empty input is rejected before any indexing)
+/// 2. No duplicate <c>CurveReference</c> within the input
+/// 3. No duplicate node labels within a curve
+/// 4. All <c>ConventionCode</c> values resolve in <c>IReferenceDataProvider</c>
+/// 5. All <c>InterpolatorKind</c> values are supported
+/// 6. Left/right extrapolator mode names are valid
+/// 7. Every projection-curve reference named by a node resolves to its own target curve or to a
+///    prior curve specification in the same input batch
 /// </remarks>
 public static class CurveCalibrationInputValidator
 {
+    // Must stay in lock-step with InterpolatedDiscountCurve.s_knownExtrapolatorModes — the runtime
+    // curve constructor throws ArgumentException for any mode outside this set, so the pre-flight
+    // validator must reject exactly the same set (it previously also listed "Linear"/"None", which
+    // the runtime rejects, defeating the validator's purpose of catching the error before construction).
     private static readonly HashSet<string> s_validExtrapolators = new(StringComparer.OrdinalIgnoreCase)
     {
         "FlatZero",
-        "FlatForward",
-        "Linear",
-        "None"
+        "FlatForward"
     };
 
     /// <summary>
@@ -50,17 +56,48 @@ public static class CurveCalibrationInputValidator
     /// </summary>
     /// <param name="input">Calibration input to validate.</param>
     /// <returns>Validation result with categorized errors and warnings.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="input"/> is <see langword="null"/>.</exception>
     public static ValidationResult Validate(CurveCalibrationInput input)
     {
+        ArgumentNullException.ThrowIfNull(input);
+
         List<ValidationEntry> errors = [];
         List<ValidationEntry> warnings = [];
 
+        ValidateNonEmptyCurves(input, errors);
         ValidateDuplicateCurveReferences(input, errors);
+        ValidateNonEmptyNodes(input, errors);
         ValidateDuplicateNodeLabels(input, errors);
         ValidateConventionResolution(input, errors);
         ValidateInterpolationSettings(input, errors, warnings);
+        ValidateProjectionCurveAvailability(input, errors);
 
         return new ValidationResult(errors.Count == 0, errors, warnings);
+    }
+
+    private static void ValidateNonEmptyCurves(CurveCalibrationInput input, List<ValidationEntry> errors)
+    {
+        if (input.Curves.Count == 0)
+        {
+            errors.Add(new ValidationEntry(
+                "EMPTY_CURVES",
+                "Calibration input contains no curve specifications; at least one curve is required.",
+                string.Empty));
+        }
+    }
+
+    private static void ValidateNonEmptyNodes(CurveCalibrationInput input, List<ValidationEntry> errors)
+    {
+        foreach (CurveCalibrationSpec curve in input.Curves)
+        {
+            if (curve.Nodes.Count == 0)
+            {
+                errors.Add(new ValidationEntry(
+                    "EMPTY_NODES",
+                    $"Curve '{curve.CurveName.Value}' contains no resolved nodes; at least one node is required.",
+                    curve.CurveName.Value));
+            }
+        }
     }
 
     private static void ValidateDuplicateCurveReferences(CurveCalibrationInput input, List<ValidationEntry> errors)
@@ -118,6 +155,46 @@ public static class CurveCalibrationInputValidator
         }
     }
 
+    private static void ValidateProjectionCurveAvailability(CurveCalibrationInput input, List<ValidationEntry> errors)
+    {
+        for (int i = 0; i < input.Curves.Count; i++)
+        {
+            CurveCalibrationSpec curve = input.Curves[i];
+            foreach (ResolvedNode node in curve.Nodes)
+            {
+                if (node.ProjectionCurves is null)
+                {
+                    continue;
+                }
+
+                foreach (CurveReference projection in node.ProjectionCurves)
+                {
+                    // A node may name its own target (equivalent to self-discounting) or any curve
+                    // calibrated earlier in the same batch (a prior spec, index j < i).
+                    bool isSelfReference = projection == curve.CurveReference;
+                    bool resolvedByPriorSpec = false;
+                    for (int j = 0; j < i && !resolvedByPriorSpec; j++)
+                    {
+                        if (input.Curves[j].CurveReference == projection)
+                        {
+                            resolvedByPriorSpec = true;
+                        }
+                    }
+
+                    if (!isSelfReference && !resolvedByPriorSpec)
+                    {
+                        string reference = $"{projection.Role}:{projection.Currency}:{projection.Benchmark?.Value ?? ""}";
+                        errors.Add(new ValidationEntry(
+                            "PROJECTION_CURVE_UNRESOLVED",
+                            $"Projection curve '{reference}' named by node '{node.Label}' in curve '{curve.CurveName.Value}' is not available; "
+                                + "it is neither the node's own target curve nor a curve calibrated by a prior specification in this input.",
+                            node.Label));
+                    }
+                }
+            }
+        }
+    }
+
     private static void ValidateInterpolationSettings(CurveCalibrationInput input, List<ValidationEntry> errors, List<ValidationEntry> warnings)
     {
         foreach (CurveCalibrationSpec curve in input.Curves)
@@ -146,10 +223,14 @@ public static class CurveCalibrationInputValidator
                 }
             }
 
-            // Check extrapolator names
+            // Check extrapolator names. The runtime InterpolatedDiscountCurve ctor throws
+            // ArgumentException for any mode outside s_validExtrapolators, so an unrecognized mode is a
+            // BLOCKING error (IsValid == false), not a warning — otherwise the calibrator proceeds on an
+            // IsValid==true input and a raw ArgumentException detonates deep in curve construction,
+            // defeating the validator's pre-flight contract.
             if (!s_validExtrapolators.Contains(curve.Interpolation.LeftExtrapolator))
             {
-                warnings.Add(new ValidationEntry(
+                errors.Add(new ValidationEntry(
                     "UNKNOWN_LEFT_EXTRAPOLATOR",
                     $"Left extrapolator '{curve.Interpolation.LeftExtrapolator}' is not a recognized mode.",
                     curve.CurveName.Value));
@@ -157,7 +238,7 @@ public static class CurveCalibrationInputValidator
 
             if (!s_validExtrapolators.Contains(curve.Interpolation.RightExtrapolator))
             {
-                warnings.Add(new ValidationEntry(
+                errors.Add(new ValidationEntry(
                     "UNKNOWN_RIGHT_EXTRAPOLATOR",
                     $"Right extrapolator '{curve.Interpolation.RightExtrapolator}' is not a recognized mode.",
                     curve.CurveName.Value));

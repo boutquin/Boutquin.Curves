@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.MarketData.DayCount;
 
-using NumericsFlatForward = Boutquin.Numerics.Interpolation.FlatForwardInterpolator;
+using NumericsFlatForward = Boutquin.Numerics.Interpolation.FlatForwardInterpolator<double>;
 
 namespace Boutquin.Curves.Interpolation;
 
@@ -74,8 +74,13 @@ public sealed class FlatForwardInterpolator : INodalCurveInterpolator
     /// $\ln P(t) = \ln P_0 - f \cdot (t - t_0)$, which is equivalent to linear interpolation in
     /// $\ln P$ space. Both forms produce identical numerical results in floating-point arithmetic.
     /// </remarks>
+    /// <exception cref="ArgumentException">A node is null, its discount factor is not finite and positive, or node dates are not strictly ascending.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="points"/> or <paramref name="dayCount"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="points"/> is empty.</exception>
     public double Interpolate(DateOnly valuationDate, DateOnly targetDate, IReadOnlyList<CurvePoint> points, IYearFractionCalculator dayCount)
     {
+        InterpolationInputValidator.Validate(points, dayCount);
+
         if (targetDate <= valuationDate)
         {
             return 1d;

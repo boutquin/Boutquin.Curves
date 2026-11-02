@@ -51,4 +51,14 @@ public sealed record RepricingDiagnostic(
     double AbsoluteError,
     double SignedError,
     string InstrumentType,
-    IReadOnlyList<string>? WarningFlags = null);
+    IReadOnlyList<string>? WarningFlags = null)
+{
+    private IReadOnlyList<string>? _warningFlags = WarningFlags is null ? null : SnapshotCopies.List(WarningFlags, nameof(WarningFlags));
+
+    /// <summary>Protected warning-flag snapshot, or null when no flags were supplied.</summary>
+    public IReadOnlyList<string>? WarningFlags
+    {
+        get => _warningFlags;
+        init => _warningFlags = value is null ? null : SnapshotCopies.List(value, nameof(WarningFlags));
+    }
+}

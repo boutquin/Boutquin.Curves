@@ -16,7 +16,7 @@
 
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
 using Boutquin.MarketData.DayCount;
 
@@ -26,8 +26,13 @@ namespace Boutquin.Curves.Risk;
 /// Represents one pillar in a bucketed zero-rate shock profile, defining the shock magnitude
 /// at a specific maturity measured in years from valuation date.
 /// </summary>
-/// <param name="MaturityYears">Maturity expressed as a year fraction from the valuation date.</param>
-/// <param name="ShiftInBasisPoints">Zero-rate shift at this maturity in basis points (1 bp = 0.01%).</param>
+/// <param name="MaturityYears">Maturity expressed as a year fraction from the valuation date (must be positive).</param>
+/// <param name="ShiftInBasisPoints">
+/// Zero-rate shift at this maturity in basis points (1 bp = 0.01%). Positive values shift rates up
+/// (discount factors decrease); negative values shift rates down (discount factors increase).
+/// The shocked discount factor is <c>df(t) * exp(-shift(t) * t)</c> where <c>shift(t)</c> is the
+/// linearly interpolated shift in decimal form (basis points / 10 000).
+/// </param>
 public sealed record BucketedShockPoint(
     double MaturityYears,
     double ShiftInBasisPoints);
@@ -55,12 +60,30 @@ public sealed record BucketedZeroRateShock : CurveShockScenario
     /// Creates a bucketed zero-rate shock scenario, storing a defensive copy of the shock points.
     /// </summary>
     /// <param name="name">Scenario label used in diagnostics and risk report output.</param>
-    /// <param name="shockPoints">Zero-rate shock pillars; need not be sorted — sorting is applied at shock time.</param>
+    /// <param name="shockPoints">
+    /// Zero-rate shock pillars; must be non-<see langword="null"/>, but need not be sorted —
+    /// sorting by <see cref="BucketedShockPoint.MaturityYears"/> is applied at shock time.
+    /// An empty list causes <see cref="Apply"/> to return the base curve unchanged.
+    /// </param>
+    /// <exception cref="ArgumentException">A pillar is null, a maturity is not positive and finite or is duplicated, or a shift is not finite.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="shockPoints"/> is <see langword="null"/>.</exception>
     public BucketedZeroRateShock(
         string name,
         IReadOnlyList<BucketedShockPoint> shockPoints) : base(name)
     {
-        ShockPoints = shockPoints.ToArray();
+        ArgumentNullException.ThrowIfNull(shockPoints);
+        BucketedShockPoint[] copy = shockPoints.OrderBy(static point => point?.MaturityYears).ToArray();
+        for (int i = 0; i < copy.Length; i++)
+        {
+            BucketedShockPoint point = copy[i];
+            if (point is null || !double.IsFinite(point.MaturityYears) || point.MaturityYears <= 0d ||
+                !double.IsFinite(point.ShiftInBasisPoints) || (i > 0 && point.MaturityYears == copy[i - 1].MaturityYears))
+            {
+                throw new ArgumentException("Shock pillars must have unique positive finite maturities and finite shifts.", nameof(shockPoints));
+            }
+        }
+
+        ShockPoints = Array.AsReadOnly(copy);
     }
 
     /// <summary>
@@ -91,11 +114,8 @@ public sealed record BucketedZeroRateShock : CurveShockScenario
             return curve;
         }
 
-        IReadOnlyList<BucketedShockPoint> sortedPoints = ShockPoints
-            .OrderBy(static point => point.MaturityYears)
-            .ToArray();
-
-        return new BucketedShiftedDiscountCurve(discountCurve, sortedPoints);
+        // The constructor captures a sorted, read-only profile.
+        return new BucketedShiftedDiscountCurve(discountCurve, ShockPoints);
     }
 
     private sealed class BucketedShiftedDiscountCurve : IDiscountCurve
@@ -113,7 +133,7 @@ public sealed record BucketedZeroRateShock : CurveShockScenario
 
         public DateOnly ValuationDate => _innerCurve.ValuationDate;
 
-        public CurrencyCode Currency => _innerCurve.Currency;
+        public Currency Currency => _innerCurve.Currency;
 
         public IYearFractionCalculator DayCount => _innerCurve.DayCount;
 
@@ -121,13 +141,23 @@ public sealed record BucketedZeroRateShock : CurveShockScenario
 
         public double DiscountFactor(DateOnly date)
         {
-            double t = Math.Max(0d, DayCount.YearFraction(ValuationDate, date));
+            if (date <= ValuationDate)
+            {
+                return _innerCurve.DiscountFactor(date);
+            }
+
+            double t = DayCount.YearFraction(ValuationDate, date);
             double shift = InterpolateShiftInBasisPoints(t) / 10_000d;
             return _innerCurve.DiscountFactor(date) * Math.Exp(-shift * t);
         }
 
         public double ZeroRate(DateOnly date, CompoundingConvention compounding)
         {
+            if (date <= ValuationDate)
+            {
+                return 0d;
+            }
+
             double t = Math.Max(1e-12d, DayCount.YearFraction(ValuationDate, date));
             double df = DiscountFactor(date);
             return compounding switch
@@ -138,20 +168,36 @@ public sealed record BucketedZeroRateShock : CurveShockScenario
                 CompoundingConvention.SemiAnnual => 2d * (Math.Pow(1d / df, 1d / (2d * t)) - 1d),
                 CompoundingConvention.Quarterly => 4d * (Math.Pow(1d / df, 1d / (4d * t)) - 1d),
                 CompoundingConvention.Monthly => 12d * (Math.Pow(1d / df, 1d / (12d * t)) - 1d),
-                _ => -Math.Log(df) / t
+                _ => throw new ArgumentOutOfRangeException(nameof(compounding), compounding,
+                    $"Unsupported compounding convention: {compounding}.")
             };
         }
 
         public double InstantaneousForwardRate(DateOnly date)
         {
+            // ~1 day in year-fraction units; prevents zero-denominator in finite difference.
             const double epsilon = 1d / 3650d;
+
+            // At or within one day of the valuation date the centered difference would require
+            // leftDate < ValuationDate, which causes YearFraction to throw (endDate < startDate).
+            // Use a one-sided right difference instead so the result is defined at the front boundary.
+            if (date <= ValuationDate.AddDays(1))
+            {
+                DateOnly rightDate = ValuationDate.AddDays(2);
+                double t0 = 0d;
+                double t1 = Math.Max(epsilon, DayCount.YearFraction(ValuationDate, rightDate));
+                double df0 = 1d; // DF at valuation date is always 1
+                double df1 = DiscountFactor(rightDate);
+                return -(Math.Log(df1) - Math.Log(df0)) / Math.Max(epsilon, t1 - t0);
+            }
+
             DateOnly leftDate = date.AddDays(-1);
-            DateOnly rightDate = date.AddDays(1);
-            double t0 = Math.Max(0d, DayCount.YearFraction(ValuationDate, leftDate));
-            double t1 = Math.Max(epsilon, DayCount.YearFraction(ValuationDate, rightDate));
-            double df0 = DiscountFactor(leftDate);
-            double df1 = DiscountFactor(rightDate);
-            return -(Math.Log(df1) - Math.Log(df0)) / Math.Max(epsilon, t1 - t0);
+            DateOnly rightDateCentered = date.AddDays(1);
+            double tLeft = Math.Max(0d, DayCount.YearFraction(ValuationDate, leftDate));
+            double tRight = Math.Max(epsilon, DayCount.YearFraction(ValuationDate, rightDateCentered));
+            double dfLeft = DiscountFactor(leftDate);
+            double dfRight = DiscountFactor(rightDateCentered);
+            return -(Math.Log(dfRight) - Math.Log(dfLeft)) / Math.Max(epsilon, tRight - tLeft);
         }
 
         /// <summary>

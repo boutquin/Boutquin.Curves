@@ -33,4 +33,14 @@ public sealed record CurveGroupDefinitionDto(
     string GroupName,
     string ValuationDate,
     IReadOnlyList<CurveDefinitionDto> Curves,
-    string SchemaVersion = "1.0");
+    string SchemaVersion = "1.0")
+{
+    private IReadOnlyList<CurveDefinitionDto> _curves = Curves is null ? null! : DefinitionCopies.List(Curves, nameof(Curves));
+
+    /// <summary>Independent snapshot of the supplied curves definitions.</summary>
+    public IReadOnlyList<CurveDefinitionDto> Curves
+    {
+        get => _curves;
+        init => _curves = value is null ? null! : DefinitionCopies.List(value, nameof(Curves));
+    }
+}

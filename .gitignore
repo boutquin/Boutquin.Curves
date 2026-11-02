@@ -6,6 +6,7 @@
 # Local-only working files
 _local/
 .claude/
+.build-arena/
 hooks/
 review-accepted.yaml
 
@@ -375,7 +376,6 @@ FodyWeavers.xsd
 # Claude Code
 sessions/
 CLAUDE.local.md
-specs/
 
 # JetBrains Rider
 .idea/
@@ -385,3 +385,22 @@ specs/
 
 # macOS
 .DS_Store
+
+# Local reference library — external textbooks/papers (copyrighted) and derived
+# extractions used as code-arena ground truth. Never committed; lives only locally.
+specs/reference/
+
+# Per-run, gitignored — the fixes themselves land as ordinary commits.
+
+# Arena run EVIDENCE is git-tracked (findings, verdicts, fixes, audits, ledger).
+# Ignore ONLY machine state. Never add a bare `.code-arena/` line.
+.code-arena/locks/
+.code-arena/**/reduced-supervisor-state.json
+.code-arena/**/preflight-ok.txt
+.code-arena/**/.preflight
+.code-arena/**/PENDING-SPAWNS.md
+.code-arena/**/__pycache__/
+.code-arena/**/*.pyc
+!.code-arena/**/*.log
+.code-arena/**/reference.txt
+.code-arena/reference/

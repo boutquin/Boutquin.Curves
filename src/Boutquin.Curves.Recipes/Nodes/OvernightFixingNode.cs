@@ -53,6 +53,7 @@ public sealed class OvernightFixingNode : ICurveNodeSpec
     private readonly int _lookbackDays;
     private readonly IBusinessCalendar? _calendar;
     private readonly ObservationShiftConvention _shiftConvention;
+    private readonly int _shiftDays;
 
     /// <summary>
     /// Creates a node specification for an overnight benchmark fixing.
@@ -64,6 +65,7 @@ public sealed class OvernightFixingNode : ICurveNodeSpec
     /// <param name="lookbackDays">Days to look back from the valuation date when fetching fixings. Counted as business days when a calendar is provided, otherwise calendar days.</param>
     /// <param name="calendar">Optional business calendar for business-day-aware lookback and observation shifting.</param>
     /// <param name="shiftConvention">Observation shift convention applied when extracting rates. Requires a calendar to take effect.</param>
+    /// <param name="shiftDays">Number of business days the observation date is shifted back under the <see cref="ObservationShiftConvention.Shifted"/> and <see cref="ObservationShiftConvention.Lookback"/> conventions. Requires a calendar to take effect.</param>
     public OvernightFixingNode(
         string label,
         string benchmarkId,
@@ -71,8 +73,16 @@ public sealed class OvernightFixingNode : ICurveNodeSpec
         CurveReference targetCurve,
         int lookbackDays = 5,
         IBusinessCalendar? calendar = null,
-        ObservationShiftConvention shiftConvention = ObservationShiftConvention.None)
+        ObservationShiftConvention shiftConvention = ObservationShiftConvention.None,
+        int shiftDays = 0)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(label);
+        ArgumentException.ThrowIfNullOrWhiteSpace(benchmarkId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(conventionCode);
+        ArgumentNullException.ThrowIfNull(targetCurve);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(lookbackDays);
+        ArgumentOutOfRangeException.ThrowIfNegative(shiftDays);
+
         Label = label;
         _benchmarkId = benchmarkId;
         ConventionCode = conventionCode;
@@ -80,24 +90,27 @@ public sealed class OvernightFixingNode : ICurveNodeSpec
         _lookbackDays = lookbackDays;
         _calendar = calendar;
         _shiftConvention = shiftConvention;
+        _shiftDays = shiftDays;
     }
 
-    /// <inheritdoc />
+    /// <summary>Human-readable label identifying this fixing anchor.</summary>
     public string Label { get; }
 
-    /// <inheritdoc />
+    /// <summary>Overnight calibration tenor.</summary>
     public Tenor Tenor { get; } = new("ON");
 
-    /// <inheritdoc />
+    /// <summary>Deposit helper classification for the overnight anchor.</summary>
     public string InstrumentType => "Deposit";
 
-    /// <inheritdoc />
+    /// <summary>Instrument convention used to interpret the fixing accrual.</summary>
     public string ConventionCode { get; }
 
-    /// <inheritdoc />
+    /// <summary>Curve calibrated by this overnight anchor.</summary>
     public CurveReference TargetCurve { get; }
 
-    /// <inheritdoc />
+    /// <summary>Requests the benchmark over the configured lookback ending at the valuation date.</summary>
+    /// <param name="valuationDate">As-of date and inclusive request end.</param>
+    /// <returns>An overnight-fixing request; the lookback uses business days when a calendar is supplied.</returns>
     public IDataRequest CreateRequest(DateOnly valuationDate) =>
         new OvernightFixingRequest(
             new MarketData.Abstractions.ReferenceData.BenchmarkName(_benchmarkId),
@@ -107,11 +120,14 @@ public sealed class OvernightFixingNode : ICurveNodeSpec
                     : valuationDate.AddDays(-_lookbackDays),
                 valuationDate));
 
-    /// <inheritdoc />
+    /// <summary>Selects the latest fixing on or before the shifted observation date.</summary>
+    /// <param name="records">Canonical fixing records returned for this benchmark.</param>
+    /// <param name="valuationDate">As-of date from which the observation convention is applied.</param>
+    /// <returns>The decimal fixing rate, or <see langword="null"/> when no eligible fixing exists.</returns>
     public decimal? ExtractRate(IReadOnlyList<object> records, DateOnly valuationDate)
     {
         var targetDate = _calendar is not null && _shiftConvention != ObservationShiftConvention.None
-            ? ObservationShiftHelper.ComputeObservationDate(valuationDate, _shiftConvention, _calendar)
+            ? ObservationShiftHelper.ComputeObservationDate(valuationDate, _shiftConvention, _calendar, _shiftDays)
             : valuationDate;
 
         return records
@@ -122,11 +138,14 @@ public sealed class OvernightFixingNode : ICurveNodeSpec
             .FirstOrDefault();
     }
 
-    /// <inheritdoc />
+    /// <summary>Reports the observation date when fixing selection rolls back before its target date.</summary>
+    /// <param name="records">Canonical fixing records returned for this benchmark.</param>
+    /// <param name="valuationDate">As-of date from which the observation convention is applied.</param>
+    /// <returns>The selected date when earlier than the target, otherwise <see langword="null"/>.</returns>
     public DateOnly? ExtractActualDate(IReadOnlyList<object> records, DateOnly valuationDate)
     {
         var targetDate = _calendar is not null && _shiftConvention != ObservationShiftConvention.None
-            ? ObservationShiftHelper.ComputeObservationDate(valuationDate, _shiftConvention, _calendar)
+            ? ObservationShiftHelper.ComputeObservationDate(valuationDate, _shiftConvention, _calendar, _shiftDays)
             : valuationDate;
 
         return records

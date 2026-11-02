@@ -22,13 +22,7 @@ public abstract class BaseArchitectureTest
         typeof(Abstractions.Identifiers.CurveName).Assembly;
 
     protected static Assembly ConventionsAssembly =>
-        typeof(Conventions.Calendars.Schedule.BusinessScheduleGenerator).Assembly;
-
-    protected static Assembly IndicesAssembly =>
-        typeof(Indices.BenchmarkCatalog).Assembly;
-
-    protected static Assembly QuotesAssembly =>
-        typeof(Quotes.MarketInstrumentType).Assembly;
+        typeof(Conventions.ScheduleGenerator).Assembly;
 
     protected static Assembly CurvesAssembly =>
         typeof(Curves.Core.CurveGroup).Assembly;
@@ -52,8 +46,6 @@ public abstract class BaseArchitectureTest
     [
         AbstractionsAssembly,
         ConventionsAssembly,
-        IndicesAssembly,
-        QuotesAssembly,
         CurvesAssembly,
         CurvesInterpolationAssembly,
         CurvesBootstrapAssembly,

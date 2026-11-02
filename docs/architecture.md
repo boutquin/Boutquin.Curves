@@ -19,7 +19,7 @@ What this layer guarantees:
 - explicit convention handling instead of hidden utility defaults,
 - normalized quote/value representations suitable for deterministic downstream use.
 
-Calendar contracts (`IBusinessCalendar`, `BusinessDayAdjustment`) live in `MarketData.Abstractions.Calendars` as a single source of truth. Calendar implementations (`HolidayCalendar`, `WeekendOnlyCalendar`) come from `MarketData.Calendars`. Analytics-specific schedule generation (`BusinessScheduleGenerator`) remains in `Analytics.Conventions`.
+Calendar contracts (`IBusinessCalendar`, `BusinessDayAdjustment`) live in `MarketData.Abstractions.Calendars` as a single source of truth. Calendar implementations (`HolidayCalendar`, `WeekendOnlyCalendar`) come from `MarketData.Calendars`. Curves-specific schedule generation (`ScheduleGenerator`) remains in `Boutquin.Curves.Conventions`.
 
 Common mistake:
 - Treating conventions as "just metadata". Day count, business-day adjustments, and settlement rules directly change cash-flow schedules and therefore repricing outcomes.
@@ -42,7 +42,6 @@ What this layer guarantees:
 - `CurveGroupExtensions` convenience methods for resolving discount and forward curves from a group by currency and benchmark,
 - calibration diagnostics (repricing, structure, numerical quality),
 - pre-calibration validation of curve group definitions (duplicate references, missing quotes, unresolvable conventions),
-- root solver abstraction (`IRootSolver`) with bisection, Brent, and Newton-Raphson implementations for iterative instrument solving,
 - historical fixings store (`IFixingsStore`) for instruments referencing past benchmark observations,
 - risk seams for scenario and sensitivity workflows.
 
@@ -80,6 +79,28 @@ The integration surface in Analytics is:
   - **Info**: expected publication lag (overnight fixings such as SOFR that publish T+1).
   - **Warning**: unexpected date gap (yield curve adapters and same-day publishers where a gap signals stale data).
 - Both adapter and node-level issues are collected in `CurveSnapshot.DataIssues`.
+
+## Boutquin.Numerics Integration
+
+`Boutquin.Curves.Interpolation` depends on [Boutquin.Numerics](https://github.com/boutquin/Boutquin.Numerics) for the interpolation kernel. No other package in this repository references Numerics directly.
+
+The integration surface is the generic `IInterpolator<T>` contract and the five stateless singleton implementations:
+
+| Numerics type | Curves wrapper | Algorithm |
+|---|---|---|
+| `LinearInterpolator<double>` | `LinearZeroRateInterpolator` | Piecewise-linear in zero-rate space |
+| `LogLinearInterpolator<double>` | `LogLinearDiscountFactorInterpolator` | Piecewise-linear in log-DF space |
+| `FlatForwardInterpolator<double>` | `FlatForwardInterpolator` | Piecewise-constant instantaneous forwards |
+| `MonotoneCubicInterpolator<double>` | `MonotoneCubicInterpolator` | Fritsch-Carlson monotone cubic Hermite |
+| `MonotoneConvexInterpolator<double>` | `MonotoneConvexInterpolator` | Hagan-West monotone convex (non-negative forwards) |
+
+Each wrapper converts `DateOnly`/`IReadOnlyList<CurvePoint>` inputs to `ReadOnlySpan<double>` year-fraction arrays, delegates to `XxxInterpolator<double>.Instance.Interpolate(x, xs, ys)`, and applies any domain-level coordinate transform (e.g., log-DF, NCR) before and after the call.
+
+**Why `<double>`:** the curve layer operates in `double` arithmetic throughout — discount factors, year fractions, and zero rates are all `double`. The Numerics `IFloatingPoint<T>` tier allows `decimal`, but the additional precision yields no benefit here and would impose a cast boundary at every interpolation call.
+
+**Why no Numerics solvers:** the bootstrap calibration is entirely analytic. Each `AbstractInstrumentHelper.SolveNodeValue` implementation computes the pillar discount factor algebraically from the market quote — no iterative root finding is needed. If future instruments require iteration (e.g., bonds with complex cashflow structures), `BrentSolver<double>` from Numerics is the natural addition; for now it is not referenced.
+
+**Version:** Curves currently targets `Boutquin.Numerics` 2.x, which uses the generic `IInterpolator<T>` surface. The pre-2.0 non-generic facades (`BNU0001` diagnostic) are not used.
 
 ## Dependency Direction
 

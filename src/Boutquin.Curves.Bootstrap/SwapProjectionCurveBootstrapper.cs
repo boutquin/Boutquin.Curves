@@ -18,7 +18,7 @@ using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Bootstrap.Inputs;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 
 namespace Boutquin.Curves.Bootstrap;
 
@@ -47,20 +47,21 @@ public sealed class SwapProjectionCurveBootstrapper
     /// <returns>The resulting curve.</returns>
     /// <exception cref="ArgumentException">Thrown when the swap quote set is empty.</exception>
     /// <remarks>
-    /// The terminal quote is treated as the single representative rate for all maturities.
+    /// The longest-tenor quote is selected regardless of list order and treated as the single representative rate for all maturities.
     /// This is intentionally simplistic and should not be used for production risk or hedge construction.
     /// </remarks>
     public IDiscountCurve Bootstrap(SwapBootstrapInput input)
     {
         ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(input.Swaps, "input.Swaps");
 
         if (input.Swaps.Count == 0)
         {
             throw new ArgumentException("At least one swap quote is required.", nameof(input));
         }
 
-        double terminalRate = input.Swaps[^1].FixedRate;
-        CurrencyCode currency = input.Currency ?? CurrencyCode.USD;
+        double terminalRate = input.Swaps.MaxBy(static quote => quote.TenorInMonths)!.FixedRate;
+        Currency currency = input.Currency ?? Currency.USD;
 
         return new FlatDiscountCurve(
             new CurveName(input.CurveName),

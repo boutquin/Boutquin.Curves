@@ -30,4 +30,33 @@ public sealed record MarketEnvironment(
     DateOnly ValuationDate,
     IReadOnlyDictionary<CurveReference, ICurve> Curves,
     IReadOnlyDictionary<BenchmarkName, RateBenchmark> Benchmarks,
-    IReadOnlyDictionary<string, decimal> Fixings);
+    IReadOnlyDictionary<string, decimal> Fixings)
+{
+    private IReadOnlyDictionary<CurveReference, ICurve> _curves = SnapshotCopies.Dictionary(Curves, nameof(Curves));
+
+    /// <summary>Protected snapshot of the supplied curves collection.</summary>
+    public IReadOnlyDictionary<CurveReference, ICurve> Curves
+    {
+        get => _curves;
+        init => _curves = SnapshotCopies.Dictionary(value, nameof(Curves));
+    }
+
+    private IReadOnlyDictionary<BenchmarkName, RateBenchmark> _benchmarks = SnapshotCopies.Dictionary(Benchmarks, nameof(Benchmarks));
+
+    /// <summary>Protected snapshot of the supplied benchmarks collection.</summary>
+    public IReadOnlyDictionary<BenchmarkName, RateBenchmark> Benchmarks
+    {
+        get => _benchmarks;
+        init => _benchmarks = SnapshotCopies.Dictionary(value, nameof(Benchmarks));
+    }
+
+    private IReadOnlyDictionary<string, decimal> _fixings = SnapshotCopies.Dictionary(Fixings, nameof(Fixings));
+
+    /// <summary>Protected snapshot of the supplied fixings collection.</summary>
+    public IReadOnlyDictionary<string, decimal> Fixings
+    {
+        get => _fixings;
+        init => _fixings = SnapshotCopies.Dictionary(value, nameof(Fixings));
+    }
+
+}

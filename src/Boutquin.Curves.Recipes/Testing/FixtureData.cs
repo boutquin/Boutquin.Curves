@@ -66,10 +66,10 @@ public static class FixtureData
     public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> UsdSofrOisQuotes() =>
         Envelope<YieldCurveQuote>(
         [
-            new("1M", 0.0480m),
-            new("3M", 0.0460m),
-            new("6M", 0.0440m),
-            new("1Y", 0.0420m),
+            new(FixtureDate, "1M", 0.0480m),
+            new(FixtureDate, "3M", 0.0460m),
+            new(FixtureDate, "6M", 0.0440m),
+            new(FixtureDate, "1Y", 0.0420m),
         ]);
 
     /// <summary>
@@ -78,12 +78,30 @@ public static class FixtureData
     public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> UsdTreasuryParQuotes() =>
         Envelope<YieldCurveQuote>(
         [
-            new("2Y", 0.0347m),
-            new("3Y", 0.0362m),
-            new("5Y", 0.0385m),
-            new("7Y", 0.0402m),
-            new("10Y", 0.0419m),
-            new("30Y", 0.0445m),
+            new(FixtureDate, "2Y", 0.0347m),
+            new(FixtureDate, "3Y", 0.0362m),
+            new(FixtureDate, "5Y", 0.0385m),
+            new(FixtureDate, "7Y", 0.0402m),
+            new(FixtureDate, "10Y", 0.0419m),
+            new(FixtureDate, "30Y", 0.0445m),
+        ]);
+
+    /// <summary>
+    /// SOFR IRS (fixed-for-SOFR) par rate quotes for the long end of the USD SOFR multi-curve
+    /// discount curve. Rates are calibrated to be consistent with <see cref="UsdSofrOisQuotes"/>
+    /// (the projection curve for the multi-curve recipe) — the SOFR OIS curve declines from
+    /// 5.29% overnight to 4.20% at 1Y and is flat-extrapolated thereafter, giving par IRS
+    /// rates in the 4.20–4.22% range across 2Y–30Y.
+    /// </summary>
+    public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> UsdSofrIrsQuotes() =>
+        Envelope<YieldCurveQuote>(
+        [
+            new(FixtureDate, "2Y", 0.0422m),
+            new(FixtureDate, "3Y", 0.0421m),
+            new(FixtureDate, "5Y", 0.0420m),
+            new(FixtureDate, "7Y", 0.0420m),
+            new(FixtureDate, "10Y", 0.0420m),
+            new(FixtureDate, "30Y", 0.0420m),
         ]);
 
     // -------------------------------------------------------------------------
@@ -107,15 +125,15 @@ public static class FixtureData
     public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> CadBocZeroQuotes() =>
         Envelope<YieldCurveQuote>(
         [
-            new("3M", 0.0245m),
-            new("6M", 0.0268m),
-            new("1Y", 0.0292m),
-            new("2Y", 0.0310m),
-            new("3Y", 0.0318m),
-            new("5Y", 0.0330m),
-            new("7Y", 0.0338m),
-            new("10Y", 0.0345m),
-            new("30Y", 0.0355m),
+            new(FixtureDate, "3M", 0.0245m),
+            new(FixtureDate, "6M", 0.0268m),
+            new(FixtureDate, "1Y", 0.0292m),
+            new(FixtureDate, "2Y", 0.0310m),
+            new(FixtureDate, "3Y", 0.0318m),
+            new(FixtureDate, "5Y", 0.0330m),
+            new(FixtureDate, "7Y", 0.0338m),
+            new(FixtureDate, "10Y", 0.0345m),
+            new(FixtureDate, "30Y", 0.0355m),
         ]);
 
     // -------------------------------------------------------------------------
@@ -139,16 +157,16 @@ public static class FixtureData
     public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> GbpSoniaOisQuotes() =>
         Envelope<YieldCurveQuote>(
         [
-            new("1M", 0.0385m),
-            new("3M", 0.0370m),
-            new("6M", 0.0358m),
-            new("1Y", 0.0345m),
-            new("2Y", 0.0330m),
-            new("3Y", 0.0325m),
-            new("5Y", 0.0328m),
-            new("7Y", 0.0335m),
-            new("10Y", 0.0340m),
-            new("30Y", 0.0350m),
+            new(FixtureDate, "1M", 0.0385m),
+            new(FixtureDate, "3M", 0.0370m),
+            new(FixtureDate, "6M", 0.0358m),
+            new(FixtureDate, "1Y", 0.0345m),
+            new(FixtureDate, "2Y", 0.0330m),
+            new(FixtureDate, "3Y", 0.0325m),
+            new(FixtureDate, "5Y", 0.0328m),
+            new(FixtureDate, "7Y", 0.0335m),
+            new(FixtureDate, "10Y", 0.0340m),
+            new(FixtureDate, "30Y", 0.0350m),
         ]);
 
     // -------------------------------------------------------------------------
@@ -172,16 +190,80 @@ public static class FixtureData
     public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> EurEstrOisQuotes() =>
         Envelope<YieldCurveQuote>(
         [
-            new("1M", 0.0320m),
-            new("3M", 0.0305m),
-            new("6M", 0.0290m),
-            new("1Y", 0.0278m),
-            new("2Y", 0.0265m),
-            new("3Y", 0.0260m),
-            new("5Y", 0.0262m),
-            new("7Y", 0.0268m),
-            new("10Y", 0.0275m),
-            new("30Y", 0.0285m),
+            new(FixtureDate, "1M", 0.0320m),
+            new(FixtureDate, "3M", 0.0305m),
+            new(FixtureDate, "6M", 0.0290m),
+            new(FixtureDate, "1Y", 0.0278m),
+            new(FixtureDate, "2Y", 0.0265m),
+            new(FixtureDate, "3Y", 0.0260m),
+            new(FixtureDate, "5Y", 0.0262m),
+            new(FixtureDate, "7Y", 0.0268m),
+            new(FixtureDate, "10Y", 0.0275m),
+            new(FixtureDate, "30Y", 0.0285m),
+        ]);
+
+    // -------------------------------------------------------------------------
+    //  CHF SARON
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// SARON overnight fixing observations (lookback window around <see cref="FixtureDate"/>).
+    /// </summary>
+    public static DataEnvelope<IReadOnlyList<ScalarObservation>> ChfSaronFixings() =>
+        Envelope<ScalarObservation>(
+        [
+            new(new DateOnly(2026, 4, 7), 0.0163m, "rate"),
+            new(new DateOnly(2026, 4, 8), 0.0163m, "rate"),
+            new(FixtureDate, 0.0163m, "rate"),
+        ]);
+
+    /// <summary>
+    /// SIX CHF SARON zero-curve quotes for the CHF discount curve.
+    /// </summary>
+    public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> ChfSaronZeroQuotes() =>
+        Envelope<YieldCurveQuote>(
+        [
+            new(FixtureDate, "3M", 0.0155m),
+            new(FixtureDate, "6M", 0.0152m),
+            new(FixtureDate, "1Y", 0.0150m),
+            new(FixtureDate, "2Y", 0.0148m),
+            new(FixtureDate, "3Y", 0.0145m),
+            new(FixtureDate, "5Y", 0.0141m),
+            new(FixtureDate, "7Y", 0.0138m),
+            new(FixtureDate, "10Y", 0.0135m),
+            new(FixtureDate, "30Y", 0.0130m),
+        ]);
+
+    // -------------------------------------------------------------------------
+    //  JPY TONA
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// TONA overnight fixing observations (lookback window around <see cref="FixtureDate"/>).
+    /// </summary>
+    public static DataEnvelope<IReadOnlyList<ScalarObservation>> JpyTonaFixings() =>
+        Envelope<ScalarObservation>(
+        [
+            new(new DateOnly(2026, 4, 7), 0.0023m, "rate"),
+            new(new DateOnly(2026, 4, 8), 0.0023m, "rate"),
+            new(FixtureDate, 0.0023m, "rate"),
+        ]);
+
+    /// <summary>
+    /// BOJ JPY TONA zero-curve quotes for the JPY discount curve.
+    /// </summary>
+    public static DataEnvelope<IReadOnlyList<YieldCurveQuote>> JpyTonaZeroQuotes() =>
+        Envelope<YieldCurveQuote>(
+        [
+            new(FixtureDate, "3M", 0.0022m),
+            new(FixtureDate, "6M", 0.0025m),
+            new(FixtureDate, "1Y", 0.0032m),
+            new(FixtureDate, "2Y", 0.0045m),
+            new(FixtureDate, "3Y", 0.0058m),
+            new(FixtureDate, "5Y", 0.0075m),
+            new(FixtureDate, "7Y", 0.0090m),
+            new(FixtureDate, "10Y", 0.0105m),
+            new(FixtureDate, "30Y", 0.0120m),
         ]);
 
     // -------------------------------------------------------------------------
@@ -200,6 +282,7 @@ public static class FixtureData
             .Register("SOFR", UsdSofrFixings())
             .Register("CME-USD-SOFR-OIS", UsdSofrOisQuotes())
             .Register("UST-PAR", UsdTreasuryParQuotes())
+            .Register("CME-USD-SOFR-IRS", UsdSofrIrsQuotes())
             // CAD
             .Register("CORRA", CadCorraFixings())
             .Register("BOC-ZERO", CadBocZeroQuotes())
@@ -208,7 +291,13 @@ public static class FixtureData
             .Register("ICE-GBP-SONIA-OIS", GbpSoniaOisQuotes())
             // EUR
             .Register("ESTR", EurEstrFixings())
-            .Register("CME-EUR-ESTR-OIS", EurEstrOisQuotes());
+            .Register("CME-EUR-ESTR-OIS", EurEstrOisQuotes())
+            // CHF
+            .Register("SARON", ChfSaronFixings())
+            .Register("SIX-CHF-SARON-OIS", ChfSaronZeroQuotes())
+            // JPY
+            .Register("TONA", JpyTonaFixings())
+            .Register("BOJ-JPY-TONA-OIS", JpyTonaZeroQuotes());
     }
 
     private static DataEnvelope<IReadOnlyList<T>> Envelope<T>(IReadOnlyList<T> payload) =>

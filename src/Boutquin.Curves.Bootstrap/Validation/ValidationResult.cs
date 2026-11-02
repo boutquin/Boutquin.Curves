@@ -26,7 +26,26 @@ public sealed record ValidationResult(
     bool IsValid,
     IReadOnlyList<ValidationEntry> Errors,
     IReadOnlyList<ValidationEntry> Warnings)
+
 {
+    private IReadOnlyList<ValidationEntry> _errors = BootstrapInputSnapshot.Copy(Errors, nameof(Errors));
+
+    /// <summary>Blocking validation findings. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<ValidationEntry> Errors
+    {
+        get => _errors;
+        init => _errors = BootstrapInputSnapshot.Copy(value, nameof(value));
+    }
+
+    private IReadOnlyList<ValidationEntry> _warnings = BootstrapInputSnapshot.Copy(Warnings, nameof(Warnings));
+
+    /// <summary>Non-blocking validation observations. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<ValidationEntry> Warnings
+    {
+        get => _warnings;
+        init => _warnings = BootstrapInputSnapshot.Copy(value, nameof(value));
+    }
+
     /// <summary>
     /// A valid result with no errors or warnings.
     /// </summary>

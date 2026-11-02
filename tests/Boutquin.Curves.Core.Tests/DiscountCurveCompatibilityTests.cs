@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using FluentAssertions;
 
 namespace Boutquin.Curves.Core.Tests;
@@ -31,7 +31,7 @@ public sealed class DiscountCurveCompatibilityTests
         FlatDiscountCurve curve = new(
             new CurveName("USD-OIS"),
             valuationDate,
-            CurrencyCode.USD,
+            Currency.USD,
             0.05d);
 
         double actual = curve.DiscountFactor(valuationDate.AddYears(1));
@@ -46,7 +46,7 @@ public sealed class DiscountCurveCompatibilityTests
         InterpolatedDiscountCurve curve = new(
             new CurveName("USD-SWAP"),
             valuationDate,
-            CurrencyCode.USD,
+            Currency.USD,
             [
                 new CurvePoint(valuationDate.AddMonths(6), 0.99d),
                 new CurvePoint(valuationDate.AddMonths(12), 0.97d)

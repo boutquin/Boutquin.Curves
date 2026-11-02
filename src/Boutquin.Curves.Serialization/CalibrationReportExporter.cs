@@ -44,6 +44,36 @@ public static class CalibrationReportExporter
     };
 
     /// <summary>
+    /// Writes a <see langword="double"/> value as a JSON number when it is finite, or as
+    /// <c>null</c> when it is NaN or ±Infinity. Non-finite values legitimately arise in
+    /// failed or degenerate calibrations; writing <c>null</c> keeps the JSON well-formed
+    /// and parseable so that failure reports can always be produced.
+    /// </summary>
+    private static void WriteFiniteOrNull(Utf8JsonWriter writer, string propertyName, double value)
+    {
+        if (double.IsFinite(value))
+        {
+            writer.WriteNumber(propertyName, value);
+        }
+        else
+        {
+            writer.WriteNull(propertyName);
+        }
+    }
+
+    private static void WriteFiniteOrNullValue(Utf8JsonWriter writer, double value)
+    {
+        if (double.IsFinite(value))
+        {
+            writer.WriteNumberValue(value);
+        }
+        else
+        {
+            writer.WriteNullValue();
+        }
+    }
+
+    /// <summary>
     /// Serializes a calibration result to an indented JSON report.
     /// </summary>
     /// <param name="result">Calibration result containing curves, diagnostics, and optional Jacobian.</param>
@@ -51,6 +81,8 @@ public static class CalibrationReportExporter
     /// <returns>JSON text representing the calibration report.</returns>
     public static string Export(CurveCalibrationResult result, DateOnly valuationDate)
     {
+        ArgumentNullException.ThrowIfNull(result);
+
         using var stream = new MemoryStream();
         using (var writer = new Utf8JsonWriter(stream, s_writerOptions))
         {
@@ -85,10 +117,10 @@ public static class CalibrationReportExporter
             writer.WriteString("label", r.Label);
             writer.WriteString("targetCurve", $"{r.TargetCurve.Role}:{r.TargetCurve.Currency}:{r.TargetCurve.Benchmark?.Value ?? ""}");
             writer.WriteString("pillarDate", r.PillarDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
-            writer.WriteNumber("marketQuote", r.MarketQuote);
-            writer.WriteNumber("impliedQuote", r.ImpliedQuote);
-            writer.WriteNumber("absoluteError", r.AbsoluteError);
-            writer.WriteNumber("signedError", r.SignedError);
+            WriteFiniteOrNull(writer, "marketQuote", r.MarketQuote);
+            WriteFiniteOrNull(writer, "impliedQuote", r.ImpliedQuote);
+            WriteFiniteOrNull(writer, "absoluteError", r.AbsoluteError);
+            WriteFiniteOrNull(writer, "signedError", r.SignedError);
             writer.WriteString("instrumentType", r.InstrumentType);
 
             if (r.WarningFlags is { Count: > 0 })
@@ -137,7 +169,7 @@ public static class CalibrationReportExporter
             writer.WriteString("message", n.Message);
             if (n.Residual.HasValue)
             {
-                writer.WriteNumber("residual", n.Residual.Value);
+                WriteFiniteOrNull(writer, "residual", n.Residual.Value);
             }
             writer.WriteEndObject();
         }
@@ -167,14 +199,15 @@ public static class CalibrationReportExporter
         writer.WriteEndArray();
 
         writer.WriteStartArray("values");
-        int rows = j.Values.GetLength(0);
-        int cols = j.Values.GetLength(1);
+        double[,] values = j.Values;
+        int rows = values.GetLength(0);
+        int cols = values.GetLength(1);
         for (int r = 0; r < rows; r++)
         {
             writer.WriteStartArray();
             for (int c = 0; c < cols; c++)
             {
-                writer.WriteNumberValue(j.Values[r, c]);
+                WriteFiniteOrNullValue(writer, values[r, c]);
             }
             writer.WriteEndArray();
         }

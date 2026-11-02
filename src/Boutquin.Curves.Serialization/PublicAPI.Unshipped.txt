@@ -1,3 +1,58 @@
 #nullable enable
-Boutquin.Curves.Serialization.CurveGroupDefinitionJsonSerializer.Serialize(Boutquin.Curves.Bootstrap.CurveCalibrationInput! input) -> string!
-Boutquin.Curves.Serialization.CurveGroupDefinitionJsonSerializer.DeserializeSpecs(string! json) -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>!
+Boutquin.Curves.Serialization.CurveGroupDefinitionJsonSerializer.DeserializeGroup(string! json) -> Boutquin.Curves.Serialization.CurveGroupSpecs!
+Boutquin.Curves.Serialization.CurveGroupSpecs
+Boutquin.Curves.Serialization.CurveGroupSpecs.<Clone>$() -> Boutquin.Curves.Serialization.CurveGroupSpecs!
+Boutquin.Curves.Serialization.CurveGroupSpecs.Curves.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>!
+Boutquin.Curves.Serialization.CurveGroupSpecs.Curves.init -> void
+Boutquin.Curves.Serialization.CurveGroupSpecs.CurveGroupSpecs(System.DateOnly ValuationDate, string! GroupName, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>! Curves) -> void
+Boutquin.Curves.Serialization.CurveGroupSpecs.Deconstruct(out System.DateOnly ValuationDate, out string! GroupName, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>! Curves) -> void
+Boutquin.Curves.Serialization.CurveGroupSpecs.Equals(Boutquin.Curves.Serialization.CurveGroupSpecs? other) -> bool
+Boutquin.Curves.Serialization.CurveGroupSpecs.GroupName.get -> string!
+Boutquin.Curves.Serialization.CurveGroupSpecs.GroupName.init -> void
+Boutquin.Curves.Serialization.CurveGroupSpecs.ValuationDate.get -> System.DateOnly
+Boutquin.Curves.Serialization.CurveGroupSpecs.ValuationDate.init -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.<Clone>$() -> Boutquin.Curves.Serialization.Dto.CurveDefinitionDto!
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Deconstruct(out string! CurveName, out string! Role, out string! Currency, out string? Benchmark, out string! ValueType, out string! DayCount, out string! Interpolator, out string! LeftExtrapolator, out string! RightExtrapolator, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.JumpPointDto!>? Jumps, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto!>! Nodes) -> void
+Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Equals(Boutquin.Curves.Serialization.Dto.CurveDefinitionDto? other) -> bool
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.<Clone>$() -> Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto!
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.Deconstruct(out string! GroupName, out string! ValuationDate, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.CurveDefinitionDto!>! Curves, out string! SchemaVersion) -> void
+Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.Equals(Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto? other) -> bool
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.<Clone>$() -> Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto!
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Deconstruct(out string! Type, out string! Label, out string! QuoteId, out string! Convention, out string! Tenor, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Serialization.Dto.CurveReferenceDto!>? ProjectionCurves) -> void
+Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Equals(Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto? other) -> bool
+Boutquin.Curves.Serialization.Dto.CurveReferenceDto.<Clone>$() -> Boutquin.Curves.Serialization.Dto.CurveReferenceDto!
+Boutquin.Curves.Serialization.Dto.CurveReferenceDto.Deconstruct(out string! Role, out string! Currency, out string? Benchmark) -> void
+Boutquin.Curves.Serialization.Dto.CurveReferenceDto.Equals(Boutquin.Curves.Serialization.Dto.CurveReferenceDto? other) -> bool
+Boutquin.Curves.Serialization.Dto.JumpPointDto.<Clone>$() -> Boutquin.Curves.Serialization.Dto.JumpPointDto!
+Boutquin.Curves.Serialization.Dto.JumpPointDto.Deconstruct(out string! Date, out double Value) -> void
+Boutquin.Curves.Serialization.Dto.JumpPointDto.Equals(Boutquin.Curves.Serialization.Dto.JumpPointDto? other) -> bool
+override Boutquin.Curves.Serialization.CurveGroupSpecs.Equals(object? obj) -> bool
+override Boutquin.Curves.Serialization.CurveGroupSpecs.GetHashCode() -> int
+override Boutquin.Curves.Serialization.CurveGroupSpecs.ToString() -> string!
+override Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.Equals(object? obj) -> bool
+override Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.GetHashCode() -> int
+override Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.ToString() -> string!
+override Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.Equals(object? obj) -> bool
+override Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.GetHashCode() -> int
+override Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.ToString() -> string!
+override Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.Equals(object? obj) -> bool
+override Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.GetHashCode() -> int
+override Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.ToString() -> string!
+override Boutquin.Curves.Serialization.Dto.CurveReferenceDto.Equals(object? obj) -> bool
+override Boutquin.Curves.Serialization.Dto.CurveReferenceDto.GetHashCode() -> int
+override Boutquin.Curves.Serialization.Dto.CurveReferenceDto.ToString() -> string!
+override Boutquin.Curves.Serialization.Dto.JumpPointDto.Equals(object? obj) -> bool
+override Boutquin.Curves.Serialization.Dto.JumpPointDto.GetHashCode() -> int
+override Boutquin.Curves.Serialization.Dto.JumpPointDto.ToString() -> string!
+static Boutquin.Curves.Serialization.CurveGroupSpecs.operator !=(Boutquin.Curves.Serialization.CurveGroupSpecs? left, Boutquin.Curves.Serialization.CurveGroupSpecs? right) -> bool
+static Boutquin.Curves.Serialization.CurveGroupSpecs.operator ==(Boutquin.Curves.Serialization.CurveGroupSpecs? left, Boutquin.Curves.Serialization.CurveGroupSpecs? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.operator !=(Boutquin.Curves.Serialization.Dto.CurveDefinitionDto? left, Boutquin.Curves.Serialization.Dto.CurveDefinitionDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveDefinitionDto.operator ==(Boutquin.Curves.Serialization.Dto.CurveDefinitionDto? left, Boutquin.Curves.Serialization.Dto.CurveDefinitionDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.operator !=(Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto? left, Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto.operator ==(Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto? left, Boutquin.Curves.Serialization.Dto.CurveGroupDefinitionDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.operator !=(Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto? left, Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto.operator ==(Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto? left, Boutquin.Curves.Serialization.Dto.CurveNodeDefinitionDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveReferenceDto.operator !=(Boutquin.Curves.Serialization.Dto.CurveReferenceDto? left, Boutquin.Curves.Serialization.Dto.CurveReferenceDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.CurveReferenceDto.operator ==(Boutquin.Curves.Serialization.Dto.CurveReferenceDto? left, Boutquin.Curves.Serialization.Dto.CurveReferenceDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.JumpPointDto.operator !=(Boutquin.Curves.Serialization.Dto.JumpPointDto? left, Boutquin.Curves.Serialization.Dto.JumpPointDto? right) -> bool
+static Boutquin.Curves.Serialization.Dto.JumpPointDto.operator ==(Boutquin.Curves.Serialization.Dto.JumpPointDto? left, Boutquin.Curves.Serialization.Dto.JumpPointDto? right) -> bool

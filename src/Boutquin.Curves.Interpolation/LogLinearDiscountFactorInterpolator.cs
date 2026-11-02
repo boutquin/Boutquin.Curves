@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.MarketData.DayCount;
 
-using NumericsLogLinear = Boutquin.Numerics.Interpolation.LogLinearInterpolator;
+using NumericsLogLinear = Boutquin.Numerics.Interpolation.LogLinearInterpolator<double>;
 
 namespace Boutquin.Curves.Interpolation;
 
@@ -73,8 +73,13 @@ public sealed class LogLinearDiscountFactorInterpolator : INodalCurveInterpolato
     /// to piecewise-constant instantaneous forward rates between nodes:
     /// $f(t) = -[\ln P_{i+1} - \ln P_i] / (t_{i+1} - t_i)$ for $t \in [t_i, t_{i+1})$.
     /// </remarks>
+    /// <exception cref="ArgumentException">A node is null, its discount factor is not finite and positive, or node dates are not strictly ascending.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="points"/> or <paramref name="dayCount"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="points"/> is empty.</exception>
     public double Interpolate(DateOnly valuationDate, DateOnly targetDate, IReadOnlyList<CurvePoint> points, IYearFractionCalculator dayCount)
     {
+        InterpolationInputValidator.Validate(points, dayCount);
+
         if (targetDate <= valuationDate)
         {
             return 1d;

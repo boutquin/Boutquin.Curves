@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.MarketData.DayCount;
 
-using NumericsLinear = Boutquin.Numerics.Interpolation.LinearInterpolator;
+using NumericsLinear = Boutquin.Numerics.Interpolation.LinearInterpolator<double>;
 
 namespace Boutquin.Curves.Interpolation;
 
@@ -72,8 +72,32 @@ public sealed class LinearZeroRateInterpolator : INodalCurveInterpolator
     /// is $z(t) = z_i + (z_{i+1} - z_i) \cdot (t - t_i) / (t_{i+1} - t_i)$. The discount factor is then
     /// $P(t) = e^{-z(t) \cdot t}$. This is linear in zero-rate space but nonlinear in discount-factor space.
     /// </remarks>
+    /// <exception cref="ArgumentException">A node is null, its discount factor is not finite and positive, or node dates are not strictly ascending.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="points"/> or <paramref name="dayCount"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="points"/> is empty, or when any node date in
+    /// <paramref name="points"/> is at or before <paramref name="valuationDate"/>.
+    /// </exception>
     public double Interpolate(DateOnly valuationDate, DateOnly targetDate, IReadOnlyList<CurvePoint> points, IYearFractionCalculator dayCount)
     {
+        InterpolationInputValidator.Validate(points, dayCount);
+
+        // Guard: a node at or before the valuation date produces xs[i] <= 0, where the zero-rate
+        // transform z_i = -ln(P_i)/t_i is singular. The legacy Math.Max(1e-12, xs[i]) floor masked
+        // this by substituting a ~1e10 zero rate, which then underflowed exp(-z·t) to a silent DF=0
+        // across the entire interior (an arbitrage-violating discount factor). Reject the node with a
+        // clear domain message naming the offending node date instead of returning corrupt output.
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (points[i].Date <= valuationDate)
+            {
+                throw new ArgumentException(
+                    $"All node dates must be strictly after the valuation date ({valuationDate:yyyy-MM-dd}). " +
+                    $"Node {i} has date {points[i].Date:yyyy-MM-dd}, which is at or before the valuation date.",
+                    nameof(points));
+            }
+        }
+
         if (targetDate <= valuationDate)
         {
             return 1d;

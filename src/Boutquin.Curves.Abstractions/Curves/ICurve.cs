@@ -15,7 +15,7 @@
 //
 
 using Boutquin.Curves.Abstractions.Identifiers;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.DayCount;
 
 namespace Boutquin.Curves.Abstractions.Curves;
@@ -52,7 +52,7 @@ public interface ICurve
     /// Multi-curve setups typically maintain one discount curve per collateral/funding currency,
     /// plus separate projection curves per index. Currency consistency is a first-line model-control check.
     /// </remarks>
-    CurrencyCode Currency { get; }
+    Currency Currency { get; }
 
     /// <summary>
     /// Day-count convention used to convert date intervals into year fractions.

@@ -15,14 +15,15 @@
 //
 
 using System.Text.Json;
+using Boutquin.Curves.Abstractions;
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Abstractions.ReferenceData;
 using Boutquin.Curves.Bootstrap;
 using Boutquin.Curves.Bootstrap.Definitions;
 using Boutquin.Curves.Bootstrap.ReferenceData;
-using Boutquin.Curves.Indices;
 using Boutquin.Curves.Interpolation;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using Boutquin.MarketData.Calendars;
 using Boutquin.MarketData.Conventions;
@@ -43,7 +44,7 @@ public sealed class SchemaVersionTests
     [Fact]
     public void CurveCalibrationInputJson_ContainsSchemaVersion()
     {
-        CurveReference curveRef = new(CurveRole.Discount, CurrencyCode.USD, new BenchmarkName("SOFR"));
+        CurveReference curveRef = new(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR"));
         CurveCalibrationInput input = new(
             new DateOnly(2024, 1, 15),
             new[]
@@ -71,7 +72,7 @@ public sealed class SchemaVersionTests
     [Fact]
     public void CurveCalibrationInputJson_Deserialize_IgnoresSchemaVersion()
     {
-        CurveReference curveRef = new(CurveRole.Discount, CurrencyCode.USD, new BenchmarkName("SOFR"));
+        CurveReference curveRef = new(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR"));
         CurveCalibrationInput input = new(
             new DateOnly(2024, 1, 15),
             new[]
@@ -96,5 +97,39 @@ public sealed class SchemaVersionTests
         var roundTripped = serializer.DeserializeSpecs(json);
         roundTripped.Should().HaveCount(1);
         roundTripped[0].CurveName.Value.Should().Be("USD-SOFR-DISC");
+    }
+
+    /// <summary>
+    /// CF-C6-6: Serialize(null) must throw ArgumentNullException, not NullReferenceException.
+    /// </summary>
+    [Fact]
+    public void Serialize_NullInput_ThrowsArgumentNullException()
+    {
+        var serializer = new CurveGroupDefinitionJsonSerializer();
+
+        Action act = () => serializer.Serialize(null!);
+
+        act.Should().Throw<ArgumentNullException>()
+            .WithParameterName("input");
+    }
+
+    /// <summary>
+    /// CF-C6-6: Serialize with an empty Curves list must throw ArgumentException (not
+    /// ArgumentOutOfRangeException from accessing index 0 on an empty list).
+    /// </summary>
+    [Fact]
+    public void Serialize_EmptyCurvesList_ThrowsArgumentException()
+    {
+        var serializer = new CurveGroupDefinitionJsonSerializer();
+
+        var input = new CurveCalibrationInput(
+            new DateOnly(2024, 1, 15),
+            Array.Empty<CurveCalibrationSpec>(),
+            CreateRefData());
+
+        Action act = () => serializer.Serialize(input);
+
+        act.Should().Throw<ArgumentException>()
+            .WithMessage("*Curves*");
     }
 }

@@ -102,4 +102,50 @@ public sealed class DataRequestEqualityComparerTests
         s_comparer.Equals(request, null).Should().BeFalse();
         s_comparer.Equals(null, request).Should().BeFalse();
     }
+
+    /// <summary>
+    /// AT-11: Two distinct concrete request types that share the same DatasetKey, date range,
+    /// and frequency must NOT be considered equal. Without a GetType() check, the comparer would
+    /// collapse them into the same fetch group, causing one request type's records to be dispatched
+    /// for the wrong request type.
+    ///
+    /// Concretely: OvernightFixingRequest("SR3") and FuturesSettlementRequest("SR3") share
+    /// DatasetKey = "SR3". If the comparer lacks a type check, they hash and equal the same —
+    /// a FuturesSettlementRequest fetch group would absorb an OvernightFixingRequest node,
+    /// returning FuturesSettlement records to ExtractRate logic that expects ScalarObservation.
+    /// </summary>
+    [Fact]
+    public void Different_RuntimeTypes_With_Same_Key_Are_Not_Equal()
+    {
+        // Arrange: same DatasetKey ("SR3"), same range, same (default) frequency,
+        // but OvernightFixingRequest vs FuturesSettlementRequest.
+        var range = new DateRange(s_baseDate.AddDays(-5), s_baseDate);
+
+        var fixing = new OvernightFixingRequest(new BenchmarkName("SR3"), range);
+        var futures = new FuturesSettlementRequest(new FuturesProductCode("SR3"), range);
+
+        // Precondition: same DatasetKey — this is exactly the collision scenario.
+        fixing.DatasetKey.Should().Be(futures.DatasetKey,
+            because: "the test is only meaningful when both requests share the DatasetKey");
+
+        // Act & Assert — same key, different types → must NOT be equal
+        s_comparer.Equals(fixing, futures).Should().BeFalse(
+            because: "different runtime types with the same DatasetKey must not collapse into one fetch group");
+    }
+
+    /// <summary>
+    /// AT-11 complementary: two OvernightFixingRequests with the same key, range, and frequency
+    /// must remain equal (regression guard — the type check must not break same-type deduplication).
+    /// </summary>
+    [Fact]
+    public void Same_RuntimeType_With_Same_Key_Are_Equal()
+    {
+        var range = new DateRange(s_baseDate.AddDays(-5), s_baseDate);
+        var r1 = new OvernightFixingRequest(new BenchmarkName("SOFR"), range);
+        var r2 = new OvernightFixingRequest(new BenchmarkName("SOFR"), range);
+
+        s_comparer.Equals(r1, r2).Should().BeTrue(
+            because: "two OvernightFixingRequests with identical fields must still be equal after the type-check is added");
+        s_comparer.GetHashCode(r1).Should().Be(s_comparer.GetHashCode(r2));
+    }
 }

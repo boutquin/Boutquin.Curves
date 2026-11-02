@@ -23,6 +23,8 @@ A yield curve is a function that tells you the time value of money: given a futu
 
 ### What the bootstrap engine solves for
 
+The calibrator supports discount-factor storage; `ZeroRate` and other storage enum values are rejected. A continuous-zero quote can still be an instrument input, converted using `P(T) = exp(-z * T)` where `T` is its nominal month/year maturity.
+
 Each instrument in the curve definition contributes one observable market quote and introduces one unknown: the discount factor at that instrument's maturity (called a **pillar date** or **node**). The bootstrap engine solves for each discount factor such that the instrument exactly reprices to its observed market quote.
 
 For a deposit maturing at time $T$ with rate $r$ and year fraction $\tau$:
@@ -60,15 +62,16 @@ Market quotes (adapter output)
 In code, `CurveBuilder` orchestrates this entire pipeline:
 
 ```csharp
-var definition = StandardCurveRecipes.UsdSofrDiscount(valuationDate);
-var snapshot = await new CurveBuilder()
-    .WithFixtureAdapters()
-    .BuildAsync(definition, valuationDate);
+// Resolve builder from the service provider configured in the README quick start.
+var definition = StandardCurveRecipes.UsdSofrDiscount();
+var snapshot = await builder.BuildAsync(definition, valuationDate).ConfigureAwait(false);
 ```
 
 ### What "exact repricing" means
 
 After calibration, the engine feeds each solved discount factor back through the instrument's pricing formula. The difference between the instrument's market quote and its model-implied quote is the **repricing error**. A well-calibrated curve has repricing errors below $10^{-8}$ — effectively machine precision. If any node has a larger error, something is wrong: a convention mismatch, a missing fixing, or a solver convergence failure.
+
+For self-discounting OIS, fixed-float and basis-swap nodes, par-annuity formulas provide an initial discount factor. If coupon dates lie between sparse pillars, their discount factors depend on the new pillar too. The calibrator therefore rebuilds the trial curve and refines the terminal log-discount-factor with Brent until the quote residual is at most $10^{-12}$. It then checks those coupon nodes on the completed curve against $10^{-10}$. Interpolation that changes earlier coupon values when later pillars are added can fail this final check; use local interpolation or simultaneous calibration for such definitions. Multi-curve and forward-role helpers retain their existing formulas and diagnostic outputs.
 
 ### Key types
 
@@ -95,7 +98,7 @@ This is the **multi-curve framework**: one curve for discounting, another for pr
 
 The discount curve answers: "What is a future cash flow worth today?" It provides discount factors used to present-value any stream of payments. In a collateralized trading environment, this curve is built from overnight index swap (OIS) rates because the collateral earns the overnight rate.
 
-`StandardCurveRecipes.UsdSofrDiscount` builds an 11-node curve (O/N + 1M–30Y) suitable for production discounting.
+`StandardCurveRecipes.UsdSofrDiscount` builds an 11-node curve (O/N + 1M–30Y) containing Treasury proxy nodes. It is not a pure OIS quote strip. Validate data provenance, conventions and repricing for the intended valuation. The CAD recipes similarly combine CORRA overnight with Government of Canada zero yields; the term nodes use continuous compounding on nominal maturities, not the simple-deposit formula. These government proxies do not establish OIS market consistency.
 
 ### Projection curve
 
@@ -117,11 +120,11 @@ A `CurveGroup` holds multiple curves and resolves them by `CurveReference`:
 
 ```csharp
 // Resolve the discount curve for USD
-var discountRef = new CurveReference(CurveRole.Discount, new CurrencyCode("USD"));
+var discountRef = new CurveReference(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR"));
 var discountCurve = (IDiscountCurve)curveGroup.GetCurve(discountRef);
 
 // Resolve the forward/projection curve for USD SOFR
-var forwardRef = new CurveReference(CurveRole.Forward, new CurrencyCode("USD"),
+var forwardRef = new CurveReference(CurveRole.Forward, Currency.USD,
     new BenchmarkName("SOFR"));
 var forwardCurve = (IForwardCurve)curveGroup.GetCurve(forwardRef);
 ```
@@ -190,12 +193,11 @@ double fwd3m = forwardCurve.ForwardRate(startDate, endDate);
 ### Practical example
 
 ```csharp
-var definition = StandardCurveRecipes.UsdSofrDiscount(valuationDate);
-var snapshot = await new CurveBuilder()
-    .WithFixtureAdapters()
-    .BuildAsync(definition, valuationDate);
+// Resolve builder from the service provider configured in the README quick start.
+var definition = StandardCurveRecipes.UsdSofrDiscount();
+var snapshot = await builder.BuildAsync(definition, valuationDate).ConfigureAwait(false);
 
-var discountRef = new CurveReference(CurveRole.Discount, new CurrencyCode("USD"));
+var discountRef = new CurveReference(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR"));
 var curve = (IDiscountCurve)snapshot.CurveGroup.GetCurve(discountRef);
 
 DateOnly fiveYear = valuationDate.AddYears(5);
@@ -278,7 +280,7 @@ A solver that does not converge signals that the instrument pricing function has
 
 ```
 All repricing errors < 1e-8 AND no structural warnings?
-    → Clean calibration. Curve is production-ready.
+    → Numerical calibration passed. Source suitability and market conventions still require assessment.
 
 All repricing errors < 1e-8 BUT structural warnings present?
     → Read the warnings. TREASURY_PROXY is expected for free EOD data.
@@ -347,18 +349,20 @@ This is why `IForwardCurve.ForwardRate(startDate, endDate)` works for both histo
 
 `Boutquin.OptionPricing` depends on `Boutquin.Curves.Abstractions` — it consumes `IDiscountCurve`, `IForwardCurve`, `ICurveGroup`, `MarketEnvironment`, `IFixingsStore`, and `IBusinessCalendar` without knowing how they were calibrated. All market dependencies are encapsulated in `OptionMarketData`.
 
-Four construction patterns are available, from simplest to most integrated:
+The following patterns illustrate the downstream integration architecture. OptionPricing is a separate product; its current API and compatibility are not qualified by the Curves package checks. Curves snippets use `Currency` from `Boutquin.Domain.Enumerations` and the configured `CurveBuilder` from the README.
+
+Four construction patterns are shown, from simplest to most integrated:
 
 ### Pattern A: Flat curves for testing and exploration
 
 ```csharp
 var discountCurve = new FlatDiscountCurve(
     new CurveName("USD-OIS"), valuationDate,
-    new CurrencyCode("USD"), riskFreeRate: 0.05);
+    Currency.USD, continuouslyCompoundedZeroRate: 0.05);
 
 var dividendCurve = new FlatDiscountCurve(
     new CurveName("DIVIDEND"), valuationDate,
-    new CurrencyCode("USD"), rate: 0.02);
+    Currency.USD, continuouslyCompoundedZeroRate: 0.02);
 
 var market = new OptionMarketData(
     valuationDate, spot: 100m, flatVolatility: 0.20,
@@ -368,12 +372,11 @@ var market = new OptionMarketData(
 ### Pattern B: Bootstrapped curves with manual extraction
 
 ```csharp
-var definition = StandardCurveRecipes.UsdSofrDiscount(valuationDate);
-var snapshot = await new CurveBuilder()
-    .WithFixtureAdapters()
-    .BuildAsync(definition, valuationDate);
+// Resolve builder from the service provider configured in the README quick start.
+var definition = StandardCurveRecipes.UsdSofrDiscount();
+var snapshot = await builder.BuildAsync(definition, valuationDate).ConfigureAwait(false);
 
-var discountRef = new CurveReference(CurveRole.Discount, new CurrencyCode("USD"));
+var discountRef = new CurveReference(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR"));
 var discountCurve = (IDiscountCurve)snapshot.CurveGroup.GetCurve(discountRef);
 
 var market = new OptionMarketData(
@@ -398,12 +401,10 @@ var market = OptionMarketData.FromCurveGroup(group, usd, spot: 100m, flatVolatil
 The factory looks up curves by role and currency — `Discount` is required, `Dividend`, `Borrow`, and `Forward` are optional. This works directly with `CurveBuilder` output:
 
 ```csharp
-var snapshot = await new CurveBuilder()
-    .WithFixtureAdapters()
-    .BuildAsync(definition, valuationDate);
+var snapshot = await builder.BuildAsync(definition, valuationDate).ConfigureAwait(false);
 
 var market = OptionMarketData.FromCurveGroup(
-    snapshot.CurveGroup, new CurrencyCode("USD"),
+    snapshot.CurveGroup, Currency.USD,
     spot: 100m, flatVolatility: 0.20);
 ```
 
@@ -413,7 +414,7 @@ When working with a full `MarketEnvironment` (curves + benchmarks + fixings), th
 
 ```csharp
 var market = OptionMarketData.FromMarketEnvironment(
-    env, new CurrencyCode("USD"),
+    env, Currency.USD,
     spot: 100m, flatVolatility: 0.20);
 
 // Fixings are available for path-dependent pricing

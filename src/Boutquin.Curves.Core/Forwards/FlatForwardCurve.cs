@@ -16,6 +16,7 @@
 
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using Boutquin.MarketData.DayCount;
 
@@ -40,7 +41,7 @@ namespace Boutquin.Curves.Core.Forwards;
 /// <example>
 /// <code>
 /// var curve = new FlatForwardCurve(
-///     new CurveName("USD-Flat"), valuationDate, CurrencyCode.USD,
+///     new CurveName("USD-Flat"), valuationDate, Currency.USD,
 ///     new BenchmarkName("SOFR"), flatForwardRate: 0.05);
 /// double rate = curve.ForwardRate(date1Y, date2Y); // returns 0.05
 /// </code>
@@ -59,7 +60,7 @@ public sealed class FlatForwardCurve : IForwardCurve
     public FlatForwardCurve(
         CurveName name,
         DateOnly valuationDate,
-        CurrencyCode currency,
+        Currency currency,
         BenchmarkName benchmark,
         double flatForwardRate,
         IYearFractionCalculator? dayCount = null)
@@ -84,7 +85,7 @@ public sealed class FlatForwardCurve : IForwardCurve
     public DateOnly ValuationDate { get; }
 
     /// <summary>Currency in which forward rates are denominated.</summary>
-    public CurrencyCode Currency { get; }
+    public Currency Currency { get; }
 
     /// <summary>Day-count convention used to convert accrual intervals into year fractions.</summary>
     public IYearFractionCalculator DayCount { get; }
@@ -106,6 +107,11 @@ public sealed class FlatForwardCurve : IForwardCurve
     /// </remarks>
     public double ValueAt(DateOnly date)
     {
+        if (date <= ValuationDate)
+        {
+            return 1d;
+        }
+
         double t = DayCount.YearFraction(ValuationDate, date);
         return Math.Exp(-FlatForwardRate * t);
     }

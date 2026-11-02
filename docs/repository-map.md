@@ -8,7 +8,7 @@ This map is organized by architecture layer so a new contributor can locate wher
 	- Stable contracts, identifiers, value objects, and core infrastructure interfaces used by downstream packages. Includes `IFixingsStore`/`InMemoryFixingsStore` for historical benchmark fixing storage.
 	- Start here when defining or extending market-facing interfaces.
 - `Boutquin.Curves.Conventions`
-	- Day count, schedule roll, business-day adjustment, and instrument-convention semantics. Contains `BusinessScheduleGenerator` for Analytics-specific schedule generation (calendar contracts themselves live in `MarketData.Abstractions.Calendars`).
+	- Day count, schedule roll, business-day adjustment, and instrument-convention semantics. Contains `ScheduleGenerator` for Curves-specific schedule generation (calendar contracts themselves live in `MarketData.Abstractions.Calendars`).
 	- Update here when a product rule changes.
 - `Boutquin.Curves.Indices`
 	- Benchmark identity and metadata catalog surfaces.

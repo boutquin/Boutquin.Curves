@@ -17,6 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Discounting;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using FluentAssertions;
 
@@ -28,7 +29,7 @@ namespace Boutquin.Curves.Core.Tests;
 public sealed class CurveGroupExtensionsTests
 {
     private static readonly DateOnly s_valuationDate = new(2026, 4, 11);
-    private const CurrencyCode Usd = CurrencyCode.USD;
+    private const Currency Usd = Currency.USD;
 
     [Fact]
     public void GetDiscountCurve_Returns_DiscountCurve_For_Currency()
@@ -130,5 +131,42 @@ public sealed class CurveGroupExtensionsTests
 
         found.Should().BeFalse();
         result.Should().BeNull();
+    }
+
+    // ── M-5: the CA1062 null-guard analyzer surfaced these 4 methods as unguarded extension
+    // methods (an extension method's receiver can be null via
+    // `((ICurveGroup)null).GetDiscountCurve(...)`) — a class of gap the A-1…A-10 manual sweep
+    // missed because it targeted ctors/factories, not extension methods.
+
+    [Fact]
+    public void GetDiscountCurve_ThrowsArgumentNullException_ForNullGroup()
+    {
+        ICurveGroup? group = null;
+        Action act = () => group!.GetDiscountCurve(Usd);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("group");
+    }
+
+    [Fact]
+    public void TryGetDiscountCurve_ThrowsArgumentNullException_ForNullGroup()
+    {
+        ICurveGroup? group = null;
+        Action act = () => group!.TryGetDiscountCurve(Usd, out _);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("group");
+    }
+
+    [Fact]
+    public void GetForwardCurve_ThrowsArgumentNullException_ForNullGroup()
+    {
+        ICurveGroup? group = null;
+        Action act = () => group!.GetForwardCurve(Usd, new BenchmarkName("SOFR"));
+        act.Should().Throw<ArgumentNullException>().WithParameterName("group");
+    }
+
+    [Fact]
+    public void TryGetForwardCurve_ThrowsArgumentNullException_ForNullGroup()
+    {
+        ICurveGroup? group = null;
+        Action act = () => group!.TryGetForwardCurve(Usd, new BenchmarkName("SOFR"), out _);
+        act.Should().Throw<ArgumentNullException>().WithParameterName("group");
     }
 }

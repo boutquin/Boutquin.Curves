@@ -44,4 +44,22 @@ public sealed record CurveSnapshot(
     BootstrapDiagnostics Diagnostics,
     IReadOnlyList<DataIssue> DataIssues,
     IReadOnlyList<DataProvenance> Provenance,
-    CalibrationJacobian? Jacobian = null);
+    CalibrationJacobian? Jacobian = null)
+{
+    private IReadOnlyList<DataIssue> _dataIssues = SnapshotList.Copy(DataIssues, nameof(DataIssues));
+    private IReadOnlyList<DataProvenance> _provenance = SnapshotList.Copy(Provenance, nameof(Provenance));
+
+    /// <summary>Protected data-quality issue snapshot for this build.</summary>
+    public IReadOnlyList<DataIssue> DataIssues
+    {
+        get => _dataIssues;
+        init => _dataIssues = SnapshotList.Copy(value, nameof(DataIssues));
+    }
+
+    /// <summary>Protected source-attribution snapshot for this build.</summary>
+    public IReadOnlyList<DataProvenance> Provenance
+    {
+        get => _provenance;
+        init => _provenance = SnapshotList.Copy(value, nameof(Provenance));
+    }
+}

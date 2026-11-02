@@ -19,6 +19,7 @@ using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Diagnostics;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Bootstrap;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using FluentAssertions;
 
@@ -35,7 +36,7 @@ public sealed class CalibrationReportExporterTests
         {
             new(
                 "USD-SOFR-O/N",
-                new CurveReference(CurveRole.Discount, CurrencyCode.USD, new BenchmarkName("SOFR")),
+                new CurveReference(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR")),
                 new DateOnly(2024, 1, 16),
                 0.0530,
                 0.053000001,
@@ -185,6 +186,48 @@ public sealed class CalibrationReportExporterTests
         diag.GetProperty("repricing").GetArrayLength().Should().Be(0);
         diag.GetProperty("structural").GetArrayLength().Should().Be(0);
         diag.GetProperty("numerical").GetArrayLength().Should().Be(0);
+    }
+
+    /// <summary>
+    /// CF-C6-3: Export must not throw when diagnostic values contain NaN or ±Infinity.
+    /// A failed/degenerate calibration produces non-finite residuals and errors; the report
+    /// must be writable so the failure can be recorded.
+    /// </summary>
+    [Fact]
+    public void Export_NonFiniteValues_DoesNotThrow_AndProducesValidJson()
+    {
+        // Arrange: repricing diagnostic with NaN errors (typical of a non-converged calibration).
+        var repricing = new List<RepricingDiagnostic>
+        {
+            new(
+                "USD-SOFR-DEGENERATE",
+                new CurveReference(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR")),
+                new DateOnly(2024, 1, 16),
+                double.NaN,      // non-finite market quote
+                double.NaN,      // non-finite implied quote
+                double.NaN,      // non-finite absolute error
+                double.PositiveInfinity, // non-finite signed error
+                "Deposit",
+                null)
+        };
+
+        var numerical = new List<NumericalDiagnostic>
+        {
+            new("Newton", 100, false, "Did not converge", double.NegativeInfinity)
+        };
+
+        var diagnostics = new BootstrapDiagnostics(repricing, [], numerical);
+        var result = new CurveCalibrationResult(StubCurveGroup.Instance, diagnostics);
+
+        // Act — must not throw even though values are NaN/±Infinity.
+        string json = default!;
+        var act = () => { json = CalibrationReportExporter.Export(result, new DateOnly(2024, 1, 15)); };
+
+        act.Should().NotThrow("a failed-calibration report must be serializable");
+
+        // Assert: valid JSON (parseable).
+        using var doc = JsonDocument.Parse(json);
+        doc.RootElement.GetProperty("schemaVersion").GetString().Should().Be("1.0");
     }
 
     /// <summary>

@@ -15,14 +15,15 @@
 //
 
 using System.Reflection;
+using Boutquin.Curves.Abstractions;
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Diagnostics;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Bootstrap.Definitions;
 using Boutquin.Curves.Bootstrap.ReferenceData;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.Curves.Indices;
 using Boutquin.Curves.Interpolation;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using Boutquin.MarketData.Calendars;
 using Boutquin.MarketData.Conventions;
@@ -36,7 +37,7 @@ public sealed class PiecewiseBootstrapCalibratorTests
     public void Calibrate_ShouldProduceCurveGroup()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference curveReference = new(CurveRole.Discount, CurrencyCode.USD);
+        CurveReference curveReference = new(CurveRole.Discount, Currency.USD);
 
         SimpleReferenceDataProvider referenceData = new(
             new[] { new WeekendOnlyCalendar("USNY") },
@@ -72,7 +73,7 @@ public sealed class PiecewiseBootstrapCalibratorTests
     public void Calibrate_ShouldProduceExpandedDiagnostics_AndRepriceAllSupportedNodeTypes()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference curveReference = new(CurveRole.Discount, CurrencyCode.USD);
+        CurveReference curveReference = new(CurveRole.Discount, Currency.USD);
 
         SimpleReferenceDataProvider referenceData = new(
             new[] { new WeekendOnlyCalendar("USNY") },
@@ -97,11 +98,14 @@ public sealed class PiecewiseBootstrapCalibratorTests
                     new InterpolationSettings(InterpolatorKind.LogLinearDiscountFactor, "FlatZero", "FlatForward"),
                     new[]
                     {
-                        new ResolvedNode("DEP-1M", new Tenor("1M"), "Deposit", "USD-SOFR-OIS", curveReference, 0.048m),
-                        new ResolvedNode("OIS-3M", new Tenor("3M"), "Ois", "USD-SOFR-OIS", curveReference, 0.045m),
-                        new ResolvedNode("FUT-6M", new Tenor("6M"), "OisFuture", "USD-SR3", curveReference, 0.043m),
-                        new ResolvedNode("FRA-9M", new Tenor("9M"), "Fra", "USD-FRA", curveReference, 0.044m),
-                        new ResolvedNode("SWAP-1Y", new Tenor("1Y"), "FixedFloatSwap", "USD-FIXED-6M-30-360", curveReference, 0.046m)
+                        new ResolvedNode("DEP-1M",  new Tenor("1M"),  "Deposit",       "USD-SOFR-OIS",         curveReference, 0.048m),
+                        new ResolvedNode("OIS-3M",  new Tenor("3M"),  "Ois",           "USD-SOFR-OIS",         curveReference, 0.045m),
+                        new ResolvedNode("FUT-6M",  new Tenor("6M"),  "OisFuture",     "USD-SR3",              curveReference, 0.043m),
+                        new ResolvedNode("FRA-9M",  new Tenor("9M"),  "Fra",           "USD-FRA",              curveReference, 0.044m),
+                        new ResolvedNode("SWAP-1Y", new Tenor("1Y"),  "FixedFloatSwap","USD-FIXED-6M-30-360",  curveReference, 0.046m),
+                        // Tenor 18M: intermediate payments at 6M and 1Y fall exactly on prior pillars,
+                        // so the repricing round-trip is exact to floating-point precision (< 1e-10).
+                        new ResolvedNode("BASIS-18M",new Tenor("18M"),"BasisSwap",    "USD-FIXED-6M-30-360",  curveReference, 0.0025m),
                     })
             },
             referenceData);
@@ -114,24 +118,70 @@ public sealed class PiecewiseBootstrapCalibratorTests
         result.Diagnostics.Structural.Should().NotContain(d => d.Code == "SCAFFOLD");
         result.Diagnostics.Numerical.Should().ContainSingle(d => d.SolverName == "PiecewiseBootstrap");
 
-        result.Diagnostics.Repricing.Should().HaveCount(5);
+        // F-04: all 6 supported instrument types must be exercised in a single calibration run.
+        result.Diagnostics.Repricing.Should().HaveCount(6);
         result.Diagnostics.Repricing.Select(d => d.InstrumentType).Should().BeEquivalentTo(new[]
         {
             "Deposit",
             "Ois",
             "OisFuture",
             "Fra",
-            "FixedFloatSwap"
+            "FixedFloatSwap",
+            "BasisSwap"
         });
 
         result.Diagnostics.Repricing.All(d => d.AbsoluteError < 1e-10).Should().BeTrue();
     }
 
     [Fact]
+    public void Calibrate_ShouldProduceKnownAnswerDiscountFactor_ForSingleOisNode()
+    {
+        // Known-answer (not self-consistency) check: a single 1Y OIS at 4% under ACT/360 must
+        // calibrate to DiscountFactor(pillar) == 1 / (1 + rate * tau_ACT360), an externally computed
+        // value under the par-annuity simple-interest relation. The existing repricing assertion
+        // (AbsoluteError < 1e-10) only pins the forward/inverse round-trip and would pass even if
+        // the helper used the wrong compounding formula.
+        DateOnly valuationDate = new(2026, 4, 9);
+        CurveReference curveReference = new(CurveRole.Discount, Currency.USD);
+        const double rate = 0.04;
+
+        SimpleReferenceDataProvider referenceData = new(
+            new[] { new WeekendOnlyCalendar("USNY") },
+            BenchmarkCatalog.CreateDefault().All(),
+            new[] { InstrumentConventionRegistry.CreateDefault().GetRequired("USD-SOFR-OIS") });
+
+        CurveCalibrationInput input = new(
+            valuationDate,
+            new[]
+            {
+                new CurveCalibrationSpec(
+                    new CurveName("USD-Disc"),
+                    curveReference,
+                    CurveValueType.DiscountFactor,
+                    "ACT/360",
+                    new InterpolationSettings(InterpolatorKind.LogLinearDiscountFactor, "FlatZero", "FlatForward"),
+                    new[]
+                    {
+                        new ResolvedNode("1Y", new Tenor("1Y"), "Ois", "USD-SOFR-OIS", curveReference, (decimal)rate)
+                    })
+            },
+            referenceData);
+
+        CurveCalibrationResult result = new PiecewiseBootstrapCalibrator().Calibrate(input);
+
+        IDiscountCurve curve = (IDiscountCurve)result.CurveGroup.GetCurve(curveReference);
+        DateOnly pillar = valuationDate.AddYears(1);
+        double tau = (pillar.DayNumber - valuationDate.DayNumber) / 360d; // ACT/360
+        // Re-pinned to the par-annuity simple-interest formula: the OIS bootstrap now solves
+        // Pc(T) = 1 / (1 + R * tau) for a single-period OIS, not exp(-R * tau).
+        curve.DiscountFactor(pillar).Should().BeApproximately(1.0 / (1.0 + rate * tau), 1e-12);
+    }
+
+    [Fact]
     public void Calibrate_ShouldWireCurveInterpolationSettingsIntoBuiltCurve()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference curveReference = new(CurveRole.Discount, CurrencyCode.USD);
+        CurveReference curveReference = new(CurveRole.Discount, Currency.USD);
         InterpolationSettings expectedSettings = new(InterpolatorKind.LinearZeroRate, "FlatZero", "FlatForward");
 
         SimpleReferenceDataProvider referenceData = new(
@@ -168,7 +218,7 @@ public sealed class PiecewiseBootstrapCalibratorTests
     public void Calibrate_ShouldWrapDiscountCurveWithJumpAdjustments_WhenConfigured()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference curveReference = new(CurveRole.Discount, CurrencyCode.USD);
+        CurveReference curveReference = new(CurveRole.Discount, Currency.USD);
 
         SimpleReferenceDataProvider referenceData = new(
             new[] { new WeekendOnlyCalendar("USNY") },
@@ -205,7 +255,7 @@ public sealed class PiecewiseBootstrapCalibratorTests
     public void Calibrate_ShouldProduceCalibrationJacobian_WithDeterministicLabelsAndDimensions()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference curveReference = new(CurveRole.Discount, CurrencyCode.USD);
+        CurveReference curveReference = new(CurveRole.Discount, Currency.USD);
 
         SimpleReferenceDataProvider referenceData = new(
             new[] { new WeekendOnlyCalendar("USNY") },

@@ -24,14 +24,16 @@ namespace Boutquin.Curves.Bootstrap.ConvexityAdjustments;
 /// <remarks>
 /// Under the Hull-White one-factor model with mean reversion $a$ and volatility $\sigma$:
 ///
-/// $$\text{CA}(T_1, T_2) = \frac{1}{2}\sigma^2 B(T_1, T_2) \left[B(0, T_1)\frac{1 - e^{-2aT_1}}{2a} + B(T_1, T_2)\right]$$
+/// $$\text{CA}(T_1, T_2) = \frac{1}{2}\sigma^2 B(T_1, T_2) \cdot \frac{1 - e^{-2aT_1}}{2a}$$
 ///
 /// where $B(t, T) = \frac{1 - e^{-a(T-t)}}{a}$ and $T_1$ is the futures expiry, $T_2$ is the
 /// maturity (end of the accrual period).
 ///
-/// When mean reversion $a \to 0$, the formula degenerates to the Ho-Lee limit:
-/// $\text{CA} = \frac{1}{2}\sigma^2 T_1 (T_2 - T_1)$. This implementation guards against
-/// numerical instability for very small $a$ by switching to the Ho-Lee formula below a threshold.
+/// The coefficient is chosen so the general mean-reverting form is continuous with the Ho-Lee
+/// branch: as $a \to 0$, $\frac{1 - e^{-2aT_1}}{2a} \to T_1$ and $B(T_1, T_2) \to (T_2 - T_1)$,
+/// so $\text{CA} \to \frac{1}{2}\sigma^2 T_1 (T_2 - T_1)$ — the explicit Ho-Lee limit. This
+/// implementation switches to the closed Ho-Lee formula below a small mean-reversion threshold
+/// to avoid catastrophic cancellation in the $1/a$ terms for very small $a$.
 /// </remarks>
 public sealed class HullWhiteConvexityAdjustment : IConvexityAdjustment
 {
@@ -45,24 +47,27 @@ public sealed class HullWhiteConvexityAdjustment : IConvexityAdjustment
     /// </summary>
     /// <param name="meanReversion">Mean reversion speed $a$ of the short rate process.</param>
     /// <param name="volatility">Volatility $\sigma$ of the short rate process.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="meanReversion"/> is negative or <paramref name="volatility"/> is non-positive.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="meanReversion"/> is negative or non-finite, or <paramref name="volatility"/> is non-positive or non-finite.</exception>
     public HullWhiteConvexityAdjustment(double meanReversion, double volatility)
     {
-        if (meanReversion < 0d)
+        if (!double.IsFinite(meanReversion) || meanReversion < 0d)
         {
-            throw new ArgumentOutOfRangeException(nameof(meanReversion), "Mean reversion must be non-negative.");
+            throw new ArgumentOutOfRangeException(nameof(meanReversion), "Mean reversion must be finite and non-negative.");
         }
 
-        if (volatility <= 0d)
+        if (!double.IsFinite(volatility) || volatility <= 0d)
         {
-            throw new ArgumentOutOfRangeException(nameof(volatility), "Volatility must be strictly positive.");
+            throw new ArgumentOutOfRangeException(nameof(volatility), "Volatility must be finite and strictly positive.");
         }
 
         _meanReversion = meanReversion;
         _volatility = volatility;
     }
 
-    /// <inheritdoc />
+    /// <summary>Computes the Hull-White futures-to-forward rate adjustment for an expiry and accrual end.</summary>
+    /// <param name="timeToExpiry">Year fraction to futures expiry.</param>
+    /// <param name="timeToMaturity">Year fraction to the end of the underlying accrual period.</param>
+    /// <returns>Zero for a non-positive expiry or an accrual end at or before expiry; otherwise the model adjustment in decimal rates.</returns>
     public double Adjustment(double timeToExpiry, double timeToMaturity)
     {
         if (timeToExpiry <= 0d || timeToMaturity <= timeToExpiry)
@@ -79,11 +84,15 @@ public sealed class HullWhiteConvexityAdjustment : IConvexityAdjustment
         }
 
         double a = _meanReversion;
-        double bExpiry = B(0d, timeToExpiry, a);
         double bAccrual = B(timeToExpiry, timeToMaturity, a);
+
+        // (1 - e^{-2 a T1}) / (2a) -> T1 as a -> 0, so 0.5 * sigma^2 * B(T1,T2) * factor
+        // converges to the explicit Ho-Lee branch 0.5 * sigma^2 * T1 * (T2 - T1) above,
+        // satisfying the a -> 0+ continuity contract (the previous bExpiry*factor + bAccrual
+        // bracket converged to T1^2 + (T2 - T1) instead, breaking continuity).
         double factor = (1d - Math.Exp(-2d * a * timeToExpiry)) / (2d * a);
 
-        return 0.5 * sigma2 * bAccrual * (bExpiry * factor + bAccrual);
+        return 0.5 * sigma2 * bAccrual * factor;
     }
 
     private static double B(double t, double T, double a)

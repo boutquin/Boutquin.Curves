@@ -1,16 +1,9 @@
 #nullable enable
-Boutquin.Curves.Conventions.Calendars.Schedule.BusinessScheduleGenerator
-Boutquin.Curves.Conventions.Calendars.Schedule.BusinessScheduleGenerator.BusinessScheduleGenerator() -> void
-Boutquin.Curves.Conventions.Calendars.Schedule.BusinessScheduleGenerator.Generate(System.DateOnly startDate, System.DateOnly endDate, Boutquin.MarketData.Conventions.PaymentFrequency frequency, Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar! calendar, Boutquin.MarketData.Abstractions.Calendars.BusinessDayAdjustment adjustment, int paymentLagBusinessDays = 0) -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod!>!
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.EndDate.get -> System.DateOnly
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.EndDate.init -> void
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.FixingDate.get -> System.DateOnly?
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.FixingDate.init -> void
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.PaymentDate.get -> System.DateOnly
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.PaymentDate.init -> void
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.SchedulePeriod(System.DateOnly StartDate, System.DateOnly EndDate, System.DateOnly PaymentDate, System.DateOnly? FixingDate = null) -> void
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.StartDate.get -> System.DateOnly
-Boutquin.Curves.Conventions.Calendars.Schedule.SchedulePeriod.StartDate.init -> void
-Boutquin.Curves.Conventions.Calendars.ObservationShiftHelper
-static Boutquin.Curves.Conventions.Calendars.ObservationShiftHelper.ComputeObservationDate(System.DateOnly accrualDate, Boutquin.MarketData.Conventions.ObservationShiftConvention convention, Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar! calendar, int shiftDays = 0) -> System.DateOnly
+Boutquin.Curves.Conventions.SchedulePeriod.<Clone>$() -> Boutquin.Curves.Conventions.SchedulePeriod!
+Boutquin.Curves.Conventions.SchedulePeriod.Deconstruct(out System.DateOnly AccrualStartDate, out System.DateOnly AccrualEndDate, out System.DateOnly PeriodStartDate, out System.DateOnly PeriodEndDate, out System.DateOnly PaymentDate, out double YearFraction) -> void
+Boutquin.Curves.Conventions.SchedulePeriod.Equals(Boutquin.Curves.Conventions.SchedulePeriod? other) -> bool
+override Boutquin.Curves.Conventions.SchedulePeriod.Equals(object? obj) -> bool
+override Boutquin.Curves.Conventions.SchedulePeriod.GetHashCode() -> int
+override Boutquin.Curves.Conventions.SchedulePeriod.ToString() -> string!
+static Boutquin.Curves.Conventions.SchedulePeriod.operator !=(Boutquin.Curves.Conventions.SchedulePeriod? left, Boutquin.Curves.Conventions.SchedulePeriod? right) -> bool
+static Boutquin.Curves.Conventions.SchedulePeriod.operator ==(Boutquin.Curves.Conventions.SchedulePeriod? left, Boutquin.Curves.Conventions.SchedulePeriod? right) -> bool

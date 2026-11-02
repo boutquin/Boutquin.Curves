@@ -31,6 +31,7 @@ namespace Boutquin.Curves.Abstractions.Diagnostics;
 /// condition estimates, iteration counts, and convergence flags — that reveal whether
 /// the calibration algorithm itself behaved well.
 /// </remarks>
+/// <exception cref="ArgumentNullException">A diagnostic list is null.</exception>
 /// <param name="Repricing">Per-node repricing diagnostics comparing market and implied quotes.</param>
 /// <param name="Structural">Structural diagnostics describing data or configuration issues.</param>
 /// <param name="Numerical">Numerical diagnostics describing solver convergence and residual quality.</param>
@@ -39,6 +40,42 @@ public sealed record BootstrapDiagnostics(
     IReadOnlyList<StructuralDiagnostic> Structural,
     IReadOnlyList<NumericalDiagnostic> Numerical)
 {
+    /// <summary>
+    /// Per-node repricing diagnostics. Stored as a defensive copy of the caller-supplied
+    /// list so that post-construction mutation of the original collection does not alter
+    /// this audit snapshot.
+    /// </summary>
+    /// <remarks>
+    /// The property is intentionally <c>get</c>-only (no <c>init</c> accessor) to prevent
+    /// callers from bypassing the defensive copy via a <c>with</c> expression. The copy is
+    /// taken once in the primary constructor and the snapshot is thereafter immutable.
+    /// </remarks>
+    public IReadOnlyList<RepricingDiagnostic> Repricing { get; } = SnapshotCopies.List(Repricing, nameof(Repricing));
+
+    /// <summary>
+    /// Structural diagnostics. Stored as a defensive copy of the caller-supplied list
+    /// so that post-construction mutation of the original collection does not alter
+    /// this audit snapshot.
+    /// </summary>
+    /// <remarks>
+    /// The property is intentionally <c>get</c>-only (no <c>init</c> accessor) to prevent
+    /// callers from bypassing the defensive copy via a <c>with</c> expression. The copy is
+    /// taken once in the primary constructor and the snapshot is thereafter immutable.
+    /// </remarks>
+    public IReadOnlyList<StructuralDiagnostic> Structural { get; } = SnapshotCopies.List(Structural, nameof(Structural));
+
+    /// <summary>
+    /// Numerical diagnostics. Stored as a defensive copy of the caller-supplied list
+    /// so that post-construction mutation of the original collection does not alter
+    /// this audit snapshot.
+    /// </summary>
+    /// <remarks>
+    /// The property is intentionally <c>get</c>-only (no <c>init</c> accessor) to prevent
+    /// callers from bypassing the defensive copy via a <c>with</c> expression. The copy is
+    /// taken once in the primary constructor and the snapshot is thereafter immutable.
+    /// </remarks>
+    public IReadOnlyList<NumericalDiagnostic> Numerical { get; } = SnapshotCopies.List(Numerical, nameof(Numerical));
+
     /// <summary>
     /// Empty diagnostics payload with no repricing, structural, or numerical entries.
     /// </summary>

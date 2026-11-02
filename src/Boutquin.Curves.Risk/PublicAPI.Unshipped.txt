@@ -1,1 +1,76 @@
 #nullable enable
+abstract Boutquin.Curves.Risk.CurveShockScenario.<Clone>$() -> Boutquin.Curves.Risk.CurveShockScenario!
+Boutquin.Curves.Risk.BucketedSensitivity.<Clone>$() -> Boutquin.Curves.Risk.BucketedSensitivity!
+Boutquin.Curves.Risk.BucketedSensitivity.Deconstruct(out string! Bucket, out double Delta) -> void
+Boutquin.Curves.Risk.BucketedSensitivity.Equals(Boutquin.Curves.Risk.BucketedSensitivity? other) -> bool
+Boutquin.Curves.Risk.BucketedShockPoint.<Clone>$() -> Boutquin.Curves.Risk.BucketedShockPoint!
+Boutquin.Curves.Risk.BucketedShockPoint.Deconstruct(out double MaturityYears, out double ShiftInBasisPoints) -> void
+Boutquin.Curves.Risk.BucketedShockPoint.Equals(Boutquin.Curves.Risk.BucketedShockPoint? other) -> bool
+Boutquin.Curves.Risk.BucketedZeroRateShock.Equals(Boutquin.Curves.Risk.BucketedZeroRateShock? other) -> bool
+Boutquin.Curves.Risk.CashFlow.<Clone>$() -> Boutquin.Curves.Risk.CashFlow!
+Boutquin.Curves.Risk.CashFlow.Deconstruct(out System.DateOnly PaymentDate, out decimal Amount, out Boutquin.Domain.Enumerations.Currency Currency) -> void
+Boutquin.Curves.Risk.CashFlow.Equals(Boutquin.Curves.Risk.CashFlow? other) -> bool
+Boutquin.Curves.Risk.CurveShockScenario.CurveShockScenario(Boutquin.Curves.Risk.CurveShockScenario! original) -> void
+Boutquin.Curves.Risk.CurveShockScenario.Deconstruct(out string! Name) -> void
+Boutquin.Curves.Risk.ParallelZeroRateShock.Deconstruct(out string! Name, out double ShiftInBasisPoints) -> void
+Boutquin.Curves.Risk.ParallelZeroRateShock.Equals(Boutquin.Curves.Risk.ParallelZeroRateShock? other) -> bool
+Boutquin.Curves.Risk.PcaCurveShock.Equals(Boutquin.Curves.Risk.PcaCurveShock? other) -> bool
+Boutquin.Curves.Risk.RiskBucket.<Clone>$() -> Boutquin.Curves.Risk.RiskBucket!
+Boutquin.Curves.Risk.RiskBucket.Deconstruct(out string! Bucket, out System.DateOnly MaturityDate) -> void
+Boutquin.Curves.Risk.RiskBucket.Equals(Boutquin.Curves.Risk.RiskBucket? other) -> bool
+Boutquin.Curves.Risk.RiskReport.<Clone>$() -> Boutquin.Curves.Risk.RiskReport!
+Boutquin.Curves.Risk.RiskReport.Equals(Boutquin.Curves.Risk.RiskReport? other) -> bool
+override Boutquin.Curves.Risk.BucketedSensitivity.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.BucketedSensitivity.GetHashCode() -> int
+override Boutquin.Curves.Risk.BucketedSensitivity.ToString() -> string!
+override Boutquin.Curves.Risk.BucketedShockPoint.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.BucketedShockPoint.GetHashCode() -> int
+override Boutquin.Curves.Risk.BucketedShockPoint.ToString() -> string!
+override Boutquin.Curves.Risk.BucketedZeroRateShock.<Clone>$() -> Boutquin.Curves.Risk.BucketedZeroRateShock!
+override Boutquin.Curves.Risk.BucketedZeroRateShock.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.BucketedZeroRateShock.GetHashCode() -> int
+override Boutquin.Curves.Risk.BucketedZeroRateShock.ToString() -> string!
+override Boutquin.Curves.Risk.CashFlow.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.CashFlow.GetHashCode() -> int
+override Boutquin.Curves.Risk.CashFlow.ToString() -> string!
+override Boutquin.Curves.Risk.CurveShockScenario.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.CurveShockScenario.GetHashCode() -> int
+override Boutquin.Curves.Risk.CurveShockScenario.ToString() -> string!
+override Boutquin.Curves.Risk.ParallelZeroRateShock.<Clone>$() -> Boutquin.Curves.Risk.ParallelZeroRateShock!
+override Boutquin.Curves.Risk.ParallelZeroRateShock.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.ParallelZeroRateShock.GetHashCode() -> int
+override Boutquin.Curves.Risk.ParallelZeroRateShock.ToString() -> string!
+override Boutquin.Curves.Risk.PcaCurveShock.<Clone>$() -> Boutquin.Curves.Risk.PcaCurveShock!
+override Boutquin.Curves.Risk.PcaCurveShock.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.PcaCurveShock.GetHashCode() -> int
+override Boutquin.Curves.Risk.PcaCurveShock.ToString() -> string!
+override Boutquin.Curves.Risk.RiskBucket.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.RiskBucket.GetHashCode() -> int
+override Boutquin.Curves.Risk.RiskBucket.ToString() -> string!
+override Boutquin.Curves.Risk.RiskReport.Equals(object? obj) -> bool
+override Boutquin.Curves.Risk.RiskReport.GetHashCode() -> int
+override Boutquin.Curves.Risk.RiskReport.ToString() -> string!
+override sealed Boutquin.Curves.Risk.BucketedZeroRateShock.Equals(Boutquin.Curves.Risk.CurveShockScenario? other) -> bool
+override sealed Boutquin.Curves.Risk.ParallelZeroRateShock.Equals(Boutquin.Curves.Risk.CurveShockScenario? other) -> bool
+override sealed Boutquin.Curves.Risk.PcaCurveShock.Equals(Boutquin.Curves.Risk.CurveShockScenario? other) -> bool
+static Boutquin.Curves.Risk.BucketedSensitivity.operator !=(Boutquin.Curves.Risk.BucketedSensitivity? left, Boutquin.Curves.Risk.BucketedSensitivity? right) -> bool
+static Boutquin.Curves.Risk.BucketedSensitivity.operator ==(Boutquin.Curves.Risk.BucketedSensitivity? left, Boutquin.Curves.Risk.BucketedSensitivity? right) -> bool
+static Boutquin.Curves.Risk.BucketedShockPoint.operator !=(Boutquin.Curves.Risk.BucketedShockPoint? left, Boutquin.Curves.Risk.BucketedShockPoint? right) -> bool
+static Boutquin.Curves.Risk.BucketedShockPoint.operator ==(Boutquin.Curves.Risk.BucketedShockPoint? left, Boutquin.Curves.Risk.BucketedShockPoint? right) -> bool
+static Boutquin.Curves.Risk.BucketedZeroRateShock.operator !=(Boutquin.Curves.Risk.BucketedZeroRateShock? left, Boutquin.Curves.Risk.BucketedZeroRateShock? right) -> bool
+static Boutquin.Curves.Risk.BucketedZeroRateShock.operator ==(Boutquin.Curves.Risk.BucketedZeroRateShock? left, Boutquin.Curves.Risk.BucketedZeroRateShock? right) -> bool
+static Boutquin.Curves.Risk.CashFlow.operator !=(Boutquin.Curves.Risk.CashFlow? left, Boutquin.Curves.Risk.CashFlow? right) -> bool
+static Boutquin.Curves.Risk.CashFlow.operator ==(Boutquin.Curves.Risk.CashFlow? left, Boutquin.Curves.Risk.CashFlow? right) -> bool
+static Boutquin.Curves.Risk.CurveShockScenario.operator !=(Boutquin.Curves.Risk.CurveShockScenario? left, Boutquin.Curves.Risk.CurveShockScenario? right) -> bool
+static Boutquin.Curves.Risk.CurveShockScenario.operator ==(Boutquin.Curves.Risk.CurveShockScenario? left, Boutquin.Curves.Risk.CurveShockScenario? right) -> bool
+static Boutquin.Curves.Risk.ParallelZeroRateShock.operator !=(Boutquin.Curves.Risk.ParallelZeroRateShock? left, Boutquin.Curves.Risk.ParallelZeroRateShock? right) -> bool
+static Boutquin.Curves.Risk.ParallelZeroRateShock.operator ==(Boutquin.Curves.Risk.ParallelZeroRateShock? left, Boutquin.Curves.Risk.ParallelZeroRateShock? right) -> bool
+static Boutquin.Curves.Risk.PcaCurveShock.operator !=(Boutquin.Curves.Risk.PcaCurveShock? left, Boutquin.Curves.Risk.PcaCurveShock? right) -> bool
+static Boutquin.Curves.Risk.PcaCurveShock.operator ==(Boutquin.Curves.Risk.PcaCurveShock? left, Boutquin.Curves.Risk.PcaCurveShock? right) -> bool
+static Boutquin.Curves.Risk.RiskBucket.operator !=(Boutquin.Curves.Risk.RiskBucket? left, Boutquin.Curves.Risk.RiskBucket? right) -> bool
+static Boutquin.Curves.Risk.RiskBucket.operator ==(Boutquin.Curves.Risk.RiskBucket? left, Boutquin.Curves.Risk.RiskBucket? right) -> bool
+static Boutquin.Curves.Risk.RiskReport.operator !=(Boutquin.Curves.Risk.RiskReport? left, Boutquin.Curves.Risk.RiskReport? right) -> bool
+static Boutquin.Curves.Risk.RiskReport.operator ==(Boutquin.Curves.Risk.RiskReport? left, Boutquin.Curves.Risk.RiskReport? right) -> bool
+virtual Boutquin.Curves.Risk.CurveShockScenario.EqualityContract.get -> System.Type!
+virtual Boutquin.Curves.Risk.CurveShockScenario.Equals(Boutquin.Curves.Risk.CurveShockScenario? other) -> bool
+virtual Boutquin.Curves.Risk.CurveShockScenario.PrintMembers(System.Text.StringBuilder! builder) -> bool

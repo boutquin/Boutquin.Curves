@@ -24,6 +24,29 @@ namespace Boutquin.Curves.Conventions.Tests;
 
 public sealed class ScheduleGeneratorTests
 {
+    [Theory]
+    [InlineData(2026, 1, 1, 2026, 1, 1)]    // equal  (endDate == startDate → zero-length)
+    [InlineData(2026, 3, 1, 2026, 1, 1)]    // before (endDate < startDate → negative span)
+    public void Generate_ShouldThrowArgumentOutOfRangeException_WhenEndDateNotAfterStartDate(
+        int startYear, int startMonth, int startDay,
+        int endYear, int endMonth, int endDay)
+    {
+        WeekendOnlyCalendar calendar = new("USNY");
+        DateOnly startDate = new(startYear, startMonth, startDay);
+        DateOnly endDate = new(endYear, endMonth, endDay);
+
+        Action act = () => ScheduleGenerator.Generate(
+            startDate,
+            endDate,
+            PaymentFrequency.Quarterly,
+            calendar,
+            BusinessDayAdjustment.ModifiedFollowing,
+            Thirty360.Instance);
+
+        act.Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("endDate");
+    }
+
     [Fact]
     public void Generate_ShouldCreateQuarterlyPeriods_WithBusinessDayAdjustmentAndYearFractions()
     {
@@ -49,4 +72,32 @@ public sealed class ScheduleGeneratorTests
         periods[1].AccrualEndDate.Should().Be(new DateOnly(2026, 7, 31));
         periods[1].YearFraction.Should().BeApproximately(0.25d, 1e-12);
     }
+    [Theory]
+    [InlineData(2025, 30, false)]
+    [InlineData(2024, 30, false)]
+
+    [InlineData(2025, 30, true)]
+    public void Generate_MonthlySchedule_PreservesOriginalDayAfterShortMonth(int year, int day, bool endOfMonth)
+    {
+        DateOnly start = new(year, 1, day);
+        var periods = ScheduleGenerator.Generate(start, new DateOnly(year, 4, day), PaymentFrequency.Monthly,
+            new WeekendOnlyCalendar(), BusinessDayAdjustment.None, Actual365Fixed.Instance, endOfMonth: endOfMonth);
+        periods.Should().HaveCount(3);
+        periods[1].AccrualEndDate.Should().Be(new DateOnly(year, 3, day));
+        periods[2].AccrualEndDate.Should().Be(new DateOnly(year, 4, day));
+    }
+
+    [Theory]
+    [InlineData(PaymentFrequency.Daily, 1)]
+    [InlineData(PaymentFrequency.Weekly, 7)]
+    public void Generate_EndOfMonthFlag_DoesNotChangeDayOrWeekIntervals(PaymentFrequency frequency, int days)
+    {
+        DateOnly start = new(2025, 1, 31);
+        var periods = ScheduleGenerator.Generate(start, start.AddDays(3 * days), frequency, new WeekendOnlyCalendar(),
+            BusinessDayAdjustment.None, Actual365Fixed.Instance, endOfMonth: true);
+        periods.Should().HaveCount(3);
+        periods.Select(period => period.AccrualEndDate.DayNumber - period.AccrualStartDate.DayNumber)
+            .Should().OnlyContain(length => length == days);
+    }
+
 }

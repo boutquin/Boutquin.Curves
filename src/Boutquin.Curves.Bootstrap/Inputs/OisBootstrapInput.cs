@@ -15,7 +15,7 @@
 //
 
 using Boutquin.Curves.Bootstrap.Instruments;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.DayCount;
 
 namespace Boutquin.Curves.Bootstrap.Inputs;
@@ -43,4 +43,23 @@ public sealed record OisBootstrapInput(
     IReadOnlyList<DepositQuote> Deposits,
     IReadOnlyList<OisSwapQuote> OisSwaps,
     IYearFractionCalculator YearFractionCalculator,
-    CurrencyCode? Currency = null);
+    Currency? Currency = null)
+{
+    private IReadOnlyList<DepositQuote> _deposits = BootstrapInputSnapshot.Copy(Deposits, nameof(Deposits));
+
+    /// <summary>Deposit quotes available to the compatibility bootstrapper. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<DepositQuote> Deposits
+    {
+        get => _deposits;
+        init => _deposits = BootstrapInputSnapshot.Copy(value, nameof(value));
+    }
+
+    private IReadOnlyList<OisSwapQuote> _oisSwaps = BootstrapInputSnapshot.Copy(OisSwaps, nameof(OisSwaps));
+
+    /// <summary>OIS quotes available to the compatibility bootstrapper. The collection is copied on construction and init assignment.</summary>
+    public IReadOnlyList<OisSwapQuote> OisSwaps
+    {
+        get => _oisSwaps;
+        init => _oisSwaps = BootstrapInputSnapshot.Copy(value, nameof(value));
+    }
+}

@@ -59,6 +59,17 @@ public interface ICurveNodeSpec
     CurveReference TargetCurve { get; }
 
     /// <summary>
+    /// Optional forward (projection) curve references that supply this node's floating-leg forwards.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="null"/> by default, meaning the node is self-discounting (forwards are
+    /// read from <see cref="TargetCurve"/>). A single-curve forward names 0 or 1 reference; a two-curve
+    /// basis swap names 2 references (Fa then Fb). Propagated unchanged onto the resolved node so the
+    /// calibrator's instrument helpers can source forwards from a distinct projection curve.
+    /// </remarks>
+    IReadOnlyList<CurveReference>? ProjectionCurves => null;
+
+    /// <summary>
     /// Builds a market-data request appropriate for the given valuation date.
     /// </summary>
     /// <param name="valuationDate">The as-of date for the calibration run.</param>
@@ -71,15 +82,22 @@ public interface ICurveNodeSpec
     /// <param name="records">Records returned by the data pipeline for the request created by <see cref="CreateRequest"/>.</param>
     /// <param name="valuationDate">The as-of date, used for filtering or date matching.</param>
     /// <returns>The extracted rate, or <see langword="null"/> if no suitable observation was found.</returns>
+    /// <remarks>
+    /// A <see langword="null"/> return signals that no observation matches the criteria for this node
+    /// (e.g., no fixing published on the valuation date, no tenor match in the quote surface).
+    /// Callers record a <c>RATE_MISSING</c> diagnostic issue and skip the node, enabling partial
+    /// curve construction when some instruments have no data rather than faulting the entire run.
+    /// </remarks>
     decimal? ExtractRate(IReadOnlyList<object> records, DateOnly valuationDate);
 
     /// <summary>
     /// Returns the actual observation date used when the extracted rate does not correspond
-    /// exactly to the valuation date (e.g., lookback to a prior business day).
+    /// exactly to the effective target observation date (e.g., lookback to a prior business day).
     /// </summary>
     /// <param name="records">Records returned by the data pipeline.</param>
     /// <param name="valuationDate">The requested as-of date.</param>
-    /// <returns>The actual date of the data used, or <see langword="null"/> when the date matches
-    /// the valuation date or cannot be determined.</returns>
+    /// <returns>The actual date of the data used, or <see langword="null"/> when it matches the
+    /// effective target date or cannot be determined. The target is the valuation date unless
+    /// the node applies an explicit observation shift.</returns>
     DateOnly? ExtractActualDate(IReadOnlyList<object> records, DateOnly valuationDate) => null;
 }

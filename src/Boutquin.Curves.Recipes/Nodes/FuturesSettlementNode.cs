@@ -34,7 +34,7 @@ namespace Boutquin.Curves.Recipes.Nodes;
 public sealed class FuturesSettlementNode : ICurveNodeSpec
 {
     private readonly string _productCode;
-    private readonly string _contractMonth;
+    private readonly ContractMonth _contractMonth;
 
     /// <summary>
     /// Creates a node specification for a futures settlement observation.
@@ -53,40 +53,62 @@ public sealed class FuturesSettlementNode : ICurveNodeSpec
         string conventionCode,
         CurveReference targetCurve)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(label);
+        ArgumentException.ThrowIfNullOrWhiteSpace(productCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(contractMonth);
+        ArgumentException.ThrowIfNullOrWhiteSpace(conventionCode);
+        ArgumentNullException.ThrowIfNull(targetCurve);
+
+        // Parse and validate the contract month once, at construction, so a malformed-but-non-
+        // whitespace value (e.g. "Jun26") fails fast here rather than throwing inside ExtractRate
+        // — which runs outside CurveBuilder's fetch try/catch and would abort the whole BuildAsync.
+        try
+        {
+            _contractMonth = new ContractMonth(contractMonth);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new ArgumentException(ex.Message, nameof(contractMonth), ex);
+        }
+
         Label = label;
         Tenor = tenor;
         _productCode = productCode;
-        _contractMonth = contractMonth;
         ConventionCode = conventionCode;
         TargetCurve = targetCurve;
     }
 
-    /// <inheritdoc />
+    /// <summary>Human-readable label identifying this futures calibration node.</summary>
     public string Label { get; }
 
-    /// <inheritdoc />
+    /// <summary>Calibration tenor identifying the futures pillar.</summary>
     public Tenor Tenor { get; }
 
-    /// <inheritdoc />
+    /// <summary>Overnight-index futures helper classification.</summary>
     public string InstrumentType => "OisFuture";
 
-    /// <inheritdoc />
+    /// <summary>Convention for futures accrual and pricing.</summary>
     public string ConventionCode { get; }
 
-    /// <inheritdoc />
+    /// <summary>Curve calibrated by this futures node.</summary>
     public CurveReference TargetCurve { get; }
 
-    /// <inheritdoc />
+    /// <summary>Requests product settlements on the valuation date.</summary>
+    /// <param name="valuationDate">Settlement observation date.</param>
+    /// <returns>A request for every contract month of the configured product on that date.</returns>
     public IDataRequest CreateRequest(DateOnly valuationDate) =>
         new FuturesSettlementRequest(
             new FuturesProductCode(_productCode),
             new DateRange(valuationDate, valuationDate));
 
-    /// <inheritdoc />
+    /// <summary>Selects the contract month's canonical implied rate or converts its settlement price.</summary>
+    /// <param name="records">Canonical settlement records returned for this product.</param>
+    /// <param name="valuationDate">As-of date of the associated request; records are filtered by contract month.</param>
+    /// <returns>The supplied implied rate, or <c>(100 - price) / 100</c>; <see langword="null"/> when the contract is absent.</returns>
     public decimal? ExtractRate(IReadOnlyList<object> records, DateOnly valuationDate) =>
         records
             .OfType<FuturesSettlement>()
-            .Where(s => s.ContractMonth == new ContractMonth(_contractMonth))
-            .Select(s => (decimal?)((100m - s.SettlePrice) / 100m))
+            .Where(s => s.ContractMonth == _contractMonth)
+            .Select(s => (decimal?)(s.ImpliedRate ?? (100m - s.SettlePrice) / 100m))
             .FirstOrDefault();
 }

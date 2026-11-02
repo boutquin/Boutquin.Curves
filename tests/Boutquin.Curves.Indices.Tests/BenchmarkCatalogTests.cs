@@ -14,6 +14,8 @@
 //   limitations under the License.
 //
 
+using Boutquin.Curves.Abstractions;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using FluentAssertions;
 
@@ -27,6 +29,21 @@ public sealed class BenchmarkCatalogTests
         BenchmarkCatalog catalog = BenchmarkCatalog.CreateDefault();
         var benchmark = catalog.GetRequired(new BenchmarkName("USD-SOFR"));
 
-        benchmark.Currency.Should().Be(CurrencyCode.USD);
+        benchmark.Currency.Should().Be(Currency.USD);
     }
+    [Fact]
+    public void DefaultCatalog_ContainsEveryDeclaredBenchmarkAndRejectsUnknownLookup()
+    {
+        var catalog = BenchmarkCatalog.CreateDefault();
+        RateBenchmark[] expected = [StandardBenchmarks.UsdSofr, StandardBenchmarks.CadCorra,
+            StandardBenchmarks.GbpSonia, StandardBenchmarks.EurEstr, StandardBenchmarks.ChfSaron, StandardBenchmarks.JpyTona];
+        catalog.All().Should().HaveCount(expected.Length);
+        foreach (var benchmark in expected)
+        {
+            catalog.GetRequired(benchmark.Name).Should().Be(benchmark);
+        }
+        Action missing = () => catalog.GetRequired(new BenchmarkName("UNKNOWN"));
+        missing.Should().Throw<KeyNotFoundException>().WithMessage("*UNKNOWN*");
+    }
+
 }

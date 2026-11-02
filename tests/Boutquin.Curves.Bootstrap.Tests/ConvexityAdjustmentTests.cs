@@ -144,4 +144,23 @@ public sealed class ConvexityAdjustmentTests
 
         adj.Should().BeApproximately(hoLee, 1e-8);
     }
+
+    [Fact]
+    public void HullWhite_GeneralBranchAboveFloor_ConvergesToHoLee()
+    {
+        // Continuity contract (tolerance-policy: "Ho-Lee limit convergence 1e-8"):
+        // the general mean-reverting closed form MUST converge to the explicit Ho-Lee
+        // branch as a -> 0+. Mean reversion 1e-6 is ABOVE the 1e-8 Ho-Lee switch floor,
+        // so this exercises the GENERAL branch (not the explicit Ho-Lee formula) and pins
+        // its limit against the Ho-Lee value 0.5*sigma^2*T1*(T2-T1).
+        double sigma = 0.01;
+        double t1 = 2.0;
+        double t2 = 2.25;
+        double hoLee = 0.5 * sigma * sigma * t1 * (t2 - t1);
+
+        var ca = new HullWhiteConvexityAdjustment(1e-6, sigma);
+        double adj = ca.Adjustment(t1, t2);
+
+        adj.Should().BeApproximately(hoLee, 1e-8);
+    }
 }

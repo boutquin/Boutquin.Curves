@@ -38,6 +38,10 @@ public interface ICurveGroup
     /// </summary>
     /// <param name="reference">Curve lookup key including role, currency, and optional benchmark.</param>
     /// <returns>The matching curve instance.</returns>
+    /// <exception cref="KeyNotFoundException">
+    /// No curve matching <paramref name="reference"/> exists in this group. Use
+    /// <see cref="TryGetCurve"/> to resolve a curve without throwing.
+    /// </exception>
     ICurve GetCurve(CurveReference reference);
 
     /// <summary>

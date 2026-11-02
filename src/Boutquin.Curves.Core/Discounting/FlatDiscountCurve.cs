@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Internal;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
 using Boutquin.MarketData.DayCount;
 
@@ -44,7 +44,7 @@ public sealed class FlatDiscountCurve : IDiscountCurve
     public FlatDiscountCurve(
         CurveName name,
         DateOnly valuationDate,
-        CurrencyCode currency,
+        Currency currency,
         double continuouslyCompoundedZeroRate,
         IYearFractionCalculator? dayCount = null)
     {
@@ -73,7 +73,7 @@ public sealed class FlatDiscountCurve : IDiscountCurve
     /// <summary>
     /// Currency in which this discount curve is expressed.
     /// </summary>
-    public CurrencyCode Currency { get; }
+    public Currency Currency { get; }
 
     /// <summary>
     /// Day-count convention used to convert dates into year fractions for discounting.
@@ -96,14 +96,24 @@ public sealed class FlatDiscountCurve : IDiscountCurve
     /// Computes the discount factor using continuous compounding from valuation date to target date.
     /// </summary>
     /// <param name="date">Target date for discounting.</param>
-    /// <returns>Discount factor for <paramref name="date"/>.</returns>
+    /// <returns>
+    /// 1.0 when <paramref name="date"/> is on or before <see cref="ValuationDate"/>;
+    /// otherwise the discount factor implied by the constant zero-rate assumption.
+    /// </returns>
     /// <remarks>
     /// Uses $P(t)=e^{-r t}$ with $r$ equal to <see cref="ContinuouslyCompoundedZeroRate"/> and
     /// $t$ from <see cref="DayCount"/>. Negative rates are supported mathematically and may produce
     /// discount factors above 1 for short maturities.
+    /// Past-date inputs return 1.0 — matching the convention of all sibling
+    /// <see cref="IDiscountCurve"/> implementations in this library.
     /// </remarks>
     public double DiscountFactor(DateOnly date)
     {
+        if (date <= ValuationDate)
+        {
+            return 1d;
+        }
+
         double t = DayCount.YearFraction(ValuationDate, date);
         return CurveMath.DiscountFactorFromContinuousZero(ContinuouslyCompoundedZeroRate, t);
     }
@@ -113,12 +123,21 @@ public sealed class FlatDiscountCurve : IDiscountCurve
     /// </summary>
     /// <param name="date">Target date for the quoted zero rate.</param>
     /// <param name="compounding">Compounding basis used for the returned rate.</param>
-    /// <returns>Zero rate quoted under <paramref name="compounding"/>.</returns>
+    /// <returns>
+    /// 0.0 when <paramref name="date"/> is on or before <see cref="ValuationDate"/> (zero time horizon);
+    /// otherwise the zero rate quoted under <paramref name="compounding"/>.
+    /// </returns>
     /// <remarks>
     /// This is a quote conversion only. The underlying curve state remains continuous-zero internally.
+    /// Past-date inputs return 0.0 — consistent with the t = 0 convention in <see cref="Internal.CurveMath"/>.
     /// </remarks>
     public double ZeroRate(DateOnly date, CompoundingConvention compounding)
     {
+        if (date <= ValuationDate)
+        {
+            return 0d;
+        }
+
         double t = DayCount.YearFraction(ValuationDate, date);
         return CurveMath.ZeroRateFromDiscountFactor(DiscountFactor(date), t, compounding);
     }

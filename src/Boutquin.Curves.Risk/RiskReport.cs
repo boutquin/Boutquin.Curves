@@ -46,9 +46,11 @@ public sealed record RiskReport
     /// <param name="sensitivities">Bucketed valuation deltas; copied at construction to ensure immutability.</param>
     public RiskReport(string label, string scenarioName, IReadOnlyList<BucketedSensitivity> sensitivities)
     {
+        ArgumentNullException.ThrowIfNull(sensitivities);
+
         Label = label;
         ScenarioName = scenarioName;
-        Sensitivities = sensitivities.ToArray();
+        Sensitivities = Array.AsReadOnly(sensitivities.ToArray());
     }
 }
 

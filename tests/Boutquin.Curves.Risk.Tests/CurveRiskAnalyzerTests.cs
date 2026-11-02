@@ -18,7 +18,7 @@ using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using FluentAssertions;
 
 namespace Boutquin.Curves.Risk.Tests;
@@ -30,7 +30,7 @@ public sealed class CurveRiskAnalyzerTests
     {
         CurveRiskAnalyzer analyzer = new();
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference reference = new(CurveRole.Discount, CurrencyCode.USD);
+        CurveReference reference = new(CurveRole.Discount, Currency.USD);
 
         Action act = () => analyzer.BuildScenarioRiskReport(
             null!,
@@ -45,8 +45,8 @@ public sealed class CurveRiskAnalyzerTests
     public void BuildScenarioRiskReport_ShouldThrow_WhenScenarioIsNull()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference reference = new(CurveRole.Discount, CurrencyCode.USD);
-        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, CurrencyCode.USD, 0.04d);
+        CurveReference reference = new(CurveRole.Discount, Currency.USD);
+        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, Currency.USD, 0.04d);
         CurveGroup curveGroup = new CurveGroupBuilder(new CurveGroupName("USD"), valuationDate)
             .Add(reference, curve)
             .Build();
@@ -66,8 +66,8 @@ public sealed class CurveRiskAnalyzerTests
     public void BuildScenarioRiskReport_ShouldThrow_WhenBucketsIsNull()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference reference = new(CurveRole.Discount, CurrencyCode.USD);
-        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, CurrencyCode.USD, 0.04d);
+        CurveReference reference = new(CurveRole.Discount, Currency.USD);
+        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, Currency.USD, 0.04d);
         CurveGroup curveGroup = new CurveGroupBuilder(new CurveGroupName("USD"), valuationDate)
             .Add(reference, curve)
             .Build();
@@ -87,7 +87,7 @@ public sealed class CurveRiskAnalyzerTests
     public void BuildPlaceholderBucketedReport_ShouldThrow_WhenCurveGroupIsNull()
     {
         CurveRiskAnalyzer analyzer = new();
-        CurveReference reference = new(CurveRole.Discount, CurrencyCode.USD);
+        CurveReference reference = new(CurveRole.Discount, Currency.USD);
 
         Action act = () => analyzer.BuildPlaceholderBucketedReport(null!, reference);
 
@@ -98,8 +98,8 @@ public sealed class CurveRiskAnalyzerTests
     public void BuildScenarioRiskReport_ShouldUseActualShockedValuationDeltas_ForParallelShock()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference reference = new(CurveRole.Discount, CurrencyCode.USD);
-        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, CurrencyCode.USD, 0.04d);
+        CurveReference reference = new(CurveRole.Discount, Currency.USD);
+        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, Currency.USD, 0.04d);
         CurveGroup curveGroup = new CurveGroupBuilder(new CurveGroupName("USD"), valuationDate)
             .Add(reference, curve)
             .Build();
@@ -129,8 +129,8 @@ public sealed class CurveRiskAnalyzerTests
     public void BuildScenarioRiskReport_ShouldSupportBucketedShocksAcrossMaturities()
     {
         DateOnly valuationDate = new(2026, 4, 9);
-        CurveReference reference = new(CurveRole.Discount, CurrencyCode.USD);
-        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, CurrencyCode.USD, 0.04d);
+        CurveReference reference = new(CurveRole.Discount, Currency.USD);
+        FlatDiscountCurve curve = new(new CurveName("USD-Disc"), valuationDate, Currency.USD, 0.04d);
         CurveGroup curveGroup = new CurveGroupBuilder(new CurveGroupName("USD"), valuationDate)
             .Add(reference, curve)
             .Build();

@@ -114,6 +114,13 @@ dotnet_diagnostic.CA1018.severity = warning
 # CA1047: Do not declare protected member in sealed type
 dotnet_diagnostic.CA1047.severity = warning
 
+# CA1062: Validate arguments of public methods — the M-5 null-guard analyzer (spec:
+# feature-curves-defensive-guard-hardening.md). Enabled here for src/ (see Directory.Build.props,
+# which suppresses it for tests/ and benchmarks/ — the target is public library entry points, not
+# test methods). TreatWarningsAsErrors promotes this to a build-breaking error, so it is the
+# durable gate against A-1…A-10's defect class regressing.
+dotnet_diagnostic.CA1062.severity = warning
+
 # CA1305: Specify IFormatProvider
 dotnet_diagnostic.CA1305.severity = warning
 
@@ -476,3 +483,8 @@ dotnet_diagnostic.IDE0005.severity = silent
 [{*.razor.cs,src/Aspire.Dashboard/Components/**.cs}]
 # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = silent
+
+# Release qualification requires explicit public API snapshots.
+[src/**/*.cs]
+dotnet_diagnostic.RS0016.severity = error
+dotnet_diagnostic.RS0017.severity = error

@@ -54,8 +54,11 @@ public sealed class CurveGroupBuilder
     /// <param name="reference">Curve key including role, currency, and optional benchmark identity.</param>
     /// <param name="curve">Resolved curve instance to store for the key.</param>
     /// <returns>The current builder instance for fluent chaining.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="reference"/> or <paramref name="curve"/> is null.</exception>
     public CurveGroupBuilder Add(CurveReference reference, ICurve curve)
     {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentNullException.ThrowIfNull(curve);
         _curves[reference] = curve;
         return this;
     }
@@ -64,5 +67,28 @@ public sealed class CurveGroupBuilder
     /// Materializes an immutable curve group snapshot from the currently added curves.
     /// </summary>
     /// <returns>A new <see cref="CurveGroup"/> instance.</returns>
-    public CurveGroup Build() => new(Name, ValuationDate, _curves);
+    /// <remarks>
+    /// A defensive copy is taken so that subsequent calls to <see cref="Add"/> on this builder
+    /// do not retroactively mutate the returned snapshot. Each call to <c>Build()</c> produces
+    /// an independent, immutable view of the curves added up to that point.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when any added curve has a <see cref="ICurve.ValuationDate"/> that differs from
+    /// the builder's <see cref="ValuationDate"/>, which would produce an inconsistent group snapshot.
+    /// </exception>
+    public CurveGroup Build()
+    {
+        foreach ((CurveReference reference, ICurve curve) in _curves)
+        {
+            if (curve.ValuationDate != ValuationDate)
+            {
+                throw new InvalidOperationException(
+                    $"Curve '{reference}' has valuation date {curve.ValuationDate:yyyy-MM-dd} " +
+                    $"but the group valuation date is {ValuationDate:yyyy-MM-dd}. " +
+                    "All curves in a group must share the same valuation date.");
+            }
+        }
+
+        return new CurveGroup(Name, ValuationDate, new Dictionary<CurveReference, ICurve>(_curves));
+    }
 }

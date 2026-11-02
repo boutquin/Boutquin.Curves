@@ -14,10 +14,13 @@
 //   limitations under the License.
 //
 
+using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Curves.Interpolation;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
+using Boutquin.MarketData.DayCount;
 using FluentAssertions;
 
 namespace Boutquin.Curves.PropertyTests;
@@ -28,7 +31,7 @@ namespace Boutquin.Curves.PropertyTests;
 public sealed class DiscountCurvePropertyTests
 {
     private static readonly DateOnly s_valuationDate = new(2026, 4, 9);
-    private const CurrencyCode Usd = CurrencyCode.USD;
+    private const Currency Usd = Currency.USD;
 
     [Property]
     public void FlatDiscountCurve_ShouldStayPositive(double rate, int days)
@@ -151,4 +154,28 @@ public sealed class DiscountCurvePropertyTests
         double zero = curve.ZeroRate(date, CompoundingConvention.Continuous);
         zero.Should().BeApproximately(boundedRate, 1e-8, "continuous zero rate should recover the input rate");
     }
+    [Property]
+    public void Rolling_PreservesConditionalDiscountSurface(double rate, int rollDays, int horizonDays, int interpolator)
+    {
+        double finiteRate = double.IsFinite(rate) ? Math.Clamp(rate, -0.1, 0.1) : 0.03;
+        InterpolatorKind kind = (InterpolatorKind)Math.Abs(interpolator % 5);
+        // Monotone-convex's Numerics kernel requires non-decreasing cumulative returns.
+        if (kind == InterpolatorKind.MonotoneConvex)
+        {
+            finiteRate = Math.Abs(finiteRate);
+        }
+
+        int step = 200 + Math.Abs(rollDays % 400);
+        DateOnly rolledDate = s_valuationDate.AddDays(step);
+        DateOnly target = rolledDate.AddDays(1 + Math.Abs(horizonDays % 1200));
+        CurvePoint[] points = [new(s_valuationDate.AddDays(365), Math.Exp(-finiteRate)),
+            new(s_valuationDate.AddDays(730), Math.Exp(-2.2 * finiteRate)),
+            new(s_valuationDate.AddDays(1460), Math.Exp(-5 * finiteRate))];
+        InterpolatedDiscountCurve original = new(new CurveName("Roll property"), s_valuationDate, Usd, points,
+            new InterpolationSettings(kind, "FlatZero", "FlatForward"), Actual360.Instance);
+        IDiscountCurve rolled = original.WithValuationDate(rolledDate);
+        rolled.DiscountFactor(target).Should().BeApproximately(
+            original.DiscountFactor(target) / original.DiscountFactor(rolledDate), 1e-12);
+    }
+
 }

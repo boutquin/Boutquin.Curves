@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);NU5104;CA1707;CA1716;CA1822</NoWarn>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
@@ -13,6 +15,7 @@
     <RepositoryUrl>https://github.com/boutquin/Boutquin.Curves</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerMinimumMajorMinor>2.0</MinVerMinimumMajorMinor>
     <Copyright>Copyright © 2026, Boutquin Computer Consulting. All rights reserved.</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -20,6 +23,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <!-- Deterministic builds & SourceLink -->
     <Deterministic>true</Deterministic>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -27,17 +31,41 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Contains('/tests/'))">
-    <NoWarn>$(NoWarn);CS1591;CA2007</NoWarn>
+  <PropertyGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Replace('\', '/').Contains('/tests/'))">
+    <!-- CA1062 (M-5 null-guard analyzer) targets public LIBRARY entry points; test methods are
+         not the class of defect it hardens against, so they're excluded here rather than forcing
+         null-guards onto every [Fact]/[Theory] parameter. -->
+    <NoWarn>$(NoWarn);CS1591;CA2007;CA1062</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Contains('/benchmarks/'))">
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  <PropertyGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Replace('\', '/').Contains('/benchmarks/'))">
+    <NoWarn>$(NoWarn);CS1591;CA1062</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
     <None Include="$(MSBuildThisFileDirectory)Resources/icon.png" Pack="true" PackagePath="\" Link="icon.png" />
+  </ItemGroup>
+
+  <!-- MinVer 7 deliberately emits 0.0.0.0 for every pre-1.0 build. Boutquin packages
+       instead bind within the current pre-1.0 minor line, where SemVer permits breaking
+       changes, and return to major-line binding at 1.0. This must run after MinVer writes
+       its values and before the SDK consumes AssemblyVersion. -->
+  <Target Name="ApplyBoutquinAssemblyVersionPolicy"
+          AfterTargets="MinVer"
+          BeforeTargets="GetAssemblyVersion"
+          Condition="'$(IsPackable)' == 'true'
+                     and '$(MinVerSkip)' != 'true'
+                     and '$(MinVerMajor)' != ''">
+    <PropertyGroup>
+      <AssemblyVersion Condition="'$(MinVerMajor)' == '0'">0.$(MinVerMinor).0.0</AssemblyVersion>
+      <AssemblyVersion Condition="'$(MinVerMajor)' != '0'">$(MinVerMajor).0.0.0</AssemblyVersion>
+    </PropertyGroup>
+  </Target>
+
+  <!-- DateRange and other shared value objects are owned by Boutquin.Domain. -->
+  <ItemGroup>
+    <Using Include="Boutquin.Domain.ValueObjects" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,9 +74,15 @@
   </ItemGroup>
 
   <!-- Public API snapshot: enforce explicit declaration of all public type and member additions -->
-  <ItemGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Contains('/src/')) AND !$([System.String]::Copy('$(MSBuildProjectDirectory)').Contains('Examples'))">
+  <ItemGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Replace('\', '/').Contains('/src/')) AND !$([System.String]::Copy('$(MSBuildProjectDirectory)').Replace('\', '/').Contains('Examples'))">
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="All" />
-    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
-    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
   </ItemGroup>
+  <!-- A candidate is qualified as a coherent package set. Preserve that set on restore. -->
+  <Target Name="PinCurvesProjectPackageDependencies" AfterTargets="_GetProjectReferenceVersions">
+    <ItemGroup>
+      <_ProjectReferencesWithVersions Update="@(_ProjectReferencesWithVersions)">
+        <ProjectVersion>[%(_ProjectReferencesWithVersions.ProjectVersion)]</ProjectVersion>
+      </_ProjectReferencesWithVersions>
+    </ItemGroup>
+  </Target>
 </Project>

@@ -40,12 +40,14 @@ public static class BootstrapDiagnosticsFactory
     /// <param name="nodeCount">Number of solved nodes across all curves.</param>
     /// <returns>A diagnostics package with repricing, structural, and numerical sections.</returns>
     /// <remarks>
-    /// The <c>NumericalDiagnostic.Passed</c> flag is always <c>true</c> for piecewise bootstrap because
-    /// each node is solved deterministically (no iterative convergence). The <c>maxAbsError</c> metric
-    /// is in native quote units (decimal rate, not basis points).
+    /// The <see cref="NumericalDiagnostic.Converged"/> flag is always <c>true</c> for piecewise
+    /// bootstrap because each node is solved deterministically (no iterative convergence). The
+    /// <c>maxAbsError</c> metric is in native quote units (decimal rate, not basis points).
     /// </remarks>
     public static BootstrapDiagnostics CreateDiagnostics(IEnumerable<RepricingDiagnostic> repricing, int curveCount, int nodeCount)
     {
+        ArgumentNullException.ThrowIfNull(repricing);
+
         RepricingDiagnostic[] repricingArray = repricing.ToArray();
         double maxAbsError = repricingArray.Length == 0 ? 0d : repricingArray.Max(static x => x.AbsoluteError);
 

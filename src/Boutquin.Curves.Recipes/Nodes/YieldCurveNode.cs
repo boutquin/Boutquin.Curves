@@ -46,6 +46,10 @@ public sealed class YieldCurveNode : ICurveNodeSpec
     /// <param name="targetTenor">Tenor string to match against <see cref="YieldCurveQuote.Tenor"/>.</param>
     /// <param name="conventionCode">Convention code for day-count and payment rules.</param>
     /// <param name="targetCurve">The curve this node calibrates into.</param>
+    /// <param name="projectionCurves">
+    /// Optional forward (projection) curve references that supply this node's floating-leg forwards.
+    /// When <see langword="null"/> (the default), the node is self-discounting.
+    /// </param>
     public YieldCurveNode(
         string label,
         Tenor tenor,
@@ -53,8 +57,16 @@ public sealed class YieldCurveNode : ICurveNodeSpec
         string curveId,
         string targetTenor,
         string conventionCode,
-        CurveReference targetCurve)
+        CurveReference targetCurve,
+        IReadOnlyList<CurveReference>? projectionCurves = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(label);
+        ArgumentException.ThrowIfNullOrWhiteSpace(instrumentType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(curveId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetTenor);
+        ArgumentException.ThrowIfNullOrWhiteSpace(conventionCode);
+        ArgumentNullException.ThrowIfNull(targetCurve);
+
         Label = label;
         Tenor = tenor;
         InstrumentType = instrumentType;
@@ -62,28 +74,37 @@ public sealed class YieldCurveNode : ICurveNodeSpec
         _targetTenor = targetTenor;
         ConventionCode = conventionCode;
         TargetCurve = targetCurve;
+        ProjectionCurves = projectionCurves is null ? null : Array.AsReadOnly(projectionCurves.ToArray());
     }
 
-    /// <inheritdoc />
+    /// <summary>Human-readable label identifying this yield-quote node.</summary>
     public string Label { get; }
 
-    /// <inheritdoc />
+    /// <summary>Calibration tenor used to determine the pillar date.</summary>
     public Tenor Tenor { get; }
 
-    /// <inheritdoc />
+    /// <summary>Instrument helper classification used for calibration.</summary>
     public string InstrumentType { get; }
 
-    /// <inheritdoc />
+    /// <summary>Convention used to interpret this quote.</summary>
     public string ConventionCode { get; }
 
-    /// <inheritdoc />
+    /// <summary>Curve calibrated by this quote node.</summary>
     public CurveReference TargetCurve { get; }
 
-    /// <inheritdoc />
+    /// <summary>Optional projection curves supplying floating-leg forwards.</summary>
+    public IReadOnlyList<CurveReference>? ProjectionCurves { get; }
+
+    /// <summary>Requests the configured yield-quote surface at the valuation date.</summary>
+    /// <param name="valuationDate">Requested surface observation date.</param>
+    /// <returns>A request containing the configured curve identifier and as-of date.</returns>
     public IDataRequest CreateRequest(DateOnly valuationDate) =>
         new YieldCurveQuoteRequest(new YieldCurveId(_curveId), valuationDate);
 
-    /// <inheritdoc />
+    /// <summary>Selects the first quote matching the configured tenor, ignoring tenor case.</summary>
+    /// <param name="records">Canonical quotes returned for the requested surface.</param>
+    /// <param name="valuationDate">As-of date of the associated request; selection matches the tenor.</param>
+    /// <returns>The matching decimal quote rate, or <see langword="null"/> when that tenor is absent.</returns>
     public decimal? ExtractRate(IReadOnlyList<object> records, DateOnly valuationDate) =>
         records
             .OfType<YieldCurveQuote>()

@@ -39,6 +39,18 @@ public static class ObservationShiftHelper
     /// <param name="calendar">The business calendar for date adjustment.</param>
     /// <param name="shiftDays">Number of business days to shift (for Shifted and Lookback conventions).</param>
     /// <returns>The adjusted observation date.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">The observation-shift convention is undefined.</exception>
+    /// <remarks>
+    /// <see cref="ObservationShiftConvention.Shifted"/> and <see cref="ObservationShiftConvention.Lookback"/>
+    /// are DELIBERATELY treated as equivalent in v1 — both compute
+    /// <c>calendar.Advance(accrualDate, -shiftDays)</c>. Per ISDA's 2021 Definitions, the two
+    /// conventions are distinct: "Lookback" also implies the shifted rate is applied to the
+    /// ORIGINAL (unshifted) accrual day-count fraction, while "Shifted" shifts the day-count
+    /// fraction along with the observation date. Modelling that accrual-fraction distinction is a
+    /// pricing-model change, deliberately out of scope here — it is not an oversight, and should
+    /// not be "fixed" without a scoped follow-up that also addresses the accrual-side change these
+    /// two conventions imply.
+    /// </remarks>
     public static DateOnly ComputeObservationDate(
         DateOnly accrualDate,
         ObservationShiftConvention convention,
@@ -53,7 +65,7 @@ public static class ObservationShiftHelper
             ObservationShiftConvention.Shifted => calendar.Advance(accrualDate, -shiftDays),
             ObservationShiftConvention.Lookback => calendar.Advance(accrualDate, -shiftDays),
             ObservationShiftConvention.Lockout => accrualDate, // Lockout freezes at period end -- not a per-date shift
-            _ => accrualDate,
+            _ => throw new ArgumentOutOfRangeException(nameof(convention), convention, "Unsupported observation-shift convention."),
         };
     }
 }

@@ -17,7 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
 using FluentAssertions;
 
@@ -29,7 +29,7 @@ namespace Boutquin.Curves.Core.Tests;
 public sealed class SpreadedDiscountCurveTests
 {
     private static readonly DateOnly s_valuationDate = new(2026, 4, 11);
-    private const CurrencyCode Usd = CurrencyCode.USD;
+    private const Currency Usd = Currency.USD;
     private static readonly DateOnly s_date1Y = new(2027, 4, 11);
     private static readonly DateOnly s_date5Y = new(2031, 4, 11);
 

@@ -16,8 +16,8 @@
 
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Recipes.Nodes;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.Records;
-using Boutquin.MarketData.Abstractions.ReferenceData;
 using Boutquin.MarketData.Abstractions.Requests;
 using Boutquin.MarketData.Calendars;
 using Boutquin.MarketData.Conventions;
@@ -31,7 +31,7 @@ namespace Boutquin.Curves.Recipes.Tests.Nodes;
 /// </summary>
 public sealed class OvernightFixingNodeTests
 {
-    private static readonly CurveReference s_usdSofrDisc = new(CurveRole.Discount, CurrencyCode.USD);
+    private static readonly CurveReference s_usdSofrDisc = new(CurveRole.Discount, Currency.USD);
 
     // --- Item 7: Calendar-day vs business-day lookback ---
 
@@ -91,28 +91,52 @@ public sealed class OvernightFixingNodeTests
     [Fact]
     public void ExtractRate_WithShiftedConvention_UsesShiftedDate()
     {
-        // Arrange — Shift back 2 business days from Wed Apr 8 = Mon Apr 6
+        // Arrange — Shifted convention with shiftDays: 2 moves the target back 2 business days
+        // from Wed Apr 8 to Mon Apr 6 (crossing the weekend via the WeekendOnlyCalendar).
         var valuationDate = new DateOnly(2026, 4, 8);
         var calendar = new WeekendOnlyCalendar();
         var node = new OvernightFixingNode("SOFR", "SOFR", "USD-SOFR-OIS", s_usdSofrDisc,
             lookbackDays: 5, calendar: calendar,
-            shiftConvention: ObservationShiftConvention.Shifted);
+            shiftConvention: ObservationShiftConvention.Shifted, shiftDays: 2);
 
         var records = new List<object>
         {
-            new ScalarObservation(new DateOnly(2026, 4, 6), 0.0430m, "decimal"), // Mon
+            new ScalarObservation(new DateOnly(2026, 4, 6), 0.0430m, "decimal"), // Mon — shifted target
             new ScalarObservation(new DateOnly(2026, 4, 7), 0.0432m, "decimal"), // Tue
-            new ScalarObservation(new DateOnly(2026, 4, 8), 0.0435m, "decimal"), // Wed
+            new ScalarObservation(new DateOnly(2026, 4, 8), 0.0435m, "decimal"), // Wed — valuationDate
         };
 
-        // Act — shifted 2 biz days back from Apr 8 = Apr 6, so should pick Apr 6 observation
-        // Note: default shiftDays is 0, so with Shifted convention and 0 shift days, target = valuationDate
-        // We need to pass shiftDays via the helper; OvernightFixingNode uses ComputeObservationDate with shiftDays=0
-        // So the target date remains valuationDate, and the most recent record on or before is Apr 8
+        // Act — shifted 2 business days back from Apr 8 = Apr 6, so picks the Apr 6 observation.
         var rate = node.ExtractRate(records, valuationDate);
 
-        // Assert — with shiftDays=0 in ComputeObservationDate, target = valuationDate, so picks Apr 8
-        rate.Should().Be(0.0435m);
+        // Assert — genuine shifted target Apr 6 ⇒ 0.0430m (NOT the unshifted Apr 8 value 0.0435m).
+        rate.Should().Be(0.0430m);
+    }
+
+    [Fact]
+    public void ExtractRate_WithShiftedConventionAndShiftDays_UsesGenuinelyShiftedDate()
+    {
+        // Arrange — Shifted convention with shiftDays: 2 must move the target observation date
+        // back 2 business days from Wed Apr 8 to Mon Apr 6 (crossing the weekend via the
+        // WeekendOnlyCalendar), so ExtractRate picks the Apr 6 observation, NOT the Apr 8 one.
+        var valuationDate = new DateOnly(2026, 4, 8);
+        var calendar = new WeekendOnlyCalendar();
+        var node = new OvernightFixingNode("SOFR", "SOFR", "USD-SOFR-OIS", s_usdSofrDisc,
+            lookbackDays: 5, calendar: calendar,
+            shiftConvention: ObservationShiftConvention.Shifted, shiftDays: 2);
+
+        var records = new List<object>
+        {
+            new ScalarObservation(new DateOnly(2026, 4, 6), 0.0430m, "decimal"), // Mon — shifted target
+            new ScalarObservation(new DateOnly(2026, 4, 7), 0.0432m, "decimal"), // Tue
+            new ScalarObservation(new DateOnly(2026, 4, 8), 0.0435m, "decimal"), // Wed — valuationDate
+        };
+
+        // Act — through the real production ExtractRate path (not a helper unit)
+        var rate = node.ExtractRate(records, valuationDate);
+
+        // Assert — genuinely shifted target Apr 6 ⇒ 0.0430m, proving the shift is wired and reachable
+        rate.Should().Be(0.0430m);
     }
 
     [Fact]
@@ -141,22 +165,25 @@ public sealed class OvernightFixingNodeTests
     [Fact]
     public void ExtractActualDate_WithShiftedConvention_ReturnsNullWhenMatchesTarget()
     {
-        // Arrange — with shiftDays=0, Shifted convention target = valuationDate
+        // Arrange — Shifted convention with shiftDays: 2 moves the target back 2 business days
+        // from Wed Apr 8 to the genuinely shifted Mon Apr 6. A record ON the shifted target
+        // must yield no rollback (actual == target ⇒ null).
         var valuationDate = new DateOnly(2026, 4, 8);
+        var shiftedTarget = new DateOnly(2026, 4, 6);
         var calendar = new WeekendOnlyCalendar();
         var node = new OvernightFixingNode("SOFR", "SOFR", "USD-SOFR-OIS", s_usdSofrDisc,
             lookbackDays: 5, calendar: calendar,
-            shiftConvention: ObservationShiftConvention.Shifted);
+            shiftConvention: ObservationShiftConvention.Shifted, shiftDays: 2);
 
         var records = new List<object>
         {
-            new ScalarObservation(valuationDate, 0.0435m, "decimal"),
+            new ScalarObservation(shiftedTarget, 0.0430m, "decimal"),
         };
 
         // Act
         var actualDate = node.ExtractActualDate(records, valuationDate);
 
-        // Assert — exact match with target, so no rollback
+        // Assert — most-recent record (Apr 6) exactly matches the shifted target, so no rollback.
         actualDate.Should().BeNull();
     }
 

@@ -1,51 +1,91 @@
 #nullable enable
-Boutquin.Curves.Bootstrap.CurveCalibrationInput
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.CurveCalibrationInput(System.DateOnly ValuationDate, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>! Curves, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! ReferenceData, bool SkipValidation = false) -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.Curves.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>!
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.Curves.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.ReferenceData.get -> Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider!
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.ReferenceData.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.SkipValidation.get -> bool
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.SkipValidation.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.ValuationDate.get -> System.DateOnly
-Boutquin.Curves.Bootstrap.CurveCalibrationInput.ValuationDate.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveCalibrationSpec(Boutquin.Curves.Abstractions.Identifiers.CurveName CurveName, Boutquin.Curves.Abstractions.Curves.CurveReference! CurveReference, Boutquin.Curves.Bootstrap.Definitions.CurveValueType ValueType, string! DayCountCode, Boutquin.Curves.Interpolation.InterpolationSettings! Interpolation, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.ResolvedNode!>! Nodes, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>? Jumps = null) -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveName.get -> Boutquin.Curves.Abstractions.Identifiers.CurveName
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveName.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveReference.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.CurveReference.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.DayCountCode.get -> string!
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.DayCountCode.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Interpolation.get -> Boutquin.Curves.Interpolation.InterpolationSettings!
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Interpolation.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Jumps.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>?
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Jumps.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Nodes.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.ResolvedNode!>!
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Nodes.init -> void
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.ValueType.get -> Boutquin.Curves.Bootstrap.Definitions.CurveValueType
-Boutquin.Curves.Bootstrap.CurveCalibrationSpec.ValueType.init -> void
-Boutquin.Curves.Bootstrap.ResolvedNode
-Boutquin.Curves.Bootstrap.ResolvedNode.ConventionCode.get -> string!
-Boutquin.Curves.Bootstrap.ResolvedNode.ConventionCode.init -> void
-Boutquin.Curves.Bootstrap.ResolvedNode.InstrumentType.get -> string!
-Boutquin.Curves.Bootstrap.ResolvedNode.InstrumentType.init -> void
-Boutquin.Curves.Bootstrap.ResolvedNode.Label.get -> string!
-Boutquin.Curves.Bootstrap.ResolvedNode.Label.init -> void
-Boutquin.Curves.Bootstrap.ResolvedNode.Rate.get -> decimal
-Boutquin.Curves.Bootstrap.ResolvedNode.Rate.init -> void
-Boutquin.Curves.Bootstrap.ResolvedNode.ResolvedNode(string! Label, Boutquin.MarketData.Abstractions.ReferenceData.Tenor Tenor, string! InstrumentType, string! ConventionCode, Boutquin.Curves.Abstractions.Curves.CurveReference! TargetCurve, decimal Rate) -> void
-Boutquin.Curves.Bootstrap.ResolvedNode.TargetCurve.get -> Boutquin.Curves.Abstractions.Curves.CurveReference!
-Boutquin.Curves.Bootstrap.ResolvedNode.TargetCurve.init -> void
-Boutquin.Curves.Bootstrap.ResolvedNode.Tenor.get -> Boutquin.MarketData.Abstractions.ReferenceData.Tenor
-Boutquin.Curves.Bootstrap.ResolvedNode.Tenor.init -> void
-Boutquin.Curves.Bootstrap.PiecewiseBootstrapCalibrator.Calibrate(Boutquin.Curves.Bootstrap.CurveCalibrationInput! request) -> Boutquin.Curves.Bootstrap.CurveCalibrationResult!
-Boutquin.Curves.Bootstrap.Helpers.BasisSwapInstrumentHelper.BasisSwapInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
-Boutquin.Curves.Bootstrap.Helpers.DepositInstrumentHelper.DepositInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
-Boutquin.Curves.Bootstrap.Helpers.FixedFloatSwapInstrumentHelper.FixedFloatSwapInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
-Boutquin.Curves.Bootstrap.Helpers.FraInstrumentHelper.FraInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
-Boutquin.Curves.Bootstrap.Helpers.OisFutureInstrumentHelper.OisFutureInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue, Boutquin.Curves.Abstractions.Bootstrap.IConvexityAdjustment? convexityAdjustment = null) -> void
-Boutquin.Curves.Bootstrap.Helpers.OisInstrumentHelper.OisInstrumentHelper(Boutquin.Curves.Bootstrap.ResolvedNode! node, double quoteValue) -> void
-static Boutquin.Curves.Bootstrap.NodeSorter.Sort(System.Collections.Generic.IEnumerable<Boutquin.Curves.Bootstrap.ResolvedNode!>! nodes, System.DateOnly valuationDate) -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.ResolvedNode!>!
-Boutquin.Curves.Bootstrap.Validation.CurveCalibrationInputValidator
-static Boutquin.Curves.Bootstrap.Validation.CurveCalibrationInputValidator.Validate(Boutquin.Curves.Bootstrap.CurveCalibrationInput! input) -> Boutquin.Curves.Bootstrap.Validation.ValidationResult!
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.<Clone>$() -> Boutquin.Curves.Bootstrap.CurveCalibrationInput!
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.Deconstruct(out System.DateOnly ValuationDate, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.CurveCalibrationSpec!>! Curves, out Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! ReferenceData, out bool SkipValidation, out Boutquin.Curves.Abstractions.Bootstrap.IConvexityAdjustment? ConvexityAdjustment) -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationInput.Equals(Boutquin.Curves.Bootstrap.CurveCalibrationInput? other) -> bool
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.<Clone>$() -> Boutquin.Curves.Bootstrap.CurveCalibrationResult!
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.Deconstruct(out Boutquin.Curves.Abstractions.Curves.ICurveGroup! CurveGroup, out Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics! Diagnostics, out Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian? Jacobian) -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationResult.Equals(Boutquin.Curves.Bootstrap.CurveCalibrationResult? other) -> bool
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.<Clone>$() -> Boutquin.Curves.Bootstrap.CurveCalibrationSpec!
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Deconstruct(out Boutquin.Curves.Abstractions.Identifiers.CurveName CurveName, out Boutquin.Curves.Abstractions.Curves.CurveReference! CurveReference, out Boutquin.Curves.Bootstrap.Definitions.CurveValueType ValueType, out string! DayCountCode, out Boutquin.Curves.Interpolation.InterpolationSettings! Interpolation, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.ResolvedNode!>! Nodes, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurvePoint!>? Jumps) -> void
+Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Equals(Boutquin.Curves.Bootstrap.CurveCalibrationSpec? other) -> bool
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.<Clone>$() -> Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput!
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.Deconstruct(out string! CurveName, out System.DateOnly AnchorDate, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.DepositQuote!>! Deposits, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote!>! OisSwaps, out Boutquin.MarketData.DayCount.IYearFractionCalculator! YearFractionCalculator, out Boutquin.Domain.Enumerations.Currency? Currency) -> void
+Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.Equals(Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput? other) -> bool
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.<Clone>$() -> Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput!
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.Deconstruct(out string! CurveName, out System.DateOnly AnchorDate, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote!>! Swaps, out Boutquin.MarketData.DayCount.IYearFractionCalculator! YearFractionCalculator, out Boutquin.Domain.Enumerations.Currency? Currency) -> void
+Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.Equals(Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput? other) -> bool
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.<Clone>$() -> Boutquin.Curves.Bootstrap.Instruments.DepositQuote!
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.Deconstruct(out int TenorInMonths, out double Rate) -> void
+Boutquin.Curves.Bootstrap.Instruments.DepositQuote.Equals(Boutquin.Curves.Bootstrap.Instruments.DepositQuote? other) -> bool
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.<Clone>$() -> Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote!
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.Deconstruct(out int TenorInMonths, out double FixedRate) -> void
+Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.Equals(Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote? other) -> bool
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.<Clone>$() -> Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote!
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.Deconstruct(out int TenorInMonths, out double FixedRate) -> void
+Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.Equals(Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote? other) -> bool
+Boutquin.Curves.Bootstrap.ResolvedNode.<Clone>$() -> Boutquin.Curves.Bootstrap.ResolvedNode!
+Boutquin.Curves.Bootstrap.ResolvedNode.Deconstruct(out string! Label, out Boutquin.MarketData.Abstractions.ReferenceData.Tenor Tenor, out string! InstrumentType, out string! ConventionCode, out Boutquin.Curves.Abstractions.Curves.CurveReference! TargetCurve, out decimal Rate, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Abstractions.Curves.CurveReference!>? ProjectionCurves) -> void
+Boutquin.Curves.Bootstrap.ResolvedNode.Equals(Boutquin.Curves.Bootstrap.ResolvedNode? other) -> bool
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.<Clone>$() -> Boutquin.Curves.Bootstrap.Validation.ValidationEntry!
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Deconstruct(out string! Code, out string! Message, out string? Context) -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Equals(Boutquin.Curves.Bootstrap.Validation.ValidationEntry? other) -> bool
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.<Clone>$() -> Boutquin.Curves.Bootstrap.Validation.ValidationResult!
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.Deconstruct(out bool IsValid, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Validation.ValidationEntry!>! Errors, out System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Bootstrap.Validation.ValidationEntry!>! Warnings) -> void
+Boutquin.Curves.Bootstrap.Validation.ValidationResult.Equals(Boutquin.Curves.Bootstrap.Validation.ValidationResult? other) -> bool
+override Boutquin.Curves.Bootstrap.CurveCalibrationInput.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.CurveCalibrationInput.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.CurveCalibrationInput.ToString() -> string!
+override Boutquin.Curves.Bootstrap.CurveCalibrationResult.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.CurveCalibrationResult.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.CurveCalibrationResult.ToString() -> string!
+override Boutquin.Curves.Bootstrap.CurveCalibrationSpec.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.CurveCalibrationSpec.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.CurveCalibrationSpec.ToString() -> string!
+override Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.ToString() -> string!
+override Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.ToString() -> string!
+override Boutquin.Curves.Bootstrap.Instruments.DepositQuote.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.Instruments.DepositQuote.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.Instruments.DepositQuote.ToString() -> string!
+override Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.ToString() -> string!
+override Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.ToString() -> string!
+override Boutquin.Curves.Bootstrap.ResolvedNode.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.ResolvedNode.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.ResolvedNode.ToString() -> string!
+override Boutquin.Curves.Bootstrap.Validation.ValidationEntry.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.Validation.ValidationEntry.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.Validation.ValidationEntry.ToString() -> string!
+override Boutquin.Curves.Bootstrap.Validation.ValidationResult.Equals(object? obj) -> bool
+override Boutquin.Curves.Bootstrap.Validation.ValidationResult.GetHashCode() -> int
+override Boutquin.Curves.Bootstrap.Validation.ValidationResult.ToString() -> string!
+static Boutquin.Curves.Bootstrap.CurveCalibrationInput.operator !=(Boutquin.Curves.Bootstrap.CurveCalibrationInput? left, Boutquin.Curves.Bootstrap.CurveCalibrationInput? right) -> bool
+static Boutquin.Curves.Bootstrap.CurveCalibrationInput.operator ==(Boutquin.Curves.Bootstrap.CurveCalibrationInput? left, Boutquin.Curves.Bootstrap.CurveCalibrationInput? right) -> bool
+static Boutquin.Curves.Bootstrap.CurveCalibrationResult.operator !=(Boutquin.Curves.Bootstrap.CurveCalibrationResult? left, Boutquin.Curves.Bootstrap.CurveCalibrationResult? right) -> bool
+static Boutquin.Curves.Bootstrap.CurveCalibrationResult.operator ==(Boutquin.Curves.Bootstrap.CurveCalibrationResult? left, Boutquin.Curves.Bootstrap.CurveCalibrationResult? right) -> bool
+static Boutquin.Curves.Bootstrap.CurveCalibrationSpec.operator !=(Boutquin.Curves.Bootstrap.CurveCalibrationSpec? left, Boutquin.Curves.Bootstrap.CurveCalibrationSpec? right) -> bool
+static Boutquin.Curves.Bootstrap.CurveCalibrationSpec.operator ==(Boutquin.Curves.Bootstrap.CurveCalibrationSpec? left, Boutquin.Curves.Bootstrap.CurveCalibrationSpec? right) -> bool
+static Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.FloorYearFraction(double yearFraction) -> double
+static Boutquin.Curves.Bootstrap.Helpers.AbstractInstrumentHelper.RequireNode(Boutquin.Curves.Bootstrap.ResolvedNode! node) -> Boutquin.Curves.Bootstrap.ResolvedNode!
+static Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.operator !=(Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput? left, Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput? right) -> bool
+static Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput.operator ==(Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput? left, Boutquin.Curves.Bootstrap.Inputs.OisBootstrapInput? right) -> bool
+static Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.operator !=(Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput? left, Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput? right) -> bool
+static Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput.operator ==(Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput? left, Boutquin.Curves.Bootstrap.Inputs.SwapBootstrapInput? right) -> bool
+static Boutquin.Curves.Bootstrap.Instruments.DepositQuote.operator !=(Boutquin.Curves.Bootstrap.Instruments.DepositQuote? left, Boutquin.Curves.Bootstrap.Instruments.DepositQuote? right) -> bool
+static Boutquin.Curves.Bootstrap.Instruments.DepositQuote.operator ==(Boutquin.Curves.Bootstrap.Instruments.DepositQuote? left, Boutquin.Curves.Bootstrap.Instruments.DepositQuote? right) -> bool
+static Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.operator !=(Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote? left, Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote? right) -> bool
+static Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote.operator ==(Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote? left, Boutquin.Curves.Bootstrap.Instruments.InterestRateSwapQuote? right) -> bool
+static Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.operator !=(Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote? left, Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote? right) -> bool
+static Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote.operator ==(Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote? left, Boutquin.Curves.Bootstrap.Instruments.OisSwapQuote? right) -> bool
+static Boutquin.Curves.Bootstrap.ResolvedNode.operator !=(Boutquin.Curves.Bootstrap.ResolvedNode? left, Boutquin.Curves.Bootstrap.ResolvedNode? right) -> bool
+static Boutquin.Curves.Bootstrap.ResolvedNode.operator ==(Boutquin.Curves.Bootstrap.ResolvedNode? left, Boutquin.Curves.Bootstrap.ResolvedNode? right) -> bool
+static Boutquin.Curves.Bootstrap.Validation.ValidationEntry.operator !=(Boutquin.Curves.Bootstrap.Validation.ValidationEntry? left, Boutquin.Curves.Bootstrap.Validation.ValidationEntry? right) -> bool
+static Boutquin.Curves.Bootstrap.Validation.ValidationEntry.operator ==(Boutquin.Curves.Bootstrap.Validation.ValidationEntry? left, Boutquin.Curves.Bootstrap.Validation.ValidationEntry? right) -> bool
+static Boutquin.Curves.Bootstrap.Validation.ValidationResult.operator !=(Boutquin.Curves.Bootstrap.Validation.ValidationResult? left, Boutquin.Curves.Bootstrap.Validation.ValidationResult? right) -> bool
+static Boutquin.Curves.Bootstrap.Validation.ValidationResult.operator ==(Boutquin.Curves.Bootstrap.Validation.ValidationResult? left, Boutquin.Curves.Bootstrap.Validation.ValidationResult? right) -> bool

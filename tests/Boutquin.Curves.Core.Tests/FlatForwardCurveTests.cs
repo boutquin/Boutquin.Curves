@@ -16,6 +16,7 @@
 
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Forwards;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using FluentAssertions;
 
@@ -29,7 +30,7 @@ public sealed class FlatForwardCurveTests
         FlatForwardCurve curve = new(
             new CurveName("USD-FWD"),
             new DateOnly(2026, 4, 10),
-            CurrencyCode.USD,
+            Currency.USD,
             new BenchmarkName("USD-LIBOR-3M"),
             0.0375d);
 
@@ -45,7 +46,7 @@ public sealed class FlatForwardCurveTests
         FlatForwardCurve curve = new(
             new CurveName("USD-FWD"),
             valuationDate,
-            CurrencyCode.USD,
+            Currency.USD,
             new BenchmarkName("USD-LIBOR-3M"),
             0.05d);
 
@@ -61,7 +62,7 @@ public sealed class FlatForwardCurveTests
         FlatForwardCurve curve = new(
             new CurveName("USD-FWD"),
             new DateOnly(2026, 4, 10),
-            CurrencyCode.USD,
+            Currency.USD,
             new BenchmarkName("USD-LIBOR-3M"),
             0.02d);
 

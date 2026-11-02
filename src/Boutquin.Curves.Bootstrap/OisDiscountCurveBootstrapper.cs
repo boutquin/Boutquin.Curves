@@ -18,7 +18,7 @@ using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Bootstrap.Inputs;
 using Boutquin.Curves.Core.Discounting;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 
 namespace Boutquin.Curves.Bootstrap;
 
@@ -47,12 +47,15 @@ public sealed class OisDiscountCurveBootstrapper
     /// <returns>The resulting discount curve.</returns>
     /// <exception cref="ArgumentException">Thrown when no deposit and no OIS swap quotes are provided.</exception>
     /// <remarks>
-    /// Quote selection is a simple terminal-point heuristic, not a market-standard bootstrap algorithm.
+    /// The longest-tenor OIS quote is selected regardless of list order; if no swaps exist, the longest deposit tenor is used.
+    /// This is a simple terminal-point heuristic, not a market-standard bootstrap algorithm.
     /// Use this only for compatibility paths, demos, or coarse sanity checks.
     /// </remarks>
     public IDiscountCurve Bootstrap(OisBootstrapInput input)
     {
         ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(input.Deposits, "input.Deposits");
+        ArgumentNullException.ThrowIfNull(input.OisSwaps, "input.OisSwaps");
 
         if (input.Deposits.Count == 0 && input.OisSwaps.Count == 0)
         {
@@ -60,10 +63,10 @@ public sealed class OisDiscountCurveBootstrapper
         }
 
         double terminalRate = input.OisSwaps.Count > 0
-            ? input.OisSwaps[^1].FixedRate
-            : input.Deposits[^1].Rate;
+            ? input.OisSwaps.MaxBy(static quote => quote.TenorInMonths)!.FixedRate
+            : input.Deposits.MaxBy(static quote => quote.TenorInMonths)!.Rate;
 
-        CurrencyCode currency = input.Currency ?? CurrencyCode.USD;
+        Currency currency = input.Currency ?? Currency.USD;
 
         return new FlatDiscountCurve(
             new CurveName(input.CurveName),

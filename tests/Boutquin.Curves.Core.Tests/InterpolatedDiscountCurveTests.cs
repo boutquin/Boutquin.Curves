@@ -18,7 +18,7 @@ using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Discounting;
 using Boutquin.Curves.Interpolation;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
 using FluentAssertions;
 
@@ -33,7 +33,7 @@ public sealed class InterpolatedDiscountCurveTests
         InterpolatedDiscountCurve curve = new(
             new CurveName("USD-Disc"),
             valuationDate,
-            CurrencyCode.USD,
+            Currency.USD,
             new[]
             {
                 new CurvePoint(valuationDate.AddMonths(6), 0.98d),
@@ -54,7 +54,7 @@ public sealed class InterpolatedDiscountCurveTests
         InterpolatedDiscountCurve curve = new(
             new CurveName("USD-Disc"),
             valuationDate,
-            CurrencyCode.USD,
+            Currency.USD,
             new[]
             {
                 new CurvePoint(valuationDate.AddYears(1), 0.98d),
@@ -82,7 +82,7 @@ public sealed class InterpolatedDiscountCurveTests
         InterpolatedDiscountCurve curve = new(
             new CurveName("USD-Disc"),
             valuationDate,
-            CurrencyCode.USD,
+            Currency.USD,
             new[]
             {
                 new CurvePoint(valuationDate.AddYears(1), 0.97d),
@@ -102,5 +102,130 @@ public sealed class InterpolatedDiscountCurveTests
         double expected = 0.91d * Math.Exp(-forward * (t3 - t2));
 
         targetDf.Should().BeApproximately(expected, 1e-12d);
+    }
+
+    // ── F-05: Unrecognised extrapolator mode caught at construction ────────────
+
+    [Fact]
+    public void Constructor_ThrowsArgumentException_ForUnrecognisedLeftExtrapolatorMode()
+    {
+        // Before fix: unrecognised mode deferred to first evaluation call.
+        // After fix: ArgumentException at construction time.
+        DateOnly valuationDate = new(2026, 4, 9);
+        Action act = () => _ = new InterpolatedDiscountCurve(
+            new CurveName("USD-Disc"),
+            valuationDate,
+            Currency.USD,
+            new[] { new CurvePoint(valuationDate.AddYears(1), 0.96d) },
+            new InterpolationSettings(InterpolatorKind.LogLinearDiscountFactor, "FlatFoo", "FlatForward"));
+
+        act.Should().Throw<ArgumentException>().WithMessage("*FlatFoo*");
+    }
+
+    [Fact]
+    public void Constructor_ThrowsArgumentException_ForUnrecognisedRightExtrapolatorMode()
+    {
+        DateOnly valuationDate = new(2026, 4, 9);
+        Action act = () => _ = new InterpolatedDiscountCurve(
+            new CurveName("USD-Disc"),
+            valuationDate,
+            Currency.USD,
+            new[] { new CurvePoint(valuationDate.AddYears(1), 0.96d) },
+            new InterpolationSettings(InterpolatorKind.LogLinearDiscountFactor, "FlatZero", "FlatBar"));
+
+        act.Should().Throw<ArgumentException>().WithMessage("*FlatBar*");
+    }
+
+    // ── F-11: Consistent exception types for invalid constructor arguments ─────
+
+    [Fact]
+    public void Constructor_ThrowsArgumentException_ForEmptyPoints()
+    {
+        DateOnly valuationDate = new(2026, 4, 9);
+        Action act = () => _ = new InterpolatedDiscountCurve(
+            new CurveName("USD-Disc"),
+            valuationDate,
+            Currency.USD,
+            Array.Empty<CurvePoint>());
+
+        act.Should().Throw<ArgumentException>().WithParameterName("points");
+    }
+
+    [Fact]
+    public void Constructor_ThrowsExactlyArgumentException_ForNonPositiveDiscountFactor()
+    {
+        DateOnly valuationDate = new(2026, 4, 9);
+        Action act = () => _ = new InterpolatedDiscountCurve(
+            new CurveName("USD-Disc"),
+            valuationDate,
+            Currency.USD,
+            new[] { new CurvePoint(valuationDate.AddYears(1), 0d) });
+
+        // F-11: standardised to ArgumentException (not ArgumentOutOfRangeException).
+        // Uses ThrowExactly so the test is red until the source change lands.
+        act.Should().ThrowExactly<ArgumentException>().WithParameterName("points");
+    }
+
+    // ── F-35: Single-point curve correctness ──────────────────────────────────
+
+    [Fact]
+    public void DiscountFactor_SingleNode_ReturnsNodeValueAtPillar()
+    {
+        DateOnly valuationDate = new(2026, 4, 9);
+        DateOnly pillar = valuationDate.AddYears(1);
+        const double df = 0.96d;
+
+        InterpolatedDiscountCurve curve = new(
+            new CurveName("USD-Disc"), valuationDate, Currency.USD,
+            new[] { new CurvePoint(pillar, df) });
+
+        curve.DiscountFactor(pillar).Should().BeApproximately(df, 1e-12d);
+    }
+
+    [Fact]
+    public void DiscountFactor_SingleNode_ReturnsOneAtValuationDate()
+    {
+        DateOnly valuationDate = new(2026, 4, 9);
+
+        InterpolatedDiscountCurve curve = new(
+            new CurveName("USD-Disc"), valuationDate, Currency.USD,
+            new[] { new CurvePoint(valuationDate.AddYears(1), 0.96d) });
+
+        curve.DiscountFactor(valuationDate).Should().Be(1d);
+    }
+
+    [Fact]
+    public void DiscountFactor_SingleNode_ExtrapolatesLeftWithFlatZero()
+    {
+        DateOnly valuationDate = new(2026, 4, 9);
+        DateOnly pillar = valuationDate.AddYears(1);
+        const double df = 0.96d;
+
+        InterpolatedDiscountCurve curve = new(
+            new CurveName("USD-Disc"), valuationDate, Currency.USD,
+            new[] { new CurvePoint(pillar, df) },
+            new InterpolationSettings(InterpolatorKind.LogLinearDiscountFactor, "FlatZero", "FlatForward"));
+
+        // Left extrapolation target: 6 months before the pillar (between valuation date and pillar)
+        DateOnly target = valuationDate.AddMonths(6);
+        double result = curve.DiscountFactor(target);
+        // With flat-zero left extrapolation the result uses the pillar zero rate
+        result.Should().BeGreaterThan(0d).And.BeLessThanOrEqualTo(1d);
+    }
+
+    [Fact]
+    public void DiscountFactor_SingleNode_ExtrapolatesRightWithFlatForward()
+    {
+        DateOnly valuationDate = new(2026, 4, 9);
+        DateOnly pillar = valuationDate.AddYears(1);
+
+        InterpolatedDiscountCurve curve = new(
+            new CurveName("USD-Disc"), valuationDate, Currency.USD,
+            new[] { new CurvePoint(pillar, 0.96d) },
+            new InterpolationSettings(InterpolatorKind.LogLinearDiscountFactor, "FlatZero", "FlatForward"));
+
+        double df2Y = curve.DiscountFactor(valuationDate.AddYears(2));
+        // Right flat-forward: single node → falls back to flat-zero, discount factor continues to decline
+        df2Y.Should().BeGreaterThan(0d).And.BeLessThan(0.96d);
     }
 }

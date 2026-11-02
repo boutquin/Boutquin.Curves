@@ -17,6 +17,7 @@
 using System.Globalization;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Abstractions.Quotes;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Boutquin.Curves.Serialization;
 
@@ -27,8 +28,9 @@ namespace Boutquin.Curves.Serialization;
 /// Expected CSV format has a header row followed by data rows. Required columns are
 /// <c>QuoteId</c>, <c>Value</c>, <c>FieldName</c>, and <c>AsOfDate</c>. Optional columns
 /// <c>Source</c>, <c>Unit</c>, and <c>Notes</c> are parsed when present. The set's
-/// <see cref="MarketQuoteSet.AsOfDate"/> is taken from the first data row. All values
-/// are trimmed of whitespace before parsing.
+/// <see cref="MarketQuoteSet.AsOfDate"/> is taken from the first data row; each quote retains its own observation date.
+/// Quoted commas, doubled quotes and multiline fields are supported. Values are trimmed,
+/// and line endings inside quoted fields are normalized to LF.
 /// </remarks>
 /// <example>
 /// <code>
@@ -64,25 +66,38 @@ public static class CsvQuoteLoader
     /// Thrown when the CSV is empty, missing required columns, contains duplicate quote IDs,
     /// or has unparseable values.
     /// </exception>
+    /// <remarks>
+    /// The caller retains ownership of <paramref name="stream"/>: this method does not dispose
+    /// or close it on either success or failure.
+    /// </remarks>
     public static MarketQuoteSet Load(Stream stream)
     {
-        using var reader = new StreamReader(stream);
+        using var reader = new StreamReader(stream, leaveOpen: true);
         return LoadCore(reader);
     }
 
     private static MarketQuoteSet LoadCore(TextReader reader)
     {
-        var headerLine = reader.ReadLine()?.Trim();
-        if (string.IsNullOrWhiteSpace(headerLine))
+        using var parser = new TextFieldParser(reader)
+        {
+            TextFieldType = FieldType.Delimited,
+            HasFieldsEnclosedInQuotes = true,
+            TrimWhiteSpace = true
+        };
+        parser.SetDelimiters(",");
+        string[]? headers = ReadFields(parser);
+        if (headers is null || headers.Length == 0)
         {
             throw new FormatException("CSV is empty or missing a header row.");
         }
 
-        var headers = headerLine.Split(',').Select(h => h.Trim()).ToArray();
         var columnIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         for (int i = 0; i < headers.Length; i++)
         {
-            columnIndex[headers[i]] = i;
+            if (!columnIndex.TryAdd(headers[i], i))
+            {
+                throw new FormatException($"CSV contains duplicate header '{headers[i]}'.");
+            }
         }
 
         foreach (var required in s_requiredColumns)
@@ -95,21 +110,34 @@ public static class CsvQuoteLoader
 
         var quotes = new Dictionary<QuoteId, MarketQuote>();
         DateOnly? setDate = null;
-        int rowNumber = 1;
+        int requiredFieldCount = s_requiredColumns.Max(c => columnIndex[c]) + 1;
 
-        string? line;
-        while ((line = reader.ReadLine()) is not null)
+        while (!parser.EndOfData)
         {
-            var trimmed = line.Trim();
-            if (string.IsNullOrWhiteSpace(trimmed))
+            long rowNumber = parser.LineNumber;
+            string[]? fields = ReadFields(parser);
+            if (fields is null)
             {
-                continue;
+                break;
             }
 
-            rowNumber++;
-            var fields = trimmed.Split(',').Select(f => f.Trim()).ToArray();
+            // Validate every required field and reject unheaded trailing values.
 
+            if (fields.Length < requiredFieldCount)
+            {
+                throw new FormatException(
+                    $"CSV row {rowNumber} has {fields.Length} field(s) but at least {requiredFieldCount} are required.");
+            }
+
+            if (fields.Length > headers.Length)
+            {
+                throw new FormatException($"CSV row {rowNumber} contains more fields than the header.");
+            }
             var quoteIdValue = fields[columnIndex["QuoteId"]];
+            if (string.IsNullOrWhiteSpace(quoteIdValue))
+            {
+                throw new FormatException($"CSV row {rowNumber} has an empty QuoteId.");
+            }
 
             if (!decimal.TryParse(fields[columnIndex["Value"]], NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
             {
@@ -144,6 +172,18 @@ public static class CsvQuoteLoader
         }
 
         return new MarketQuoteSet(setDate.Value, quotes);
+    }
+
+    private static string[]? ReadFields(TextFieldParser parser)
+    {
+        try
+        {
+            return parser.ReadFields()?.Select(field => field.Trim().ReplaceLineEndings("\n")).ToArray();
+        }
+        catch (MalformedLineException ex)
+        {
+            throw new FormatException($"Cannot parse CSV row {ex.LineNumber}.", ex);
+        }
     }
 
     private static string? GetOptional(string[] fields, Dictionary<string, int> columnIndex, string columnName)

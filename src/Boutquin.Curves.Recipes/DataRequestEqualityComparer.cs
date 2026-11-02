@@ -24,9 +24,10 @@ namespace Boutquin.Curves.Recipes;
 /// </summary>
 /// <remarks>
 /// Used to deduplicate data requests across multiple curve nodes that may request
-/// overlapping datasets. Two requests are considered equal when they target the same
-/// dataset key, span the same date range, and use the same observation frequency,
-/// regardless of their concrete runtime type.
+/// overlapping datasets. Two requests are considered equal when they share the same
+/// concrete runtime type, target the same dataset key, span the same date range, and
+/// use the same observation frequency. Requests that differ in runtime type are never
+/// considered equal, even when their dataset keys and date ranges match.
 /// </remarks>
 public sealed class DataRequestEqualityComparer : IEqualityComparer<IDataRequest>
 {
@@ -35,7 +36,10 @@ public sealed class DataRequestEqualityComparer : IEqualityComparer<IDataRequest
     /// </summary>
     public static DataRequestEqualityComparer Instance { get; } = new();
 
-    /// <inheritdoc />
+    /// <summary>Compares runtime type, ordinal dataset key, inclusive range and frequency.</summary>
+    /// <param name="x">First request; may be <see langword="null"/>.</param>
+    /// <param name="y">Second request; may be <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> for equal identities or two nulls; otherwise <see langword="false"/>.</returns>
     public bool Equals(IDataRequest? x, IDataRequest? y)
     {
         if (ReferenceEquals(x, y))
@@ -48,18 +52,23 @@ public sealed class DataRequestEqualityComparer : IEqualityComparer<IDataRequest
             return false;
         }
 
-        return string.Equals(x.DatasetKey, y.DatasetKey, StringComparison.Ordinal)
+        return x.GetType() == y.GetType()
+            && string.Equals(x.DatasetKey, y.DatasetKey, StringComparison.Ordinal)
             && x.Range.From == y.Range.From
             && x.Range.To == y.Range.To
             && x.Frequency == y.Frequency;
     }
 
-    /// <inheritdoc />
+    /// <summary>Hashes the same identity fields used by request equality.</summary>
+    /// <param name="obj">Non-null request whose identity is hashed.</param>
+    /// <returns>A hash of runtime type, dataset key, range and frequency.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="obj"/> is null.</exception>
     public int GetHashCode(IDataRequest obj)
     {
         ArgumentNullException.ThrowIfNull(obj);
 
         return HashCode.Combine(
+            obj.GetType(),
             obj.DatasetKey,
             obj.Range.From,
             obj.Range.To,

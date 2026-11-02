@@ -31,6 +31,15 @@ public sealed record MarketQuoteSet(
     DateOnly AsOfDate,
     IReadOnlyDictionary<QuoteId, MarketQuote> Quotes)
 {
+    private IReadOnlyDictionary<QuoteId, MarketQuote> _quotes = SnapshotCopies.Dictionary(Quotes, nameof(Quotes));
+
+    /// <summary>Protected snapshot of the supplied quotes collection.</summary>
+    public IReadOnlyDictionary<QuoteId, MarketQuote> Quotes
+    {
+        get => _quotes;
+        init => _quotes = SnapshotCopies.Dictionary(value, nameof(Quotes));
+    }
+
     /// <summary>
     /// Returns a quote by id and throws when the quote is missing.
     /// </summary>

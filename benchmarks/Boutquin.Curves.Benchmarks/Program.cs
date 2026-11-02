@@ -27,8 +27,13 @@ public static class Program
     /// Runs the benchmark set. Pass <c>--job dry</c> as arguments for CI smoke verification.
     /// </summary>
     /// <param name="args">Command-line arguments forwarded to BenchmarkSwitcher for job/filter selection.</param>
-    public static void Main(string[] args)
+    /// <returns>Zero when at least one benchmark completes successfully; otherwise one.</returns>
+    public static int Main(string[] args)
     {
-        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+        var summaries = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args).ToArray();
+        return summaries.Length > 0 && summaries.All(summary =>
+            !summary.HasCriticalValidationErrors && summary.Reports.Any() && summary.Reports.All(report => report.Success))
+            ? 0
+            : 1;
     }
 }

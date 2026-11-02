@@ -16,6 +16,7 @@
 
 using Boutquin.MarketData.Abstractions.Contracts;
 using Boutquin.MarketData.Abstractions.Results;
+using Boutquin.MarketData.Abstractions.Snapshots;
 
 namespace Boutquin.Curves.Recipes.Testing;
 
@@ -51,7 +52,14 @@ public sealed class FakeDataPipeline : IDataPipeline
         return this;
     }
 
-    /// <inheritdoc />
+    /// <summary>Returns the registered fixture for the request's dataset key without I/O.</summary>
+    /// <typeparam name="TRequest">Request type supplying the dataset key.</typeparam>
+    /// <typeparam name="TRecord">Canonical record type registered under that key.</typeparam>
+    /// <param name="request">Request identifying the fixture; range and frequency do not filter it.</param>
+    /// <param name="cancellationToken">Accepted for interface compatibility; fixture lookup completes synchronously.</param>
+    /// <returns>An already-completed task containing the registered envelope.</returns>
+    /// <exception cref="InvalidOperationException">No envelope is registered for the dataset key.</exception>
+    /// <exception cref="InvalidCastException">The registered envelope has a different record type.</exception>
     public Task<DataEnvelope<IReadOnlyList<TRecord>>> ExecuteAsync<TRequest, TRecord>(
         TRequest request,
         CancellationToken cancellationToken = default)
@@ -59,11 +67,51 @@ public sealed class FakeDataPipeline : IDataPipeline
     {
         if (_envelopes.TryGetValue(request.DatasetKey, out var envelope))
         {
-            return Task.FromResult((DataEnvelope<IReadOnlyList<TRecord>>)envelope);
+            if (envelope is not DataEnvelope<IReadOnlyList<TRecord>> typed)
+            {
+                throw new InvalidCastException(
+                    $"Fixture '{request.DatasetKey}' was registered with a different record type; expected {typeof(TRecord).Name}.");
+            }
+            return Task.FromResult(typed);
         }
 
         throw new InvalidOperationException(
             $"No fixture data registered for dataset key '{request.DatasetKey}'. " +
             $"Call Register<{typeof(TRecord).Name}>(\"{request.DatasetKey}\", ...) before executing.");
     }
+
+    /// <summary>Rejects partitioned reads, which this fixture pipeline does not implement.</summary>
+    /// <typeparam name="TRequest">Batch request type.</typeparam>
+    /// <typeparam name="TRecord">Canonical record type.</typeparam>
+    /// <typeparam name="TPartitionKey">Identity of one batch partition.</typeparam>
+    /// <typeparam name="TDatasetKey">Identity of one stored dataset.</typeparam>
+    /// <param name="request">Unused batch request.</param>
+    /// <param name="splitForPartition">Unused partition projection.</param>
+    /// <param name="buildDatasetKey">Unused dataset-key projection.</param>
+    /// <param name="cancellationToken">Unused cancellation token.</param>
+    /// <returns>No task is returned; the method throws synchronously.</returns>
+    /// <exception cref="NotSupportedException">Partitioned reads are unsupported.</exception>
+    /// <remarks>
+    /// Not implemented: the curve recipes drive every node through the single-request
+    /// <see cref="ExecuteAsync{TRequest, TRecord}"/> path, so the fake never needs the
+    /// per-partition FX read. Register one envelope per dataset key and use <c>ExecuteAsync</c>.
+    /// </remarks>
+    public Task<IReadOnlyDictionary<TDatasetKey, DataEnvelope<IReadOnlyList<TRecord>>>>
+        ExecutePartitionedAsync<TRequest, TRecord, TPartitionKey, TDatasetKey>(
+            TRequest request,
+            Func<TRequest, TPartitionKey, TRequest> splitForPartition,
+            Func<TRequest, TPartitionKey, TDatasetKey> buildDatasetKey,
+            CancellationToken cancellationToken = default)
+        where TRequest : IBatchDataRequest<TPartitionKey>
+        where TDatasetKey : notnull
+        => throw new NotSupportedException(
+            "FakeDataPipeline does not implement partitioned reads; register per-dataset envelopes and use ExecuteAsync.");
+
+    /// <summary>Rejects point-in-time read handles, which this fixture pipeline does not implement.</summary>
+    /// <param name="cancellationToken">Unused cancellation token.</param>
+    /// <returns>No task is returned; the method throws synchronously.</returns>
+    /// <exception cref="NotSupportedException">Snapshot reads are unsupported.</exception>
+    /// <remarks>Not implemented: the curve recipes do not take point-in-time snapshots.</remarks>
+    public Task<IDataSnapshot> AcquireReadSnapshotAsync(CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("FakeDataPipeline does not implement snapshot reads.");
 }

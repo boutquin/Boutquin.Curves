@@ -1,1 +1,9 @@
 #nullable enable
+Boutquin.Curves.Interpolation.InterpolationSettings.<Clone>$() -> Boutquin.Curves.Interpolation.InterpolationSettings!
+Boutquin.Curves.Interpolation.InterpolationSettings.Deconstruct(out Boutquin.Curves.Interpolation.InterpolatorKind Interpolator, out string! LeftExtrapolator, out string! RightExtrapolator) -> void
+Boutquin.Curves.Interpolation.InterpolationSettings.Equals(Boutquin.Curves.Interpolation.InterpolationSettings? other) -> bool
+override Boutquin.Curves.Interpolation.InterpolationSettings.Equals(object? obj) -> bool
+override Boutquin.Curves.Interpolation.InterpolationSettings.GetHashCode() -> int
+override Boutquin.Curves.Interpolation.InterpolationSettings.ToString() -> string!
+static Boutquin.Curves.Interpolation.InterpolationSettings.operator !=(Boutquin.Curves.Interpolation.InterpolationSettings? left, Boutquin.Curves.Interpolation.InterpolationSettings? right) -> bool
+static Boutquin.Curves.Interpolation.InterpolationSettings.operator ==(Boutquin.Curves.Interpolation.InterpolationSettings? left, Boutquin.Curves.Interpolation.InterpolationSettings? right) -> bool

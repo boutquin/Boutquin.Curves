@@ -16,6 +16,7 @@
 
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Recipes.Nodes;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.Records;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using Boutquin.MarketData.Abstractions.Requests;
@@ -31,7 +32,7 @@ namespace Boutquin.Curves.Recipes.Tests.Nodes;
 public sealed class CurveNodeSpecTests
 {
     private static readonly DateOnly s_valuationDate = new(2026, 4, 9);
-    private static readonly CurveReference s_usdSofrDisc = new(CurveRole.Discount, CurrencyCode.USD);
+    private static readonly CurveReference s_usdSofrDisc = new(CurveRole.Discount, Currency.USD);
 
     // --- OvernightFixingNode ---
 
@@ -104,9 +105,9 @@ public sealed class CurveNodeSpecTests
         var node = new YieldCurveNode("2Y", new Tenor("2Y"), "FixedFloatSwap", "UST", "2Y", "USD-SOFR-OIS", s_usdSofrDisc);
         var records = new List<object>
         {
-            new YieldCurveQuote("1Y", 0.040m),
-            new YieldCurveQuote("2Y", 0.042m),
-            new YieldCurveQuote("5Y", 0.045m),
+            new YieldCurveQuote(new DateOnly(2026, 4, 9), "1Y", 0.040m),
+            new YieldCurveQuote(new DateOnly(2026, 4, 9), "2Y", 0.042m),
+            new YieldCurveQuote(new DateOnly(2026, 4, 9), "5Y", 0.045m),
         };
 
         // Act
@@ -123,8 +124,8 @@ public sealed class CurveNodeSpecTests
         var node = new YieldCurveNode("10Y", new Tenor("10Y"), "FixedFloatSwap", "UST", "10Y", "USD-SOFR-OIS", s_usdSofrDisc);
         var records = new List<object>
         {
-            new YieldCurveQuote("1Y", 0.040m),
-            new YieldCurveQuote("2Y", 0.042m),
+            new YieldCurveQuote(new DateOnly(2026, 4, 9), "1Y", 0.040m),
+            new YieldCurveQuote(new DateOnly(2026, 4, 9), "2Y", 0.042m),
         };
 
         // Act
@@ -172,6 +173,39 @@ public sealed class CurveNodeSpecTests
     }
 
     [Fact]
+    public void FuturesSettlementNode_ExtractRate_Honours_Canonical_ImpliedRate_When_Present()
+    {
+        // Arrange — canonical ImpliedRate (0.0500) deliberately diverges from the naive
+        // price conversion (100 - 95.70) / 100 = 0.0430. The node must prefer the supplied
+        // ImpliedRate per the normalizer contract (ImpliedRate ?? (100 - price) / 100).
+        var node = new FuturesSettlementNode("SR3-Jun26", new Tenor("3M"), "SR3", "2026-06", "CME-SOFR-FUT", s_usdSofrDisc);
+        var records = new List<object>
+        {
+            new FuturesSettlement(s_valuationDate, new MdReferenceData.FuturesProductCode("SR3"), new MdReferenceData.ContractMonth("2026-06"), 95.70m, 0.0500m),
+        };
+
+        // Act
+        var rate = node.ExtractRate(records, s_valuationDate);
+
+        // Assert
+        rate.Should().Be(0.0500m); // canonical ImpliedRate preferred over (100 - 95.70) / 100 = 0.0430
+    }
+
+    [Fact]
+    public void FuturesSettlementNode_ExtractRate_ReturnsNullForMissingContract()
+    {
+        var node = new FuturesSettlementNode("SR3-Sep26", new Tenor("6M"), "SR3", "2026-09", "CME-SOFR-FUT", s_usdSofrDisc);
+        object[] records =
+        [
+            new FuturesSettlement(s_valuationDate, new MdReferenceData.FuturesProductCode("SR3"),
+                new MdReferenceData.ContractMonth("2026-06"), 95.70m, null),
+        ];
+
+        node.ExtractRate(records, s_valuationDate).Should().BeNull();
+        node.ExtractRate([], s_valuationDate).Should().BeNull();
+    }
+
+    [Fact]
     public void FuturesSettlementNode_CreateRequest_Returns_FuturesSettlementRequest()
     {
         // Arrange
@@ -184,4 +218,16 @@ public sealed class CurveNodeSpecTests
         request.Should().BeOfType<FuturesSettlementRequest>();
         request.DatasetKey.Should().Be("SR3");
     }
+    [Fact]
+    public void YieldCurveNode_ProjectionReferences_AreCapturedAsProtectedSnapshot()
+    {
+        var projection = new CurveReference(CurveRole.Forward, Currency.USD);
+        var references = new List<CurveReference> { projection };
+        var node = new YieldCurveNode("1Y", new Tenor("1Y"), "FixedFloatSwap", "UST", "1Y", "USD-SOFR-OIS", s_usdSofrDisc, references);
+        references.Clear();
+        node.ProjectionCurves.Should().ContainSingle().Which.Should().Be(projection);
+        Action mutate = () => ((IList<CurveReference>)node.ProjectionCurves!).Clear();
+        mutate.Should().Throw<NotSupportedException>();
+    }
+
 }

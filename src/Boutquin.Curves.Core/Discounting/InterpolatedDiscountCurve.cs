@@ -18,7 +18,7 @@ using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Core.Internal;
 using Boutquin.Curves.Interpolation;
-using Boutquin.MarketData.Abstractions.ReferenceData;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Conventions;
 using Boutquin.MarketData.DayCount;
 
@@ -61,7 +61,7 @@ namespace Boutquin.Curves.Core.Discounting;
 /// <code>
 /// var points = new[] { new CurvePoint(date1Y, 0.9512), new CurvePoint(date5Y, 0.7788) };
 /// var curve = new InterpolatedDiscountCurve(
-///     new CurveName("USD-SOFR-Disc"), valuationDate, CurrencyCode.USD, points);
+///     new CurveName("USD-SOFR-Disc"), valuationDate, Currency.USD, points);
 /// double df = curve.DiscountFactor(date3Y);
 /// double zero = curve.ZeroRate(date3Y, CompoundingConvention.Continuous);
 /// </code>
@@ -71,8 +71,14 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
 {
     private const double TimeEpsilon = 1e-12d;
 
+    private static readonly HashSet<string> s_knownExtrapolatorModes =
+        new(StringComparer.OrdinalIgnoreCase) { "FlatZero", "FlatForward" };
+
     private readonly INodalCurveInterpolator _interpolator;
     private readonly CurvePoint[] _points;
+    private readonly IReadOnlyList<CurvePoint> _pointView;
+    private readonly InterpolatedDiscountCurve? _rollSource;
+    private readonly double _rollAnchorDf = 1d;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InterpolatedDiscountCurve"/> type.
@@ -94,7 +100,7 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     public InterpolatedDiscountCurve(
         CurveName name,
         DateOnly valuationDate,
-        CurrencyCode currency,
+        Currency currency,
         IEnumerable<CurvePoint> points)
         : this(
             name,
@@ -115,16 +121,19 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     /// <param name="points">Discount-factor nodes used to build the curve.</param>
     /// <param name="interpolation">Interpolation and extrapolation settings applied to this curve.</param>
     /// <param name="dayCount">Day-count convention used to convert dates into year fractions. Defaults to ACT/365F.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="points"/> or <paramref name="interpolation"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="points"/> is empty or extrapolator modes are blank.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when any discount factor in <paramref name="points"/> is non-positive.</exception>
     public InterpolatedDiscountCurve(
         CurveName name,
         DateOnly valuationDate,
-        CurrencyCode currency,
+        Currency currency,
         IEnumerable<CurvePoint> points,
         InterpolationSettings interpolation,
         IYearFractionCalculator? dayCount = null)
     {
+        ArgumentNullException.ThrowIfNull(points);
+        ArgumentNullException.ThrowIfNull(interpolation);
         Name = name;
         ValuationDate = valuationDate;
         Currency = currency;
@@ -133,16 +142,33 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
         Interpolation = interpolation;
         _interpolator = InterpolatorFactory.Create(interpolation.Interpolator);
         // Sort by date so interpolation and extrapolation can assume monotonic ordering.
-        _points = points.OrderBy(static point => point.Date).ToArray();
+        CurvePoint[] input = points.ToArray();
+        if (input.Any(static point => point is null))
+        {
+            throw new ArgumentException("Curve points cannot contain null nodes.", nameof(points));
+        }
+
+        _points = input.OrderBy(static point => point.Date).ToArray();
+        _pointView = Array.AsReadOnly(_points);
 
         if (_points.Length == 0)
         {
             throw new ArgumentException("At least one curve point is required.", nameof(points));
         }
 
-        if (_points.Any(static point => point.Value <= 0d))
+        if (_points.Any(static point => !double.IsFinite(point.Value) || point.Value <= 0d))
         {
-            throw new ArgumentOutOfRangeException(nameof(points), "Curve points must be strictly positive.");
+            // F-11: standardised from ArgumentOutOfRangeException to ArgumentException so all
+            // points-parameter validation uses a single exception type.
+            throw new ArgumentException("Curve points must have finite, strictly positive values.", nameof(points));
+        }
+
+        for (int i = 0; i < _points.Length; i++)
+        {
+            if (_points[i].Date < valuationDate || (i > 0 && _points[i].Date == _points[i - 1].Date))
+            {
+                throw new ArgumentException("Curve node dates must be unique and cannot precede valuation.", nameof(points));
+            }
         }
 
         if (string.IsNullOrWhiteSpace(Interpolation.LeftExtrapolator))
@@ -154,6 +180,24 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
         {
             throw new ArgumentException("Right extrapolator mode is required.", nameof(interpolation));
         }
+
+        // F-05: validate extrapolator mode strings at construction so an unrecognised mode is caught
+        // immediately rather than at the first evaluation call (where the context is harder to diagnose).
+        if (!s_knownExtrapolatorModes.Contains(Interpolation.LeftExtrapolator))
+        {
+            throw new ArgumentException(
+                $"Unsupported left extrapolator mode '{Interpolation.LeftExtrapolator}'. " +
+                $"Supported modes: {string.Join(", ", s_knownExtrapolatorModes)}.",
+                nameof(interpolation));
+        }
+
+        if (!s_knownExtrapolatorModes.Contains(Interpolation.RightExtrapolator))
+        {
+            throw new ArgumentException(
+                $"Unsupported right extrapolator mode '{Interpolation.RightExtrapolator}'. " +
+                $"Supported modes: {string.Join(", ", s_knownExtrapolatorModes)}.",
+                nameof(interpolation));
+        }
     }
 
     /// <summary>Curve identifier used in diagnostics, repricing output, and risk report labels.</summary>
@@ -163,7 +207,7 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     public DateOnly ValuationDate { get; }
 
     /// <summary>Settlement currency of the instruments calibrated to this curve.</summary>
-    public CurrencyCode Currency { get; }
+    public Currency Currency { get; }
 
     /// <summary>Day-count convention used to convert calendar dates into year fractions for discounting and rate extraction.</summary>
     public IYearFractionCalculator DayCount { get; }
@@ -172,7 +216,7 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     public InterpolationSettings Interpolation { get; }
 
     /// <summary>Calibration nodes sorted by date, each containing a date and its solved discount factor.</summary>
-    public IReadOnlyList<CurvePoint> Points => _points;
+    public IReadOnlyList<CurvePoint> Points => _pointView;
 
     /// <summary>
     /// Returns the discount factor at the requested date.
@@ -188,7 +232,7 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     /// <returns>Discount factor for <paramref name="date"/>.</returns>
     /// <remarks>
     /// Returns 1.0 for dates on or before valuation date. Applies the configured left extrapolation
-    /// mode for dates before the first node, and right extrapolation mode beyond the last node.
+    /// mode for dates on or before the first node (after valuation), and right extrapolation mode on or beyond the last node.
     /// In normal market data, discount factors should remain positive and broadly decreasing by maturity;
     /// this method does not forcibly enforce monotonicity, so data quality controls should run upstream.
     /// </remarks>
@@ -197,6 +241,11 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
         if (date <= ValuationDate)
         {
             return 1d;
+        }
+
+        if (_rollSource is not null)
+        {
+            return _rollSource.DiscountFactor(date) / _rollAnchorDf;
         }
 
         if (date <= _points[0].Date)
@@ -224,6 +273,11 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     /// </remarks>
     public double ZeroRate(DateOnly date, CompoundingConvention compounding)
     {
+        if (date <= ValuationDate)
+        {
+            return 0d;
+        }
+
         double t = DayCount.YearFraction(ValuationDate, date);
         return CurveMath.ZeroRateFromDiscountFactor(DiscountFactor(date), t, compounding);
     }
@@ -247,13 +301,27 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     {
         // ~1 day in year-fraction units; prevents zero-denominator in finite difference.
         const double epsilon = 1d / 3650d;
+
+        // At or within one day of the valuation date the centered difference would require
+        // leftDate < ValuationDate, which causes YearFraction to throw (endDate < startDate).
+        // Use a one-sided right difference instead so the result is defined at the front boundary.
+        if (date <= ValuationDate.AddDays(1))
+        {
+            DateOnly rightDate = ValuationDate.AddDays(2);
+            double t0 = 0d;
+            double t1 = Math.Max(epsilon, DayCount.YearFraction(ValuationDate, rightDate));
+            double df0 = 1d; // DF at valuation date is always 1
+            double df1 = DiscountFactor(rightDate);
+            return -(Math.Log(df1) - Math.Log(df0)) / Math.Max(epsilon, t1 - t0);
+        }
+
         DateOnly leftDate = date.AddDays(-1);
-        DateOnly rightDate = date.AddDays(1);
-        double t0 = Math.Max(0d, DayCount.YearFraction(ValuationDate, leftDate));
-        double t1 = Math.Max(epsilon, DayCount.YearFraction(ValuationDate, rightDate));
-        double df0 = DiscountFactor(leftDate);
-        double df1 = DiscountFactor(rightDate);
-        return -(Math.Log(df1) - Math.Log(df0)) / Math.Max(epsilon, t1 - t0);
+        DateOnly rightDateCentered = date.AddDays(1);
+        double tLeft = Math.Max(0d, DayCount.YearFraction(ValuationDate, leftDate));
+        double tRight = Math.Max(epsilon, DayCount.YearFraction(ValuationDate, rightDateCentered));
+        double dfLeft = DiscountFactor(leftDate);
+        double dfRight = DiscountFactor(rightDateCentered);
+        return -(Math.Log(dfRight) - Math.Log(dfLeft)) / Math.Max(epsilon, tRight - tLeft);
     }
 
     /// <summary>
@@ -271,7 +339,8 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
     /// <c>1 / originalDF(newValuationDate)</c>, preserving forward rates over any
     /// interval on or after <paramref name="newValuationDate"/>. The original
     /// interpolation and extrapolation settings and day-count convention are
-    /// preserved. Pillars at or before <paramref name="newValuationDate"/> are
+    /// preserved. Evaluation retains the original interpolation surface rather than refitting
+    /// the remaining points, so off-pillar values satisfy the same identity. Pillars at or before <paramref name="newValuationDate"/> are
     /// dropped from the rolled curve.
     /// </returns>
     /// <remarks>
@@ -314,7 +383,7 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
 
         if (newValuationDate == ValuationDate)
         {
-            return new InterpolatedDiscountCurve(Name, ValuationDate, Currency, _points, Interpolation, DayCount);
+            return this;
         }
 
         double anchorDf = DiscountFactor(newValuationDate);
@@ -329,13 +398,17 @@ public sealed class InterpolatedDiscountCurve : IDiscountCurve
             rolledPoints.Add(new CurvePoint(pillar.Date, pillar.Value / anchorDf));
         }
 
-        return new InterpolatedDiscountCurve(
-            Name,
-            newValuationDate,
-            Currency,
-            rolledPoints,
-            Interpolation,
-            DayCount);
+        return new InterpolatedDiscountCurve(this, newValuationDate, rolledPoints);
+    }
+
+    private InterpolatedDiscountCurve(InterpolatedDiscountCurve source, DateOnly valuationDate, IReadOnlyList<CurvePoint> points)
+        : this(source.Name, valuationDate, source.Currency, points, source.Interpolation, source.DayCount)
+    {
+        // Retain the original interpolation surface: rebuilding from remaining pillars changes
+        // nonlocal cubic/zero-rate interpolation and can change the front extrapolation region.
+        // Flatten repeated rolls so query cost and retained state do not grow with roll count.
+        _rollSource = source._rollSource ?? source;
+        _rollAnchorDf = _rollSource.DiscountFactor(valuationDate);
     }
 
     private double ApplyLeftExtrapolation(DateOnly date)

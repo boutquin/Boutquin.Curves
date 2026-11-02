@@ -16,6 +16,7 @@
 
 using Boutquin.Curves.Abstractions.Identifiers;
 using Boutquin.Curves.Abstractions.Quotes;
+using Boutquin.Curves.Core;
 using FluentAssertions;
 
 namespace Boutquin.Curves.Quotes.Tests;

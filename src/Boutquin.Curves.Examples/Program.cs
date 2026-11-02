@@ -17,6 +17,7 @@
 using Boutquin.Curves.Abstractions.Curves;
 using Boutquin.Curves.Recipes;
 using Boutquin.Curves.Recipes.Testing;
+using Boutquin.Domain.Enumerations;
 using Boutquin.MarketData.Abstractions.ReferenceData;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -49,13 +50,13 @@ Console.WriteLine(new string('-', 60));
 (string Label, CurveGroupRecipe Recipe, CurveReference Reference)[] curves =
 [
     ("USD SOFR Discount", StandardCurveRecipes.UsdSofrDiscount(),
-        new CurveReference(CurveRole.Discount, CurrencyCode.USD, new BenchmarkName("SOFR"))),
+        new CurveReference(CurveRole.Discount, Currency.USD, new BenchmarkName("SOFR"))),
     ("CAD CORRA Discount", StandardCurveRecipes.CadCorraDiscount(),
-        new CurveReference(CurveRole.Discount, CurrencyCode.CAD, new BenchmarkName("CORRA"))),
+        new CurveReference(CurveRole.Discount, Currency.CAD, new BenchmarkName("CORRA"))),
     ("GBP SONIA Discount", StandardCurveRecipes.GbpSoniaDiscount(),
-        new CurveReference(CurveRole.Discount, CurrencyCode.GBP, new BenchmarkName("SONIA"))),
+        new CurveReference(CurveRole.Discount, Currency.GBP, new BenchmarkName("SONIA"))),
     ("EUR ESTR Discount", StandardCurveRecipes.EurEstrDiscount(),
-        new CurveReference(CurveRole.Discount, CurrencyCode.EUR, new BenchmarkName("ESTR"))),
+        new CurveReference(CurveRole.Discount, Currency.EUR, new BenchmarkName("ESTR"))),
 ];
 
 foreach (var (label, recipe, curveRef) in curves)

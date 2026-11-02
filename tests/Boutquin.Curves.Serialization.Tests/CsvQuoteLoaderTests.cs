@@ -201,4 +201,47 @@ public sealed class CsvQuoteLoaderTests
 
         result.Quotes.Should().ContainKey(new QuoteId("NYFED:SOFR"));
     }
+
+    /// <summary>
+    /// CF-C6-2: A row shorter than the header (fewer fields than required column indices)
+    /// must throw FormatException with row context, not IndexOutOfRangeException.
+    /// </summary>
+    [Fact]
+    public void Load_ShortRow_ThrowsFormatExceptionWithRowContext()
+    {
+        // Row has only 2 fields; header expects 4 (QuoteId, Value, FieldName, AsOfDate).
+        const string csv = """
+            QuoteId,Value,FieldName,AsOfDate
+            NYFED:SOFR,0.05
+            """;
+
+        var act = () => CsvQuoteLoader.Load(csv);
+
+        act.Should().Throw<FormatException>()
+            .WithMessage("*row 2*");
+    }
+
+    /// <summary>
+    /// CF-C6-5: Load(Stream) must not dispose a caller-managed stream.
+    /// The stream should remain readable after Load returns.
+    /// </summary>
+    [Fact]
+    public void Load_Stream_DoesNotDisposeCallerOwnedStream()
+    {
+        const string csv = """
+            QuoteId,Value,FieldName,AsOfDate
+            NYFED:SOFR,0.0530,RATE,2024-01-15
+            """;
+
+        using var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(csv));
+
+        // Act
+        var result = CsvQuoteLoader.Load(ms);
+
+        // Assert: the stream must still be readable (CanRead == true) after Load.
+        ms.CanRead.Should().BeTrue("Load(Stream) must not dispose a caller-owned stream");
+
+        // Also verify the load itself succeeded.
+        result.Quotes.Should().HaveCount(1);
+    }
 }

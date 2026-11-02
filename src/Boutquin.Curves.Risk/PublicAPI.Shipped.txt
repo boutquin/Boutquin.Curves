@@ -1,6 +1,5 @@
 #nullable enable
 
-abstract Boutquin.Curves.Risk.CurveShockScenario.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!
 Boutquin.Curves.Risk.BucketedSensitivity
 Boutquin.Curves.Risk.BucketedSensitivity.Bucket.get -> string!
 Boutquin.Curves.Risk.BucketedSensitivity.Bucket.init -> void
@@ -16,10 +15,19 @@ Boutquin.Curves.Risk.BucketedShockPoint.ShiftInBasisPoints.init -> void
 Boutquin.Curves.Risk.BucketedZeroRateShock
 Boutquin.Curves.Risk.BucketedZeroRateShock.BucketedZeroRateShock(string! name, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedShockPoint!>! shockPoints) -> void
 Boutquin.Curves.Risk.BucketedZeroRateShock.ShockPoints.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedShockPoint!>!
+Boutquin.Curves.Risk.CashFlow
+Boutquin.Curves.Risk.CashFlow.Amount.get -> decimal
+Boutquin.Curves.Risk.CashFlow.Amount.init -> void
+Boutquin.Curves.Risk.CashFlow.CashFlow(System.DateOnly PaymentDate, decimal Amount, Boutquin.Domain.Enumerations.Currency Currency) -> void
+Boutquin.Curves.Risk.CashFlow.Currency.get -> Boutquin.Domain.Enumerations.Currency
+Boutquin.Curves.Risk.CashFlow.Currency.init -> void
+Boutquin.Curves.Risk.CashFlow.PaymentDate.get -> System.DateOnly
+Boutquin.Curves.Risk.CashFlow.PaymentDate.init -> void
 Boutquin.Curves.Risk.CurveRiskAnalyzer
 Boutquin.Curves.Risk.CurveRiskAnalyzer.BuildPlaceholderBucketedReport(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, Boutquin.Curves.Abstractions.Curves.CurveReference! reference) -> Boutquin.Curves.Risk.RiskReport!
 Boutquin.Curves.Risk.CurveRiskAnalyzer.BuildScenarioRiskReport(Boutquin.Curves.Abstractions.Curves.ICurveGroup! curveGroup, Boutquin.Curves.Abstractions.Curves.CurveReference! reference, Boutquin.Curves.Risk.CurveShockScenario! scenario, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.RiskBucket!>! buckets) -> Boutquin.Curves.Risk.RiskReport!
 Boutquin.Curves.Risk.CurveRiskAnalyzer.CurveRiskAnalyzer() -> void
+Boutquin.Curves.Risk.CurveRiskMetrics
 Boutquin.Curves.Risk.CurveShockScenario
 Boutquin.Curves.Risk.CurveShockScenario.CurveShockScenario(string! Name) -> void
 Boutquin.Curves.Risk.CurveShockScenario.Name.get -> string!
@@ -28,6 +36,14 @@ Boutquin.Curves.Risk.ParallelZeroRateShock
 Boutquin.Curves.Risk.ParallelZeroRateShock.ParallelZeroRateShock(string! Name, double ShiftInBasisPoints) -> void
 Boutquin.Curves.Risk.ParallelZeroRateShock.ShiftInBasisPoints.get -> double
 Boutquin.Curves.Risk.ParallelZeroRateShock.ShiftInBasisPoints.init -> void
+Boutquin.Curves.Risk.PcaCurveShock
+Boutquin.Curves.Risk.PcaCurveShock.Component.get -> Boutquin.Curves.Risk.PrincipalComponent
+Boutquin.Curves.Risk.PcaCurveShock.PcaCurveShock(Boutquin.Curves.Risk.PrincipalComponent component, decimal standardDeviations, Boutquin.Numerics.LinearAlgebra.PcaResult! factorModel, System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.ReferenceData.Tenor>! tenorGrid) -> void
+Boutquin.Curves.Risk.PcaCurveShock.StandardDeviations.get -> decimal
+Boutquin.Curves.Risk.PrincipalComponent
+Boutquin.Curves.Risk.PrincipalComponent.Curvature = 2 -> Boutquin.Curves.Risk.PrincipalComponent
+Boutquin.Curves.Risk.PrincipalComponent.Level = 0 -> Boutquin.Curves.Risk.PrincipalComponent
+Boutquin.Curves.Risk.PrincipalComponent.Slope = 1 -> Boutquin.Curves.Risk.PrincipalComponent
 Boutquin.Curves.Risk.RiskBucket
 Boutquin.Curves.Risk.RiskBucket.Bucket.get -> string!
 Boutquin.Curves.Risk.RiskBucket.Bucket.init -> void
@@ -39,5 +55,13 @@ Boutquin.Curves.Risk.RiskReport.Label.get -> string!
 Boutquin.Curves.Risk.RiskReport.RiskReport(string! label, string! scenarioName, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedSensitivity!>! sensitivities) -> void
 Boutquin.Curves.Risk.RiskReport.ScenarioName.get -> string!
 Boutquin.Curves.Risk.RiskReport.Sensitivities.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.BucketedSensitivity!>!
+abstract Boutquin.Curves.Risk.CurveShockScenario.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!
 override Boutquin.Curves.Risk.BucketedZeroRateShock.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!
 override Boutquin.Curves.Risk.ParallelZeroRateShock.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!
+override Boutquin.Curves.Risk.PcaCurveShock.Apply(Boutquin.Curves.Abstractions.Curves.ICurve! curve) -> Boutquin.Curves.Abstractions.Curves.ICurve!
+static Boutquin.Curves.Risk.CurveRiskMetrics.Convexity(this Boutquin.Curves.Abstractions.Curves.IDiscountCurve! curve, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.CashFlow!>! cashFlows, System.DateOnly valuationDate) -> double
+static Boutquin.Curves.Risk.CurveRiskMetrics.DollarDuration(this Boutquin.Curves.Abstractions.Curves.IDiscountCurve! curve, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.CashFlow!>! cashFlows, System.DateOnly valuationDate, int compoundingFrequency) -> decimal
+static Boutquin.Curves.Risk.CurveRiskMetrics.Dv01(this Boutquin.Curves.Abstractions.Curves.IDiscountCurve! curve, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.CashFlow!>! cashFlows, System.DateOnly valuationDate) -> decimal
+static Boutquin.Curves.Risk.CurveRiskMetrics.Gamma(this Boutquin.Curves.Abstractions.Curves.IDiscountCurve! curve, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.CashFlow!>! cashFlows, System.DateOnly valuationDate) -> decimal
+static Boutquin.Curves.Risk.CurveRiskMetrics.MacaulayDuration(this Boutquin.Curves.Abstractions.Curves.IDiscountCurve! curve, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.CashFlow!>! cashFlows, System.DateOnly valuationDate) -> double
+static Boutquin.Curves.Risk.CurveRiskMetrics.ModifiedDuration(this Boutquin.Curves.Abstractions.Curves.IDiscountCurve! curve, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Risk.CashFlow!>! cashFlows, System.DateOnly valuationDate, int compoundingFrequency) -> double

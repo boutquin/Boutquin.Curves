@@ -27,7 +27,8 @@ namespace Boutquin.Curves.Bootstrap.Helpers;
 /// <remarks>
 /// Uses simple-rate discounting: <c>df = 1 / (1 + rate * tau)</c>. Repricing inverts via
 /// <c>rate = (1/df - 1) / tau</c>. The year fraction is floored at <c>1e-12</c> to prevent
-/// division by zero for same-day tenors.
+/// division by zero for same-day tenors; a negative year fraction (pillar before valuation date)
+/// is rejected with <see cref="ArgumentOutOfRangeException"/> rather than silently floored.
 /// </remarks>
 public sealed class FraInstrumentHelper : AbstractInstrumentHelper
 {
@@ -38,19 +39,28 @@ public sealed class FraInstrumentHelper : AbstractInstrumentHelper
     /// </summary>
     /// <param name="node">Resolved node carrying rate and metadata.</param>
     /// <param name="quoteValue">Observed market quote for the FRA instrument.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="node"/> is <see langword="null"/>.</exception>
     public FraInstrumentHelper(ResolvedNode node, double quoteValue)
-        : base(node.Label, node.TargetCurve, quoteValue, node.InstrumentType)
+        : base(RequireNode(node).Label, node.TargetCurve, quoteValue, node.InstrumentType)
     {
         _node = node;
     }
 
-    /// <inheritdoc/>
+    /// <summary>Resolves the instrument pillar by applying its tenor to the valuation date.</summary>
+    /// <param name="valuationDate">Date from which the node tenor is measured.</param>
+    /// <param name="referenceData">Reference-data provider retained for the helper contract.</param>
+    /// <returns>The unadjusted contractual pillar date.</returns>
+    /// <exception cref="NotSupportedException">The node tenor format is unsupported.</exception>
     public override DateOnly PillarDate(DateOnly valuationDate, IReferenceDataProvider referenceData)
     {
         return TenorParser.AddTenor(valuationDate, _node.Tenor);
     }
 
-    /// <inheritdoc/>
+    /// <summary>Estimates the terminal discount factor from this instrument's quote and available prior curve state.</summary>
+    /// <param name="partialCurveGroup">Previously calibrated curves and pillars.</param>
+    /// <param name="valuationDate">Calibration valuation date.</param>
+    /// <param name="referenceData">Instrument conventions used to resolve accruals and schedules.</param>
+    /// <returns>The discount factor implied by this helper's pricing relation; coupon estimates may require refinement by the calibrator.</returns>
     public override double SolveNodeValue(ICurveGroup partialCurveGroup, DateOnly valuationDate, IReferenceDataProvider referenceData)
     {
         DateOnly pillar = PillarDate(valuationDate, referenceData);
@@ -58,7 +68,11 @@ public sealed class FraInstrumentHelper : AbstractInstrumentHelper
         return 1d / (1d + (QuoteValue * tau));
     }
 
-    /// <inheritdoc/>
+    /// <summary>Reprices this instrument using the supplied curve group.</summary>
+    /// <param name="curveGroup">Curves used to compute the implied quote.</param>
+    /// <param name="valuationDate">Calibration valuation date.</param>
+    /// <param name="referenceData">Instrument conventions used for accruals and schedules.</param>
+    /// <returns>The implied quote, or the original quote when the target discount curve is unavailable.</returns>
     public override double ImpliedQuote(ICurveGroup curveGroup, DateOnly valuationDate, IReferenceDataProvider referenceData)
     {
         DateOnly pillar = PillarDate(valuationDate, referenceData);
@@ -68,6 +82,12 @@ public sealed class FraInstrumentHelper : AbstractInstrumentHelper
             return QuoteValue;
         }
 
+        if (discountFactor.Value <= 0d)
+        {
+            throw new InvalidOperationException(
+                $"Non-positive discount factor {discountFactor.Value:G6} at {pillar:yyyy-MM-dd}: calibration has diverged.");
+        }
+
         double tau = ComputeYearFraction(valuationDate, pillar, referenceData);
         return (1d / discountFactor.Value - 1d) / tau;
     }
@@ -75,6 +95,6 @@ public sealed class FraInstrumentHelper : AbstractInstrumentHelper
     private double ComputeYearFraction(DateOnly valuationDate, DateOnly pillar, IReferenceDataProvider referenceData)
     {
         FraConvention convention = (FraConvention)referenceData.GetConvention(_node.ConventionCode);
-        return Math.Max(1e-12, DayCountResolver.Resolve(convention.DayCountCode).YearFraction(valuationDate, pillar));
+        return FloorYearFraction(DayCountResolver.Resolve(convention.DayCountCode).YearFraction(valuationDate, pillar));
     }
 }

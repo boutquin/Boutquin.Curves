@@ -13,9 +13,12 @@
     <ProjectReference Include="../../src/Boutquin.Curves.Core/Boutquin.Curves.Core.csproj" />
     <ProjectReference Include="../../src/Boutquin.Curves.Interpolation/Boutquin.Curves.Interpolation.csproj" />
     <ProjectReference Include="../../src/Boutquin.Curves.Bootstrap/Boutquin.Curves.Bootstrap.csproj" />
+    <ProjectReference Include="../../src/Boutquin.Curves.Recipes/Boutquin.Curves.Recipes.csproj" />
     <ProjectReference Include="../../src/Boutquin.Curves.Serialization/Boutquin.Curves.Serialization.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Boutquin.MarketData.Adapter.BankOfCanada" />
+    <PackageReference Include="Boutquin.MarketData.DependencyInjection" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />

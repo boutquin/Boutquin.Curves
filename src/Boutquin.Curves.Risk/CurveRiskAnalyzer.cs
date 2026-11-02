@@ -30,7 +30,7 @@ namespace Boutquin.Curves.Risk;
 /// <example>
 /// <code>
 /// var analyzer = new CurveRiskAnalyzer();
-/// var scenario = new ParallelZeroRateShock(0.0001); // 1 bp parallel shock
+/// var scenario = new ParallelZeroRateShock("Parallel +1bp", 1d); // Shift is expressed in basis points
 /// var buckets = new[] { new RiskBucket("1Y", date1Y), new RiskBucket("5Y", date5Y) };
 /// RiskReport report = analyzer.BuildScenarioRiskReport(curveGroup, curveRef, scenario, buckets);
 /// // report.Sensitivities contains delta per bucket
