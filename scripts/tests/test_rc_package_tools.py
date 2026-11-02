@@ -127,6 +127,22 @@ class PackageCorruptionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unexpectedly exports'):
             self.verify()
 
+    def add_dependency(self, locked):
+        if locked:
+            self.sources['dependency-source.json'] = json.dumps({'packages': [], 'publishedPackages': [
+                {'id': 'Boutquin.Storage.Domain', 'version': '2.0.1'}]}).encode()
+        self.mutate('.nuspec', lambda content: content.replace(
+            b'</group>', b'<dependency id="Boutquin.Storage.Domain" version="[2.0.1]"/></group>'))
+
+    def test_exact_transitive_pin_from_the_locked_closure_is_accepted(self):
+        self.add_dependency(True)
+        self.assertEqual('PASS', self.verify()['status'])
+
+    def test_extra_dependency_outside_the_locked_closure_is_rejected(self):
+        self.add_dependency(False)
+        with self.assertRaisesRegex(ValueError, 'Missing or unexpected dependencies'):
+            self.verify()
+
     def test_build_metadata_identity_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'exact stable or numeric RC identity'):
             VERIFY.verify(self.feed, VERSION + '+metadata', COMMIT, self.feed / 'hashes.json', Path('inspector'))
