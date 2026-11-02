@@ -125,14 +125,15 @@ def verify(feed: Path, version: str, commit: str, manifest: Path, inspector: Pat
                 dependencies = {item.get("id"): item.get("version") for item in entries}
                 require(len(dependencies) == len(entries), f"Duplicate dependency: {name}")
                 expected_dependencies_for_package = expected_dependencies(commit, name, version, central, dependency_versions)
-                # Central transitive pinning writes exact pins of locked upstream closure members into the nuspec;
-                # any other extra dependency, or a missing one, is an error.
+                # Central transitive pinning writes the repository's own pins of upstream closure members into the
+                # nuspec at their pinned versions; any other extra dependency, or a missing one, is an error.
                 extras = dependencies.keys() - expected_dependencies_for_package.keys()
-                require(expected_dependencies_for_package.keys() <= dependencies.keys() and extras <= dependency_versions.keys(),
+                require(expected_dependencies_for_package.keys() <= dependencies.keys() and extras <= central.keys(),
                         f"Missing or unexpected dependencies: {name}: expected {sorted(expected_dependencies_for_package)}, got {sorted(dependencies)}")
                 for dep in extras:
-                    require(dependencies[dep] == f"[{dependency_versions[dep]}]",
-                            f"Wrong transitive pin {name} -> {dep}: {dependencies[dep]}")
+                    pinned = central[dep].strip("[]")
+                    allowed = (f"[{pinned}]",) if dep.startswith("Boutquin.") else (pinned, f"[{pinned}]", f"[{pinned}, )")
+                    require(dependencies[dep] in allowed, f"Wrong transitive pin {name} -> {dep}: {dependencies[dep]}")
                 for dep, required in expected_dependencies_for_package.items():
                     resolved = dependencies[dep]
                     allowed = (f"[{required.strip('[]')}]",) if dep.startswith('Boutquin.') else (required, f"[{required}]", f"[{required}, )")

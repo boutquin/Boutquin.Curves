@@ -127,20 +127,27 @@ class PackageCorruptionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unexpectedly exports'):
             self.verify()
 
-    def add_dependency(self, locked):
-        if locked:
-            self.sources['dependency-source.json'] = json.dumps({'packages': [], 'publishedPackages': [
-                {'id': 'Boutquin.Storage.Domain', 'version': '2.0.1'}]}).encode()
+    def add_dependency(self, pinned, version='[2.0.1]'):
+        if pinned:
+            self.sources['Directory.Packages.props'] = (
+                b'<Project><ItemGroup><PackageVersion Include="Boutquin.Domain" Version="[1.0.0]"/>'
+                b'<PackageVersion Include="Boutquin.Storage.Domain" Version="[2.0.1]"/>'
+                b'<PackageVersion Include="Polly.Core" Version="8.9.0"/></ItemGroup></Project>')
         self.mutate('.nuspec', lambda content: content.replace(
-            b'</group>', b'<dependency id="Boutquin.Storage.Domain" version="[2.0.1]"/></group>'))
+            b'</group>', f'<dependency id="Boutquin.Storage.Domain" version="{version}"/></group>'.encode()))
 
-    def test_exact_transitive_pin_from_the_locked_closure_is_accepted(self):
+    def test_exact_transitive_pin_from_the_central_pins_is_accepted(self):
         self.add_dependency(True)
         self.assertEqual('PASS', self.verify()['status'])
 
-    def test_extra_dependency_outside_the_locked_closure_is_rejected(self):
+    def test_extra_dependency_outside_the_central_pins_is_rejected(self):
         self.add_dependency(False)
         with self.assertRaisesRegex(ValueError, 'Missing or unexpected dependencies'):
+            self.verify()
+
+    def test_transitive_pin_at_the_wrong_version_is_rejected(self):
+        self.add_dependency(True, '[2.0.9]')
+        with self.assertRaisesRegex(ValueError, 'Wrong transitive pin'):
             self.verify()
 
     def test_build_metadata_identity_is_rejected(self):
