@@ -19,15 +19,15 @@
       },
       "Boutquin.MarketData.DependencyInjection": {
         "type": "Direct",
-        "requested": "[2.0.1, 2.0.1]",
-        "resolved": "2.0.1",
-        "contentHash": "BCbTsX/4nAio7qChTe4mNHQRD3KXsgb77H+vuBtjxOGLDt9kIqI8LYozZd9t9dgSwJVqhD4byyJH5NrtTZqKnw==",
+        "requested": "[3.0.0, 3.0.0]",
+        "resolved": "3.0.0",
+        "contentHash": "TDciiFkQ1HQXQXsVBWJlrlrWrRhKD2vuj64eQ87nYHcfvqe2A2L3AafgYAAcvV5dLjSjArcdp/dcsUNdYRlw9Q==",
         "dependencies": {
-          "Boutquin.MarketData.Cache": "2.0.1",
-          "Boutquin.MarketData.Normalization": "2.0.1",
-          "Boutquin.MarketData.Orchestration": "2.0.1",
-          "Boutquin.MarketData.Storage": "2.0.1",
-          "Boutquin.MarketData.Transport": "2.0.1",
+          "Boutquin.MarketData.Cache": "3.0.0",
+          "Boutquin.MarketData.Normalization": "3.0.0",
+          "Boutquin.MarketData.Orchestration": "3.0.0",
+          "Boutquin.MarketData.Storage": "3.0.0",
+          "Boutquin.MarketData.Transport": "3.0.0",
           "Boutquin.Storage.Infrastructure": "2.0.1",
           "Microsoft.Extensions.DependencyInjection": "10.0.14",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.14",
@@ -102,10 +102,10 @@
       },
       "Boutquin.MarketData.Cache": {
         "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "MudugLcC3IQlj5nJPbVztVb4aLiVkn/Vy9FfuWj8+0Y1u0UChBek6g+NAgyn9cYg+KokFnUppovkE7Ts+NzqKw==",
+        "resolved": "3.0.0",
+        "contentHash": "gxgVKBjUQK9FfCIM+B9NRgcAUApVfLOINxLMkAYef/3iSPhXvXnGeD6hou7AjVPisU1ns/18BEctEjx4TK9fqw==",
         "dependencies": {
-          "Boutquin.MarketData.Abstractions": "2.0.1",
+          "Boutquin.MarketData.Abstractions": "3.0.0",
           "Boutquin.Storage.Infrastructure": "2.0.1",
           "Microsoft.Extensions.Caching.Memory": "10.0.14",
           "Microsoft.Extensions.Logging.Abstractions": "10.0.14",
@@ -114,27 +114,27 @@
       },
       "Boutquin.MarketData.Catalog": {
         "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "dFAFKGwBz1ESB7aymp6ROSqZNCcQz2Luki0T61GmiW3gqRvrLXULmiAzM3HQll/QbdkONMi1zON2ir9pBEotdw==",
+        "resolved": "3.0.0",
+        "contentHash": "ZFbI6yjfO716fZ3VTnZttuFG9qoz5ihHZyuigZv3fGJo8SyJ5elG+ar1tu6eu6Z1F4Arlx48zTJj+TMOfNlQPA==",
         "dependencies": {
-          "Boutquin.MarketData.Abstractions": "2.0.1"
+          "Boutquin.MarketData.Abstractions": "3.0.0"
         }
       },
       "Boutquin.MarketData.Normalization": {
         "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "uxLUwuzKTe16ACoUCRxh2SXCTmYwYSyjz0APz8XPqTe6rXbhFZyjY5m9N4QaRucjfPGdAJ4TCgUp6HmQYd9DDQ==",
+        "resolved": "3.0.0",
+        "contentHash": "EkdB3AGzGliI2bIvf8XLD90piqL01NzGVf7xMyzNRMqyv6jOPLPvktcQWVjyxl0PTvlBLg2AsBHxUHqtuuxWCQ==",
         "dependencies": {
-          "Boutquin.MarketData.Abstractions": "2.0.1",
-          "Boutquin.MarketData.Catalog": "2.0.1"
+          "Boutquin.MarketData.Abstractions": "3.0.0",
+          "Boutquin.MarketData.Catalog": "3.0.0"
         }
       },
       "Boutquin.MarketData.Transport": {
         "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "6lXhH4+hoIOr7/I++d4BSejFI9DbuGw9WlZt3KUw+UxKieLpJLfYPQz9IgNNtrzDX9QXTzvGkTD8ts0i7i7BKg==",
+        "resolved": "3.0.0",
+        "contentHash": "56I7WXXeGKwhbspXVRDmhuWWQPndY7cF8X0bOQhotF2vqhQsSTyRBpFGity80oW9XIncqv/CL5/Pey2LxKUGAw==",
         "dependencies": {
-          "Boutquin.MarketData.Abstractions": "2.0.1",
+          "Boutquin.MarketData.Abstractions": "3.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "10.0.14",
           "Polly.Core": "8.9.0",
           "Polly.RateLimiting": "8.9.0",

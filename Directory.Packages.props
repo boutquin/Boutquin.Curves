@@ -34,7 +34,7 @@
     <PackageVersion Include="Boutquin.MarketData.DayCount" Version="[2.0.1]" />
     <PackageVersion Include="Boutquin.MarketData.Orchestration" Version="[2.0.1]" />
     <PackageVersion Include="Boutquin.MarketData.Storage" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.DependencyInjection" Version="[2.0.1]" />
+    <PackageVersion Include="Boutquin.MarketData.DependencyInjection" Version="[3.0.0]" />
     <PackageVersion Include="Boutquin.MarketData.Testing" Version="[2.0.1]" />
 
     <!-- Numerics -->
