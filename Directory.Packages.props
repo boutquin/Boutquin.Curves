@@ -41,7 +41,7 @@
     <PackageVersion Include="Boutquin.Numerics" Version="[2.0.0]" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Boutquin.MarketData.Adapter.BankOfCanada" Version="[2.0.1]" />
+    <PackageVersion Include="Boutquin.MarketData.Adapter.BankOfCanada" Version="[3.0.0]" />
   </ItemGroup>
   <!-- Explicit stable transitive versions allowed by the restored parent ranges. -->
   <ItemGroup>
