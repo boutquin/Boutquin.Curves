@@ -28,20 +28,20 @@
     <PackageVersion Include="Boutquin.Storage.Infrastructure" Version="[2.0.1]" />
 
     <!-- MarketData kernel packages -->
-    <PackageVersion Include="Boutquin.MarketData.Abstractions" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.Calendars" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.Conventions" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.DayCount" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.Orchestration" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.Storage" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.DependencyInjection" Version="[2.0.1]" />
-    <PackageVersion Include="Boutquin.MarketData.Testing" Version="[2.0.1]" />
+    <PackageVersion Include="Boutquin.MarketData.Abstractions" Version="[3.0.0]" />
+    <PackageVersion Include="Boutquin.MarketData.Calendars" Version="[3.0.0]" />
+    <PackageVersion Include="Boutquin.MarketData.Conventions" Version="[3.0.0]" />
+    <PackageVersion Include="Boutquin.MarketData.DayCount" Version="[3.0.0]" />
+    <PackageVersion Include="Boutquin.MarketData.Orchestration" Version="[3.0.0]" />
+    <PackageVersion Include="Boutquin.MarketData.Storage" Version="[3.0.0]" />
+    <PackageVersion Include="Boutquin.MarketData.DependencyInjection" Version="[3.0.0]" />
+    <PackageVersion Include="Boutquin.MarketData.Testing" Version="[3.0.0]" />
 
     <!-- Numerics -->
     <PackageVersion Include="Boutquin.Numerics" Version="[2.0.0]" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Boutquin.MarketData.Adapter.BankOfCanada" Version="[2.0.1]" />
+    <PackageVersion Include="Boutquin.MarketData.Adapter.BankOfCanada" Version="[3.0.0]" />
   </ItemGroup>
   <!-- Explicit stable transitive versions allowed by the restored parent ranges. -->
   <ItemGroup>

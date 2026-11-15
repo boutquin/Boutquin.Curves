@@ -1,9 +1,1 @@
 #nullable enable
-Boutquin.Curves.Conventions.SchedulePeriod.<Clone>$() -> Boutquin.Curves.Conventions.SchedulePeriod!
-Boutquin.Curves.Conventions.SchedulePeriod.Deconstruct(out System.DateOnly AccrualStartDate, out System.DateOnly AccrualEndDate, out System.DateOnly PeriodStartDate, out System.DateOnly PeriodEndDate, out System.DateOnly PaymentDate, out double YearFraction) -> void
-Boutquin.Curves.Conventions.SchedulePeriod.Equals(Boutquin.Curves.Conventions.SchedulePeriod? other) -> bool
-override Boutquin.Curves.Conventions.SchedulePeriod.Equals(object? obj) -> bool
-override Boutquin.Curves.Conventions.SchedulePeriod.GetHashCode() -> int
-override Boutquin.Curves.Conventions.SchedulePeriod.ToString() -> string!
-static Boutquin.Curves.Conventions.SchedulePeriod.operator !=(Boutquin.Curves.Conventions.SchedulePeriod? left, Boutquin.Curves.Conventions.SchedulePeriod? right) -> bool
-static Boutquin.Curves.Conventions.SchedulePeriod.operator ==(Boutquin.Curves.Conventions.SchedulePeriod? left, Boutquin.Curves.Conventions.SchedulePeriod? right) -> bool

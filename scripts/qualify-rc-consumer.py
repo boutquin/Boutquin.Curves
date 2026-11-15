@@ -59,6 +59,13 @@ def prepare(consumer, version, commit):
                 target.write_bytes(archive.read(entry))
     shutil.move(consumer / "src" / EXAMPLES, consumer / "consumer-app")
     (consumer / "src").rmdir()
+    example_project = consumer / "consumer-app" / f"{EXAMPLES}.csproj"
+    example_tree = ET.parse(example_project)
+    for group in example_tree.findall("PropertyGroup"):
+        for item in list(group):
+            if item.tag in ("TargetFramework", "TargetFrameworks"):
+                group.remove(item)
+    example_tree.write(example_project, encoding="unicode")
     projects = sorted((consumer / "tests").rglob("*.csproj"))
     require(len(projects) == 13, "Expected all 13 test projects")
     solution = ET.Element("Solution")
@@ -151,18 +158,21 @@ def write_identity_probe(consumer, expected):
     for name, value in (("OutputType", "Exe"), ("IsPackable", "false")):
         ET.SubElement(props, name).text = value
     group = ET.SubElement(project, "ItemGroup")
-    runtime = []
+    runtime = {framework: [] for framework in ("net10.0", "net11.0")}
     for name, package in expected.items():
         ET.SubElement(group, "PackageReference", Include=name, VersionOverride=f"[{package['version']}]")
         with zipfile.ZipFile(package["archive"]) as zipped:
-            dll = f"lib/net10.0/{name}.dll"
-            if dll not in zipped.namelist():
-                require(name == "Boutquin.Storage.SourceGenerator", f"Unexpected qualified runtime layout: {name}")
-                continue
-            core = package["version"].split("-")[0]
-            runtime.append(dict(id=name, informationalVersion=package["version"] + "+" + package["sourceCommit"],
-                assemblyVersion=core.split(".")[0] + ".0.0.0", fileVersion=core + ".0",
-                dllSha256=hashlib.sha256(zipped.read(dll)).hexdigest()))
+            for framework in runtime:
+                dll = f"lib/{framework}/{name}.dll"
+                if dll not in zipped.namelist():
+                    dll = f"lib/net10.0/{name}.dll"
+                if dll not in zipped.namelist():
+                    require(name == "Boutquin.Storage.SourceGenerator", f"Unexpected qualified runtime layout: {name}")
+                    continue
+                core = package["version"].split("-")[0]
+                runtime[framework].append(dict(id=name, informationalVersion=package["version"] + "+" + package["sourceCommit"],
+                    assemblyVersion=core.split(".")[0] + ".0.0.0", fileVersion=core + ".0",
+                    dllSha256=hashlib.sha256(zipped.read(dll)).hexdigest()))
     ET.SubElement(group, "None", Include="runtime-identities.json", CopyToOutputDirectory="PreserveNewest")
     ET.ElementTree(project).write(directory / "IdentityProbe.csproj", encoding="unicode")
     (directory / "runtime-identities.json").write_text(json.dumps(runtime, indent=2) + "\n")
@@ -172,7 +182,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "runtime-identities.json")));
 var results = new List<object>();
-foreach (var package in document.RootElement.EnumerateArray())
+foreach (var package in document.RootElement.GetProperty("net" + Environment.Version.Major + ".0").EnumerateArray())
 {
     var name = package.GetProperty("id").GetString()!;
     var assembly = Assembly.Load(name);
@@ -189,7 +199,7 @@ foreach (var package in document.RootElement.EnumerateArray())
 }
 Console.WriteLine(JsonSerializer.Serialize(results));
 ''')
-    return directory / "IdentityProbe.csproj", len(runtime)
+    return directory / "IdentityProbe.csproj", len(runtime["net10.0"])
 
 
 def write_config(consumer, feed, locked):
@@ -253,6 +263,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("feed", "inspection", "manifest", "work", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--test-host", help="Optional dotnet host containing both target runtimes")
     args = parser.parse_args()
     feed, work, output = args.feed.resolve(), args.work.resolve(), args.output.resolve()
     inspection = json.loads(args.inspection.read_text())
@@ -285,22 +296,30 @@ def main():
     resolved = verify_restore(consumer, cache, expected)
     run(["dotnet", "restore", SOLUTION, "--configfile", "nuget.config", "--no-http-cache", "--locked-mode", "-p:_WorkloadLibraryPacksFolder=" + str(work / "absent-sdk-feed")], consumer, output / "locked-restore.log", env)
     run(["dotnet", "build", SOLUTION, "-c", "Release", "--no-restore"], consumer, output / "build.log", env)
-    run(["dotnet", "test", SOLUTION, "-c", "Release", "--no-restore", "--no-build", "--logger", "trx", "--results-directory", str(output / "trx")], consumer, output / "tests.log", env)
-    run(["dotnet", "run", "--project", str(probe), "-c", "Release", "--no-build", "--no-restore"], consumer, output / "runtime-identities.json", env)
+    counters = []
+    identities = {}
+    for framework in ("net10.0", "net11.0"):
+        test = ["dotnet", "test", SOLUTION, "-c", "Release", "--framework", framework, "--no-restore", "--no-build", "--logger", "trx", "--results-directory", str(output / "trx" / framework)]
+        if args.test_host:
+            test += ["--", "RunConfiguration.DotNetHostPath=" + str(Path(args.test_host).resolve())]
+        run(test, consumer, output / f"tests-{framework}.log", env)
+        lane = test_counters(output / "trx" / framework, projects)
+        counters.extend(dict(framework=framework, **item) for item in lane)
+        identity_path = output / f"runtime-identities-{framework}.json"
+        run(["dotnet", "run", "--project", str(probe), "-c", "Release", "--framework", framework, "--no-build", "--no-restore"], consumer, identity_path, env)
+        identities[framework] = json.loads(identity_path.read_text())
+        require(len(identities[framework]) == runtime_count, "Not every runtime package loaded: " + framework)
+        run(["dotnet", "run", "--project", f"consumer-app/{EXAMPLES}.csproj", "-c", "Release", "--framework", framework, "--no-build", "--no-restore"], consumer, output / f"example-{framework}.log", env)
+        example = (output / f"example-{framework}.log").read_text()
+        require(all(label in example for label in ("USD SOFR Discount", "CAD CORRA Discount", "GBP SONIA Discount", "EUR ESTR Discount", "Done.")), "Offline example did not build all four curves")
+        require(len(re.findall(r"DF\((?:spot|1Y|5Y|10Y)\)\s*=\s*([0-9.]+)", example)) == 16, "Offline example has missing or invalid discount factors")
+        for index in (0, 2):
+            run(["dotnet", "run", "--project", str(readme_projects[index]), "-c", "Release", "--framework", framework, "--no-build", "--no-restore"], consumer, output / f"readme-example-{index}-{framework}.log", env)
+        require(re.search(r"2Y DF:\s*[0-9.]+", (output / f"readme-example-0-{framework}.log").read_text()), "README fixture did not query its curve")
     run(["python3", str(ROOT / "scripts/verify-dependency-identities.py"), "--packages", str(cache), "--outputs", str(consumer), "--report", str(output / "dependency-identities.json")], ROOT, output / "dependency-identities.txt", env)
-    identities = json.loads((output / "runtime-identities.json").read_text())
-    require(len(identities) == runtime_count, "Not every runtime package loaded")
-    run(["dotnet", "run", "--project", f"consumer-app/{EXAMPLES}.csproj", "-c", "Release", "--no-build", "--no-restore"], consumer, output / "example.log", env)
-    example = (output / "example.log").read_text()
-    require(all(label in example for label in ("USD SOFR Discount", "CAD CORRA Discount", "GBP SONIA Discount", "EUR ESTR Discount", "Done.")), "Offline example did not build all four curves")
-    require(len(re.findall(r"DF\((?:spot|1Y|5Y|10Y)\)\s*=\s*([0-9.]+)", example)) == 16, "Offline example has missing or invalid discount factors")
-    for index in (0, 2):
-        run(["dotnet", "run", "--project", str(readme_projects[index]), "-c", "Release", "--no-build", "--no-restore"], consumer, output / f"readme-example-{index}.log", env)
-    require(re.search(r"2Y DF:\s*[0-9.]+", (output / "readme-example-0.log").read_text()), "README fixture did not query its curve")
     verify_restore(consumer, cache, expected)
     verify_hashes(feed, manifest["sha256"])
     require(json.loads(args.manifest.read_text()) == manifest, "Manifest changed during qualification")
-    counters = test_counters(output / "trx", projects)
     for lock in consumer.rglob("packages.lock.json"):
         target = output / "locks" / lock.relative_to(consumer)
         target.parent.mkdir(parents=True, exist_ok=True)

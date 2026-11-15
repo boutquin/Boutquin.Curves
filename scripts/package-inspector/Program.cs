@@ -44,6 +44,8 @@ var exportedTypes = metadata.TypeDefinitions.Select(metadata.GetTypeDefinition)
     .Count(type => (type.Attributes & TypeAttributes.VisibilityMask) is TypeAttributes.Public or TypeAttributes.NestedPublic);
 var entry = pe.ReadDebugDirectory().Single(item => item.Type == DebugDirectoryEntryType.CodeView);
 var codeView = pe.ReadCodeViewDebugDirectoryData(entry);
+var checksumEntry = pe.ReadDebugDirectory().Single(item => item.Type == DebugDirectoryEntryType.PdbChecksum);
+var checksum = pe.ReadPdbChecksumDebugDirectoryData(checksumEntry);
 using var pdbStream = File.OpenRead(args[1]);
 using var provider = MetadataReaderProvider.FromPortablePdbStream(pdbStream);
 var reader = provider.GetMetadataReader();
@@ -96,4 +98,6 @@ Console.WriteLine(JsonSerializer.Serialize(new
     name = assembly.Name, assemblyVersion = assembly.Version.ToString(),
     fileVersion = file.FileVersion, informationalVersion = file.ProductVersion,
     pdbId = Convert.ToHexString(id.AsSpan()), sourceLink, exportedTypes,
+    pdbGuid = codeView.Guid.ToString("N"), pdbChecksumAlgorithm = checksum.AlgorithmName,
+    pdbChecksum = Convert.ToHexString(checksum.Checksum.AsSpan()).ToLowerInvariant(),
 }));

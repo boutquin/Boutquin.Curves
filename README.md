@@ -5,10 +5,10 @@
 Runtime libraries target both .NET 10 and .NET 11. Build with the .NET 11 SDK selected by `global.json`; install both runtimes to run the full test suite. Compiler tooling retains its .NET Standard target. The .NET 11 target uses the latest stable third-party dependencies verified on NuGet.org on November 14, 2026; target-specific pins preserve the .NET 10 dependency contract.
 
 [![NuGet](https://img.shields.io/nuget/v/Boutquin.Curves.Abstractions.svg)](https://www.nuget.org/packages/Boutquin.Curves.Abstractions)
-[![License](https://img.shields.io/github/license/boutquin/Boutquin.Curves)](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/LICENSE.txt)
+[![License](https://img.shields.io/github/license/boutquin/Boutquin.Curves)](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/LICENSE.txt)
 [![Build](https://github.com/boutquin/Boutquin.Curves/actions/workflows/pr-verify.yml/badge.svg)](https://github.com/boutquin/Boutquin.Curves/actions/workflows/pr-verify.yml)
 
-> **2.0.0:** targets .NET 10, `Boutquin.MarketData` 2.0.1 and `Boutquin.Numerics` 2.0.0 from NuGet.org. Install the explicit version below to keep the package family aligned. See the [changelog](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/CHANGELOG.md) and [build verification](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/docs/runner-dependencies.md).
+> **3.0.0:** targets .NET 10 and .NET 11, `Boutquin.MarketData` / Adapter 3.0.0 and `Boutquin.Numerics` 2.0.0 from NuGet.org. Install the explicit version below to keep the package family aligned. See the [3.0 migration guide](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/docs/migration-3.0.md). See the [changelog](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/CHANGELOG.md) and [build verification](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/docs/runner-dependencies.md).
 
 A curve construction library for .NET 10. Post-LIBOR, RFR-first, multi-curve architecture.
 
@@ -81,10 +81,10 @@ Risk / Serialization / Examples          (risk analysis, JSON export, usage exam
 ### Installation
 
 ```sh
-dotnet add package Boutquin.Curves.Abstractions --version 2.0.0
-dotnet add package Boutquin.Curves.Core --version 2.0.0
-dotnet add package Boutquin.Curves.Bootstrap --version 2.0.0
-dotnet add package Boutquin.Curves.Recipes --version 2.0.0
+dotnet add package Boutquin.Curves.Abstractions --version 3.0.0
+dotnet add package Boutquin.Curves.Core --version 3.0.0
+dotnet add package Boutquin.Curves.Bootstrap --version 3.0.0
+dotnet add package Boutquin.Curves.Recipes --version 3.0.0
 ```
 
 ### Build a Curve with Fixture Data (No Network)
@@ -211,7 +211,7 @@ Market data ingestion is delegated to `Boutquin.MarketData` (shared kernel) and 
 
 For downstream pricing systems, the minimum dependency surface is `Boutquin.Curves.Abstractions` + `Boutquin.Curves.Core`.
 
-See [docs/architecture.md](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/docs/architecture.md) for design rationale and package placement guidance.
+See [docs/architecture.md](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/docs/architecture.md) for design rationale and package placement guidance.
 
 ## Design Principles
 
@@ -254,14 +254,14 @@ Boutquin.Curves/
 
 | Document | Description |
 |----------|-------------|
-| [docs/architecture.md](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/docs/architecture.md) | Layer design rationale, pipeline context, and package placement guide |
-| [docs/curve-construction-guide.md](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/docs/curve-construction-guide.md) | Practitioner guide: bootstrapping, multi-curve, querying, diagnostics, fixings, and OptionPricing integration |
-| [docs/repository-map.md](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/docs/repository-map.md) | Per-package descriptions organized by layer with navigation guidance |
-| [docs/tolerance-policy.md](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/docs/tolerance-policy.md) | Numerical tolerance standards for tests and diagnostics |
+| [docs/architecture.md](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/docs/architecture.md) | Layer design rationale, pipeline context, and package placement guide |
+| [docs/curve-construction-guide.md](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/docs/curve-construction-guide.md) | Practitioner guide: bootstrapping, multi-curve, querying, diagnostics, fixings, and OptionPricing integration |
+| [docs/repository-map.md](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/docs/repository-map.md) | Per-package descriptions organized by layer with navigation guidance |
+| [docs/tolerance-policy.md](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/docs/tolerance-policy.md) | Numerical tolerance standards for tests and diagnostics |
 
 ## Contributing
 
-Contributions are welcome! Please read the [contributing guidelines](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/CONTRIBUTING.md) and [code of conduct](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/CODE_OF_CONDUCT.md) first.
+Contributions are welcome! Please read the [contributing guidelines](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/CONTRIBUTING.md) and [code of conduct](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/CODE_OF_CONDUCT.md) first.
 
 ### Reporting Bugs
 
@@ -276,7 +276,7 @@ If you find a bug, please report it by opening an issue on the [Issues](https://
 
 1. Fork the repository and clone locally
 2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes following the [style guides](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/CONTRIBUTING.md)
+3. Make your changes following the [style guides](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/CONTRIBUTING.md)
 4. Commit with clear messages: `git commit -m "Add feature X"`
 5. Push and open a pull request
 
@@ -288,7 +288,7 @@ Boutquin.Curves is open-source software provided under the Apache 2.0 License. I
 
 ## License
 
-Licensed under the [Apache License, Version 2.0](https://github.com/boutquin/Boutquin.Curves/blob/v2.0.0/LICENSE.txt).
+Licensed under the [Apache License, Version 2.0](https://github.com/boutquin/Boutquin.Curves/blob/v3.0.0/LICENSE.txt).
 
 Copyright (c) 2026 Pierre G. Boutquin. All rights reserved.
 
