@@ -133,8 +133,8 @@
         "type": "Project",
         "dependencies": {
           "Boutquin.Domain": "[1.0.1, 1.0.1]",
-          "Boutquin.MarketData.Abstractions": "[2.0.1, 2.0.1]",
-          "Boutquin.MarketData.Conventions": "[2.0.1, 2.0.1]",
+          "Boutquin.MarketData.Abstractions": "[3.0.0, )",
+          "Boutquin.MarketData.Conventions": "[3.0.0, )",
           "Boutquin.MarketData.DayCount": "[2.0.1, 2.0.1]"
         }
       },
@@ -153,7 +153,7 @@
         "dependencies": {
           "Boutquin.Curves.Abstractions": "[1.0.0, )",
           "Boutquin.MarketData.Calendars": "[2.0.1, 2.0.1]",
-          "Boutquin.MarketData.Conventions": "[2.0.1, 2.0.1]"
+          "Boutquin.MarketData.Conventions": "[3.0.0, )"
         }
       },
       "boutquin.curves.core": {
@@ -185,9 +185,9 @@
       },
       "Boutquin.MarketData.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[2.0.1, 2.0.1]",
-        "resolved": "2.0.1",
-        "contentHash": "R2piTf5wYylrMtjmK4z+eMqaGi/hd9lrIZPDkn36N4WfW7PFetqvc6qW7A7YawoAODjwm2qTrXv74SHEJPDhAA==",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "eAkotKSpmLLycKC+i18WElkVPNMpMnWCeyxN+WjcbJVWtIc3gEIY7xuAb3mk081htVP8hFj2tobMIZUHfrsRBA==",
         "dependencies": {
           "Boutquin.Domain": "1.0.1",
           "Boutquin.Storage.Domain": "2.0.1"
@@ -204,11 +204,11 @@
       },
       "Boutquin.MarketData.Conventions": {
         "type": "CentralTransitive",
-        "requested": "[2.0.1, 2.0.1]",
-        "resolved": "2.0.1",
-        "contentHash": "e4elMuQ9rtDRgGUlSoetFLbg5ayTf+5pWV0nVFDWjQYszbhse/zYv4CbKgM5X0AMCdbHrQr0wpXkq6mad8w/9A==",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "7uLEKos9jj0J8lJHJP8ZdC/uZWyNGe4yGWchTsG+JE5xyz8NLc4UWeT8NwuAF32oc0fTM28aEOepdzKxM6ufyw==",
         "dependencies": {
-          "Boutquin.MarketData.Abstractions": "2.0.1"
+          "Boutquin.MarketData.Abstractions": "3.0.0"
         }
       },
       "Boutquin.MarketData.DayCount": {
@@ -374,8 +374,8 @@
         "type": "Project",
         "dependencies": {
           "Boutquin.Domain": "[1.0.1, 1.0.1]",
-          "Boutquin.MarketData.Abstractions": "[2.0.1, 2.0.1]",
-          "Boutquin.MarketData.Conventions": "[2.0.1, 2.0.1]",
+          "Boutquin.MarketData.Abstractions": "[3.0.0, )",
+          "Boutquin.MarketData.Conventions": "[3.0.0, )",
           "Boutquin.MarketData.DayCount": "[2.0.1, 2.0.1]"
         }
       },
@@ -394,7 +394,7 @@
         "dependencies": {
           "Boutquin.Curves.Abstractions": "[1.0.0, )",
           "Boutquin.MarketData.Calendars": "[2.0.1, 2.0.1]",
-          "Boutquin.MarketData.Conventions": "[2.0.1, 2.0.1]"
+          "Boutquin.MarketData.Conventions": "[3.0.0, )"
         }
       },
       "boutquin.curves.core": {
@@ -426,9 +426,9 @@
       },
       "Boutquin.MarketData.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[2.0.1, 2.0.1]",
-        "resolved": "2.0.1",
-        "contentHash": "R2piTf5wYylrMtjmK4z+eMqaGi/hd9lrIZPDkn36N4WfW7PFetqvc6qW7A7YawoAODjwm2qTrXv74SHEJPDhAA==",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "eAkotKSpmLLycKC+i18WElkVPNMpMnWCeyxN+WjcbJVWtIc3gEIY7xuAb3mk081htVP8hFj2tobMIZUHfrsRBA==",
         "dependencies": {
           "Boutquin.Domain": "1.0.1",
           "Boutquin.Storage.Domain": "2.0.1"
@@ -445,11 +445,11 @@
       },
       "Boutquin.MarketData.Conventions": {
         "type": "CentralTransitive",
-        "requested": "[2.0.1, 2.0.1]",
-        "resolved": "2.0.1",
-        "contentHash": "e4elMuQ9rtDRgGUlSoetFLbg5ayTf+5pWV0nVFDWjQYszbhse/zYv4CbKgM5X0AMCdbHrQr0wpXkq6mad8w/9A==",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "7uLEKos9jj0J8lJHJP8ZdC/uZWyNGe4yGWchTsG+JE5xyz8NLc4UWeT8NwuAF32oc0fTM28aEOepdzKxM6ufyw==",
         "dependencies": {
-          "Boutquin.MarketData.Abstractions": "2.0.1"
+          "Boutquin.MarketData.Abstractions": "3.0.0"
         }
       },
       "Boutquin.MarketData.DayCount": {
