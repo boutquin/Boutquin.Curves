@@ -39,7 +39,7 @@ def package_violations(path):
                 payload = archive.read(name)
                 if ET.fromstring(payload).findtext("assembly/name") != Path(name).stem:
                     errors.append(f"{path.name}:{name}: XML assembly identity mismatch")
-                errors.extend(f"{path.name}:{name}:{member}" for member in xml_violations(archive.read(name), allow_empty=name in ("lib/net10.0/Boutquin.Curves.Indices.xml", "lib/net10.0/Boutquin.Curves.Quotes.xml")))
+                errors.extend(f"{path.name}:{name}:{member}" for member in xml_violations(archive.read(name), allow_empty=name in tuple(f"lib/{framework}/Boutquin.Curves.{assembly}.xml" for framework in ("net10.0", "net11.0") for assembly in ("Indices", "Quotes"))))
             except ET.ParseError as error:
                 errors.append(f"{path.name}:{name}: invalid XML: {error}")
         return errors
