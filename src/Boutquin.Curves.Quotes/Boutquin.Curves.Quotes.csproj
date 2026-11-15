@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     <RootNamespace>Boutquin.Curves.Quotes</RootNamespace>
     <AssemblyName>Boutquin.Curves.Quotes</AssemblyName>
     <Description>DEPRECATED — types moved to Boutquin.Curves.Core in v1.0. This package will be removed in v1.1.</Description>

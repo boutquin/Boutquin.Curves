@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <TargetFrameworks />
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Boutquin.Curves.Benchmarks</RootNamespace>
     <AssemblyName>Boutquin.Curves.Benchmarks</AssemblyName>
