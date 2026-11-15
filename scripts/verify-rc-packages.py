@@ -18,6 +18,18 @@ IDS = tuple("Boutquin.Curves." + name for name in (
     "Abstractions", "Conventions", "Core", "Interpolation", "Bootstrap",
     "Recipes", "Risk", "Serialization", "Indices", "Quotes"))
 
+# .NET 11 supplies these exact 11.0.0 contracts in Microsoft.NETCore.App.
+# NuGet privatizes direct prunable references, excluding them from the nuspec:
+# https://learn.microsoft.com/dotnet/core/compatibility/sdk/10.0/nu1510-pruned-references
+# Keep this narrow: a newer package version or a first-party dependency must
+# still be present and checked normally.
+FRAMEWORK_PROVIDED = {
+    "net11.0": {
+        "Microsoft.Extensions.DependencyInjection.Abstractions": "11.0.0",
+        "Microsoft.Extensions.Logging.Abstractions": "11.0.0",
+    },
+}
+
 
 def require(condition: bool, message: str) -> None:
     if not condition:
@@ -143,13 +155,17 @@ def verify(feed: Path, version: str, commit: str, manifest: Path, inspector: Pat
                     require(len(dependencies) == len(entries), f"Duplicate dependency: {name} {framework}")
                     expected_dependencies_for_package = expected_dependencies(commit, name, version, central, dependency_versions)
                     extras = dependencies.keys() - expected_dependencies_for_package.keys()
-                    require(expected_dependencies_for_package.keys() <= dependencies.keys() and extras <= central.keys(),
+                    pruned = {dep for dep, required in expected_dependencies_for_package.items()
+                              if FRAMEWORK_PROVIDED.get(framework, {}).get(dep) == required.strip("[]")}
+                    require(expected_dependencies_for_package.keys() - pruned <= dependencies.keys() and extras <= central.keys(),
                             f"Missing or unexpected dependencies: {name} {framework}")
                     for dep in extras:
                         pinned = central[dep].strip("[]")
                         allowed = (f"[{pinned}]",) if dep.startswith("Boutquin.") else (pinned, f"[{pinned}]", f"[{pinned}, )")
                         require(dependencies[dep] in allowed, f"Wrong transitive pin {name} {framework} -> {dep}: {dependencies[dep]}")
                     for dep, required in expected_dependencies_for_package.items():
+                        if dep in pruned and dep not in dependencies:
+                            continue
                         resolved = dependencies[dep]
                         allowed = (f"[{required.strip('[]')}]",) if dep.startswith('Boutquin.') else (required, f"[{required}]", f"[{required}, )")
                         require(resolved in allowed, f"Wrong dependency {name} {framework} -> {dep}: {resolved}")

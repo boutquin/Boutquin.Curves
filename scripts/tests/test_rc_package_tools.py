@@ -176,6 +176,27 @@ class PackageCorruptionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'runtime DLL inventory'):
             self.verify()
 
+    def test_net11_framework_pruning_is_allowed_only_for_the_exact_contract(self):
+        dependency = 'Microsoft.Extensions.Logging.Abstractions'
+        self.sources['Directory.Packages.props'] = self.sources['Directory.Packages.props'].replace(
+            b'</ItemGroup>', f'<PackageVersion Include="{dependency}" Version="11.0.0"/></ItemGroup>'.encode())
+        name = VERIFY.IDS[1]
+        key = f'src/{name}/{name}.csproj'
+        self.sources[key] = self.sources[key].replace(
+            b'</ItemGroup>', f'<PackageReference Include="{dependency}"/></ItemGroup>'.encode())
+        def add_net10(content):
+            document = ET.fromstring(content)
+            group = next(g for g in document.findall('.//group') if g.get('targetFramework') == 'net10.0')
+            ET.SubElement(group, 'dependency', id=dependency, version='11.0.0')
+            return ET.tostring(document)
+        self.mutate('.nuspec', add_net10)
+        self.assertEqual('PASS', self.verify()['status'])
+        (self.feed / 'hashes.json').unlink()
+        self.sources['Directory.Packages.props'] = self.sources['Directory.Packages.props'].replace(b'11.0.0', b'11.0.1')
+        self.mutate('.nuspec', lambda content: content.replace(b'11.0.0', b'11.0.1'))
+        with self.assertRaisesRegex(ValueError, 'Missing or unexpected dependencies.*net11.0'):
+            self.verify()
+
     def test_build_metadata_identity_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'exact stable or numeric RC identity'):
             VERIFY.verify(self.feed, VERSION + '+metadata', COMMIT, self.feed / 'hashes.json', Path('inspector'))
