@@ -40,15 +40,18 @@ class PackageCorruptionTests(unittest.TestCase):
             self.sources[f'src/{name}/{name}.csproj'] = f'<Project><ItemGroup>{dependencies}</ItemGroup></Project>'.encode()
             versions = '' if name.endswith('.Abstractions') else f'<dependency id="Boutquin.Curves.Abstractions" version="[{VERSION}]"/>'
             versions += '<dependency id="Boutquin.Domain" version="[1.0.0]"/>'
-            nuspec = f'<package><metadata><id>{name}</id><version>{VERSION}</version><repository url="https://github.com/boutquin/Boutquin.Curves" commit="{COMMIT}"/><license type="expression">Apache-2.0</license><readme>README.md</readme><dependencies><group targetFramework="net10.0">{versions}</group></dependencies></metadata></package>'
+            nuspec = f'<package><metadata><id>{name}</id><version>{VERSION}</version><repository url="https://github.com/boutquin/Boutquin.Curves" commit="{COMMIT}"/><license type="expression">Apache-2.0</license><readme>README.md</readme><dependencies><group targetFramework="net10.0">{versions}</group><group targetFramework="net11.0">{versions}</group></dependencies></metadata></package>'
             with zipfile.ZipFile(self.feed / f'{name}.{VERSION}.nupkg', 'w') as archive:
                 archive.writestr(name + '.nuspec', nuspec)
                 archive.writestr('README.md', self.sources['README.md'])
                 archive.writestr(f'lib/net10.0/{name}.dll', b'packaged DLL')
+                archive.writestr(f'lib/net11.0/{name}.dll', b'packaged DLL')
                 archive.writestr(f'lib/net10.0/{name}.xml', f'<doc><assembly><name>{name}</name></assembly><members><member name="T:Fixture"><summary>Returns an observation.</summary></member></members></doc>')
+                archive.writestr(f'lib/net11.0/{name}.xml', f'<doc><assembly><name>{name}</name></assembly><members><member name="T:Fixture"><summary>Returns an observation.</summary></member></members></doc>')
             with zipfile.ZipFile(self.feed / f'{name}.{VERSION}.snupkg', 'w') as archive:
                 archive.writestr(name + '.nuspec', nuspec)
                 archive.writestr(f'lib/net10.0/{name}.pdb', b'portable PDB')
+                archive.writestr(f'lib/net11.0/{name}.pdb', b'portable PDB')
         self.addCleanup(patch.stopall)
         patch.object(VERIFY, 'source_bytes', side_effect=lambda commit, path: self.sources[path]).start()
         patch.object(VERIFY.subprocess, 'check_output', side_effect=lambda args, **kwargs: json.dumps({'name': Path(args[2]).stem, 'exportedTypes': 0})).start()
@@ -148,6 +151,29 @@ class PackageCorruptionTests(unittest.TestCase):
     def test_transitive_pin_at_the_wrong_version_is_rejected(self):
         self.add_dependency(True, '[2.0.9]')
         with self.assertRaisesRegex(ValueError, 'Wrong transitive pin'):
+            self.verify()
+
+    def test_net11_dependency_range_is_independently_checked(self):
+        def wrong_net11(payload):
+            document = ET.fromstring(payload)
+            for group in document.findall('.//group'):
+                if group.get('targetFramework') == 'net11.0':
+                    for dependency in group:
+                        if dependency.get('id') == 'Boutquin.Domain':
+                            dependency.set('version', '[9.0.0]')
+            return ET.tostring(document)
+        self.mutate('.nuspec', wrong_net11)
+        with self.assertRaisesRegex(ValueError, 'Wrong dependency.*net11.0'):
+            self.verify()
+
+    def test_missing_net11_runtime_dll_is_rejected(self):
+        path = self.feed / f'{VERIFY.IDS[1]}.{VERSION}.nupkg'
+        with zipfile.ZipFile(path) as archive:
+            entries = {entry: archive.read(entry) for entry in archive.namelist() if not entry.startswith('lib/net11.0/')}
+        with zipfile.ZipFile(path, 'w') as archive:
+            for name, content in entries.items():
+                archive.writestr(name, content)
+        with self.assertRaisesRegex(ValueError, 'runtime DLL inventory'):
             self.verify()
 
     def test_build_metadata_identity_is_rejected(self):

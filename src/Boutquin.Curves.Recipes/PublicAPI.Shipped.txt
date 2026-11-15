@@ -1,16 +1,18 @@
 #nullable enable
-
 Boutquin.Curves.Recipes.AnalyticsDependencyInjectionExtensions
 Boutquin.Curves.Recipes.CurveBuilder
 Boutquin.Curves.Recipes.CurveBuilder.BuildAsync(Boutquin.Curves.Recipes.CurveGroupRecipe! recipe, System.DateOnly valuationDate, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Boutquin.Curves.Recipes.CurveSnapshot!>!
 Boutquin.Curves.Recipes.CurveBuilder.CurveBuilder(Boutquin.MarketData.Abstractions.Contracts.IDataPipeline! pipeline, Boutquin.Curves.Bootstrap.PiecewiseBootstrapCalibrator! calibrator, Boutquin.Curves.Abstractions.ReferenceData.IReferenceDataProvider! referenceData, Microsoft.Extensions.Logging.ILogger<Boutquin.Curves.Recipes.CurveBuilder!>! logger) -> void
 Boutquin.Curves.Recipes.CurveGroupRecipe
+Boutquin.Curves.Recipes.CurveGroupRecipe.<Clone>$() -> Boutquin.Curves.Recipes.CurveGroupRecipe!
 Boutquin.Curves.Recipes.CurveGroupRecipe.CurveGroupRecipe(string! groupName, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.CurveRecipe!>! curves) -> void
 Boutquin.Curves.Recipes.CurveGroupRecipe.Curves.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.CurveRecipe!>!
 Boutquin.Curves.Recipes.CurveGroupRecipe.Curves.init -> void
+Boutquin.Curves.Recipes.CurveGroupRecipe.Equals(Boutquin.Curves.Recipes.CurveGroupRecipe? other) -> bool
 Boutquin.Curves.Recipes.CurveGroupRecipe.GroupName.get -> string!
 Boutquin.Curves.Recipes.CurveGroupRecipe.GroupName.init -> void
 Boutquin.Curves.Recipes.CurveRecipe
+Boutquin.Curves.Recipes.CurveRecipe.<Clone>$() -> Boutquin.Curves.Recipes.CurveRecipe!
 Boutquin.Curves.Recipes.CurveRecipe.CurveId.get -> string!
 Boutquin.Curves.Recipes.CurveRecipe.CurveId.init -> void
 Boutquin.Curves.Recipes.CurveRecipe.CurveRecipe(string! curveId, Boutquin.Curves.Abstractions.Curves.CurveReference! curveReference, Boutquin.Curves.Bootstrap.Definitions.CurveValueType valueType, string! dayCountCode, Boutquin.Curves.Interpolation.InterpolationSettings! interpolation, System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec!>! nodes) -> void
@@ -18,6 +20,7 @@ Boutquin.Curves.Recipes.CurveRecipe.CurveReference.get -> Boutquin.Curves.Abstra
 Boutquin.Curves.Recipes.CurveRecipe.CurveReference.init -> void
 Boutquin.Curves.Recipes.CurveRecipe.DayCountCode.get -> string!
 Boutquin.Curves.Recipes.CurveRecipe.DayCountCode.init -> void
+Boutquin.Curves.Recipes.CurveRecipe.Equals(Boutquin.Curves.Recipes.CurveRecipe? other) -> bool
 Boutquin.Curves.Recipes.CurveRecipe.Interpolation.get -> Boutquin.Curves.Interpolation.InterpolationSettings!
 Boutquin.Curves.Recipes.CurveRecipe.Interpolation.init -> void
 Boutquin.Curves.Recipes.CurveRecipe.Nodes.get -> System.Collections.Generic.IReadOnlyList<Boutquin.Curves.Recipes.Nodes.ICurveNodeSpec!>!
@@ -25,13 +28,16 @@ Boutquin.Curves.Recipes.CurveRecipe.Nodes.init -> void
 Boutquin.Curves.Recipes.CurveRecipe.ValueType.get -> Boutquin.Curves.Bootstrap.Definitions.CurveValueType
 Boutquin.Curves.Recipes.CurveRecipe.ValueType.init -> void
 Boutquin.Curves.Recipes.CurveSnapshot
+Boutquin.Curves.Recipes.CurveSnapshot.<Clone>$() -> Boutquin.Curves.Recipes.CurveSnapshot!
 Boutquin.Curves.Recipes.CurveSnapshot.CurveGroup.get -> Boutquin.Curves.Abstractions.Curves.ICurveGroup!
 Boutquin.Curves.Recipes.CurveSnapshot.CurveGroup.init -> void
 Boutquin.Curves.Recipes.CurveSnapshot.CurveSnapshot(string! GroupName, System.DateOnly ValuationDate, Boutquin.Curves.Abstractions.Curves.ICurveGroup! CurveGroup, Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics! Diagnostics, System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataIssue!>! DataIssues, System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataProvenance!>! Provenance, Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian? Jacobian = null) -> void
 Boutquin.Curves.Recipes.CurveSnapshot.DataIssues.get -> System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataIssue!>!
 Boutquin.Curves.Recipes.CurveSnapshot.DataIssues.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.Deconstruct(out string! GroupName, out System.DateOnly ValuationDate, out Boutquin.Curves.Abstractions.Curves.ICurveGroup! CurveGroup, out Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics! Diagnostics, out System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataIssue!>! DataIssues, out System.Collections.Generic.IReadOnlyList<Boutquin.MarketData.Abstractions.Results.DataProvenance!>! Provenance, out Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian? Jacobian) -> void
 Boutquin.Curves.Recipes.CurveSnapshot.Diagnostics.get -> Boutquin.Curves.Abstractions.Diagnostics.BootstrapDiagnostics!
 Boutquin.Curves.Recipes.CurveSnapshot.Diagnostics.init -> void
+Boutquin.Curves.Recipes.CurveSnapshot.Equals(Boutquin.Curves.Recipes.CurveSnapshot? other) -> bool
 Boutquin.Curves.Recipes.CurveSnapshot.GroupName.get -> string!
 Boutquin.Curves.Recipes.CurveSnapshot.GroupName.init -> void
 Boutquin.Curves.Recipes.CurveSnapshot.Jacobian.get -> Boutquin.Curves.Abstractions.Diagnostics.CalibrationJacobian?
@@ -91,7 +97,22 @@ Boutquin.Curves.Recipes.Testing.FakeDataPipeline.ExecutePartitionedAsync<TReques
 Boutquin.Curves.Recipes.Testing.FakeDataPipeline.FakeDataPipeline() -> void
 Boutquin.Curves.Recipes.Testing.FakeDataPipeline.Register<TRecord>(string! datasetKey, Boutquin.MarketData.Abstractions.Results.DataEnvelope<System.Collections.Generic.IReadOnlyList<TRecord>!>! envelope) -> Boutquin.Curves.Recipes.Testing.FakeDataPipeline!
 Boutquin.Curves.Recipes.Testing.FixtureData
+override Boutquin.Curves.Recipes.CurveGroupRecipe.Equals(object? obj) -> bool
+override Boutquin.Curves.Recipes.CurveGroupRecipe.GetHashCode() -> int
+override Boutquin.Curves.Recipes.CurveGroupRecipe.ToString() -> string!
+override Boutquin.Curves.Recipes.CurveRecipe.Equals(object? obj) -> bool
+override Boutquin.Curves.Recipes.CurveRecipe.GetHashCode() -> int
+override Boutquin.Curves.Recipes.CurveRecipe.ToString() -> string!
+override Boutquin.Curves.Recipes.CurveSnapshot.Equals(object? obj) -> bool
+override Boutquin.Curves.Recipes.CurveSnapshot.GetHashCode() -> int
+override Boutquin.Curves.Recipes.CurveSnapshot.ToString() -> string!
 static Boutquin.Curves.Recipes.AnalyticsDependencyInjectionExtensions.AddAnalytics(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Boutquin.Curves.Recipes.CurveGroupRecipe.operator !=(Boutquin.Curves.Recipes.CurveGroupRecipe? left, Boutquin.Curves.Recipes.CurveGroupRecipe? right) -> bool
+static Boutquin.Curves.Recipes.CurveGroupRecipe.operator ==(Boutquin.Curves.Recipes.CurveGroupRecipe? left, Boutquin.Curves.Recipes.CurveGroupRecipe? right) -> bool
+static Boutquin.Curves.Recipes.CurveRecipe.operator !=(Boutquin.Curves.Recipes.CurveRecipe? left, Boutquin.Curves.Recipes.CurveRecipe? right) -> bool
+static Boutquin.Curves.Recipes.CurveRecipe.operator ==(Boutquin.Curves.Recipes.CurveRecipe? left, Boutquin.Curves.Recipes.CurveRecipe? right) -> bool
+static Boutquin.Curves.Recipes.CurveSnapshot.operator !=(Boutquin.Curves.Recipes.CurveSnapshot? left, Boutquin.Curves.Recipes.CurveSnapshot? right) -> bool
+static Boutquin.Curves.Recipes.CurveSnapshot.operator ==(Boutquin.Curves.Recipes.CurveSnapshot? left, Boutquin.Curves.Recipes.CurveSnapshot? right) -> bool
 static Boutquin.Curves.Recipes.DataRequestEqualityComparer.Instance.get -> Boutquin.Curves.Recipes.DataRequestEqualityComparer!
 static Boutquin.Curves.Recipes.StandardCurveRecipes.CadCorraDiscount(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!
 static Boutquin.Curves.Recipes.StandardCurveRecipes.CadCorraProjection(Boutquin.MarketData.Abstractions.Calendars.IBusinessCalendar? calendar = null) -> Boutquin.Curves.Recipes.CurveGroupRecipe!

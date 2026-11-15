@@ -38,19 +38,21 @@ def main():
     refs = ''.join(f'<PackageReference Include="{name}" Version="{args.version}"/>' for name in IDS)
     (work / 'nuget.config').write_text(CONFIG)
     (work / 'c.csproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType>'
-                                   f'<TargetFramework>net10.0</TargetFramework></PropertyGroup><ItemGroup>{refs}</ItemGroup></Project>')
+                                   f'<TargetFrameworks>net10.0;net11.0</TargetFrameworks></PropertyGroup><ItemGroup>{refs}</ItemGroup></Project>')
     loads = ''.join(f'Console.WriteLine("{n} " + Assembly.Load("{n}").GetName().Version + " " + '
                     f'Assembly.Load("{n}").GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);\n'
                     for n in IDS)
     (work / 'P.cs').write_text('using System;\nusing System.Reflection;\n' + loads)
     packages = work / 'pk'
     subprocess.run(['dotnet', 'restore', '--packages', str(packages), '--no-cache'], cwd=work, check=True)
-    subprocess.run(['dotnet', 'run', '-c', 'Release', '--no-restore'], cwd=work, check=True)
+    for framework in ('net10.0', 'net11.0'):
+        subprocess.run(['dotnet', 'run', '-c', 'Release', '--no-restore', '--framework', framework], cwd=work, check=True)
     bad = []
     for name in IDS:
         file = f'{name}.{args.version}.nupkg'
         candidate = payload(args.candidate / file)
         published_path = packages / name.lower() / args.version.lower() / file.lower()
+        subprocess.run(['dotnet', 'nuget', 'verify', str(published_path), '--all', '--verbosity', 'detailed'], check=True)
         published = payload(published_path)
         with zipfile.ZipFile(published_path) as archive:
             signed = '.signature.p7s' in archive.namelist()

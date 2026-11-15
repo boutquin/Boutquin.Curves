@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 COMMIT = "a" * 40
 VERSION = "2.0.0-test"
 env = os.environ.copy()
-env["NUGET_PACKAGES"] = str(ROOT / "artifacts/published-storage-20261027/inspector-cache")
+env["NUGET_PACKAGES"] = str(ROOT / "artifacts/package-inspector-controls/cache")
 
 
 def run(args):
@@ -23,6 +23,7 @@ def run(args):
     return result
 
 
+(ROOT / "artifacts").mkdir(exist_ok=True)
 with (ROOT / "artifacts/rc-build.lock").open("a") as lock:
     fcntl.flock(lock, fcntl.LOCK_EX)
     built = run(["dotnet", "build", ROOT / "scripts/package-inspector/PackageInspector.csproj", "--configuration", "Release", "-p:UseSharedCompilation=false"])

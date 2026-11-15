@@ -6,10 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [3.0.0] — 2026-11-14
+
 ### Added
 
 - .NET 11 builds alongside .NET 10, with target-specific stable dependency versions and tests for both frameworks.
 
+### Changed
+
+- Adopt the complete published MarketData and Adapter 3.0.0 family with exact dependency ranges and signed archive provenance. Curves exposes upstream kernel contracts, so callers must migrate the package families together. Curves pricing algorithms are unchanged.
+- Retain published Numerics 2.0.0, Storage 2.0.1 and Domain 1.0.1.
+- Verify immutable release packages, dependency groups, runtime assemblies and portable symbols for both target frameworks before publication.
 
 ## [2.0.0] — 2026-11-02
 
